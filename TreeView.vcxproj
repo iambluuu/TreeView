@@ -139,12 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="TreeView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Hash_Table.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
