@@ -1,19 +1,13 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
-#include "Window.h"
+#include "SharedContext.h"
 
 #include <unordered_map>
 #include <functional>
 
 enum class StateType {
 	MainMenu = 1, HashTable, BinaryTree, AVLTree, TTTree, TTFTree, Trie, Graph, Exit
-};
-
-struct SharedContext {
-	SharedContext() : m_wind(nullptr) {}
-
-	Window* m_wind;
 };
 
 class StateManager;

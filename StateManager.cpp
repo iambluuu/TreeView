@@ -1,4 +1,5 @@
 #include "StateManager.h"
+#include "Hash_Table.h"
 
 StateManager::StateManager(SharedContext* l_shareContext)
 {
