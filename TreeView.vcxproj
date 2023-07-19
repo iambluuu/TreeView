@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="AVL_Tree.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="TreeView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="AVL_Tree.h" />
     <ClInclude Include="NodeRenderer.h" />
     <ClInclude Include="Hash_Table.h" />
     <ClInclude Include="Node.h" />

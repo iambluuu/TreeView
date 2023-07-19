@@ -1,4 +1,5 @@
 #include "StateManager.h"
+#include "AVL_Tree.h"
 #include "Hash_Table.h"
 
 StateManager::StateManager(SharedContext* l_shareContext)
@@ -8,7 +9,7 @@ StateManager::StateManager(SharedContext* l_shareContext)
 	//RegisterState<Main_Menu>(StateType::MainMenu);
 	//RegisterState<Hash_Table>(StateType::HashTable);
 	//RegisterState<Binary_Tree>(StateType::BinaryTree);
-	//RegisterState<AVL_Tree>(StateType::AVLTree);
+	RegisterState<AVL_Tree>(StateType::AVLTree);
 	//RegisterState<TT_Tree>(StateType::TTTree);
 	//RegisterState<TTF_Tree>(StateType::TTFTree);
 	//RegisterState<Trie>(StateType::Trie);

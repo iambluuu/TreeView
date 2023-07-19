@@ -7,5 +7,6 @@ struct SharedContext {
 
 	Window* m_wind;
 	NodeRenderer* m_nodeRenderer;
+
 };
 
