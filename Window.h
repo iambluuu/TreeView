@@ -25,12 +25,15 @@ public:
 	void EndDraw(); //display the changes
 
 	void Update();
+	void Draw(sf::Drawable& l_drawable);
 
 	bool IsDone();
 	bool IsFullscreen();
 	sf::Vector2i GetWindowSize();
 
 	void ToggleFullscreen();
-
-	void Draw(sf::Drawable& l_drawable);
+	
+	sf::RenderWindow* GetRenderWindow() {
+		return &m_window;
+	}
 };

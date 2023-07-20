@@ -3,19 +3,25 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 
-enum class NodeLink {
+enum NodeLink {
 	NLeft = 1, NRight, NMiddle
+};
+
+enum NodeState {
+	Selected, Visited, Default, New, InRemove
 };
 
 struct NodeInfo {
 	sf::Vector2f m_coord{ 0, 0 };
 	std::vector<int> m_shownValue;
 	
-	bool isSelected{ 0 };
-	bool isVisible{ 1 };
-	bool isColorChanging{ 0 };
-	bool isSplitting{ 0 };
-	int isAppearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
+	bool is_visible{ 1 };
+	bool is_colorChanging{ 0 };
+	bool is_splitting{ 0 };
+	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
+
+	int value_num{ 1 };
+	NodeState node_state{ Default };
 };
 
 const NodeInfo DEFAULT_NODE_INFO;

@@ -36,16 +36,8 @@ void AVL_Tree::ClearStep(Node* Cur) {
 	ClearStep(Cur->getLink(NodeLink::NRight));
 }
 
-void AVL_Tree::Generate(bool isRandom) {
-	int treeSize = 0;
-	if (isRandom) {
-		treeSize = rand() % 10 + 1;
-	}
-	else {
-		treeSize = 5; //Subject to change
-	}
-
-
+void AVL_Tree::Generate(Node* Cur, int value) {
+	
 }
 
 Node* AVL_Tree::InsertNode(Node* Cur, int value) {
@@ -77,6 +69,10 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value) {
 
 
 	return Cur;
+}
+
+void AVL_Tree::OnGenerate() {
+
 }
 
 void AVL_Tree::OnInsert() {

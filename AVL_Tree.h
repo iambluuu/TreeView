@@ -3,6 +3,8 @@
 
 class AVL_Tree {
 private:
+	
+	float m_elapsed{ 0.f };
 	bool m_isReversing{ 0 };
 	bool m_isPausing{ 0 };
 	Node* m_root{ nullptr };
@@ -10,7 +12,7 @@ private:
 	Node* m_removedNode{ nullptr };
 
 	Node* InsertNode(Node* Cur, int value);
-	void Generate(bool isRandom);
+	void Generate(Node* Cur, int value);
 	void RemoveNode(Node* Cur, int value);
 
 	void AddNewStep(Node* Cur);
@@ -29,7 +31,7 @@ public:
 	void Update(const sf::Time& l_time);
 	void Draw();
 
-	void OnGenerate(bool isRandom);
+	void OnGenerate();
 	void OnInsert();
 	void OnRemove(int value);
 

@@ -5,9 +5,12 @@
 class App {
 private:
 	StateManager m_stateManager;
+	TextureManager m_textureManager;
+	NodeRenderer m_nodeRenderer;
 	Window m_window;
-	SharedContext m_context;
 
+	SharedContext m_context;
+	
 	sf::Clock m_clock;
 	sf::Time m_elapsed;
 public:
