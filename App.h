@@ -22,7 +22,7 @@ public:
 	}
 
 	void RestartClock() {
-		m_elapsed += m_clock.restart();
+		m_elapsed = m_clock.restart();
 	}
 
 	void HandleInput();

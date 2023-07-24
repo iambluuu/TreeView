@@ -1,7 +1,7 @@
 #pragma once
 #include "StateManager.h"
 
-class AVL_Tree {
+class AVL_Tree : public BaseState {
 private:
 	
 	float m_elapsed{ 0.f };

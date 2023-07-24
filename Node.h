@@ -15,8 +15,9 @@ struct NodeInfo {
 	sf::Vector2f m_coord{ 0, 0 };
 	std::vector<int> m_shownValue;
 	
+	bool is_moving{ 0 };
 	bool is_visible{ 1 };
-	bool is_colorChanging{ 0 };
+	bool is_stateChanging{ 0 };
 	bool is_splitting{ 0 };
 	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
 

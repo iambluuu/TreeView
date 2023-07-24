@@ -1,6 +1,6 @@
 #include "App.h"
 
-App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context) {
+App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context), m_textureManager(cfg_path) {
 	m_context.m_wind = &m_window;
 	m_context.m_textureManager = &m_textureManager;
 	m_context.m_nodeRenderer = &m_nodeRenderer;

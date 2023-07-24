@@ -2,7 +2,15 @@
 #include <assert.h> 
 
 void AVL_Tree::Update(const sf::Time& l_time) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
+	if (!m_isPausing) {
+		float elapsed = l_time.asMilliseconds();
+		if (m_isReversing)
+			elapsed = -elapsed;
+
+		renderer->Update(elapsed);
+	}
 }
 
 void AVL_Tree::Draw() {
@@ -20,6 +28,13 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 	}
 	else {
 		NodeInfo clone = CurInfo->back();
+		clone.is_moving = 0;
+		clone.is_appearing = 0;
+		clone.is_stateChanging = 0;
+		clone.is_expanding = 0;
+		if (clone.node_state == Selected)
+			clone.node_state = Visited;
+
 		CurInfo->push_back(clone);
 	}
 
@@ -48,12 +63,12 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value) {
 	NodeInfo* CurStepInfo = &CurInfo->back();
 
 	if (!Cur) {
-		CurStepInfo->isVisible = 1;
+		CurStepInfo->is_visible = 1;
 		return m_newNode;
 	}
 	
-	CurStepInfo->isSelected = 1;
-	CurStepInfo->isColorChanging = 1;
+	CurStepInfo->node_state = Selected;
+	CurStepInfo->is_stateChanging = 1;
 
 	int CurValue = Cur->getValue(NodeLink::NLeft);
 
