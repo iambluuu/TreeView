@@ -64,5 +64,6 @@ void Window::Update() {
 		if (E.type == sf::Event::Closed) {
 			m_isDone = 1;
 		}
+
 	}
 }

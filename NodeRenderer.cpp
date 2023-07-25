@@ -61,39 +61,41 @@ void NodeRenderer::SpawnNode() {
 }
 
 void NodeRenderer::DrawNode(Node* Cur) {
-	sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
-	std::vector<NodeInfo>* info = Cur->getInfo();
-
-	int i = GetStep();
-	NodeInfo CurInfo = info->at(i);
-	float CurStepElapsed = m_animationCurrent - STEP_DURATION * i;
-
-	if (!CurInfo.is_visible)
+	if (!Cur)
 		return;
 
 	SharedContext* context = m_stateManager->GetContext();
 	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
+	std::vector<NodeInfo>* info = Cur->getInfo();
+
+	int CurStep = GetStep();
+	NodeInfo CurInfo = info->at(CurStep);
+	sf::Vector2f coord = GetPosOnScreen(CurInfo.m_coord);
+	float CurStepElapsed = m_animationCurrent - STEP_DURATION * CurStep;
+
+	if (!CurInfo.is_visible)
+		return;
 
 	NodeGraphics* CurSprite = GetNodeGraphics(CurInfo.value_num); //do something here 
 	sf::Sprite* BorderSprite = &CurSprite->first;
 	sf::Sprite* FillerSprite = &CurSprite->second;
 
-	BorderSprite->setPosition(CurInfo.m_coord);
-	FillerSprite->setPosition(CurInfo.m_coord);
+	BorderSprite->setPosition(coord);
+	FillerSprite->setPosition(coord);
 
-	switch (CurInfo.node_state) {
-	case Visited:
-		BorderSprite->setColor(m_selectedColor);
-		FillerSprite->setColor(sf::Color::White);
-		break;
-	case Selected:
-		BorderSprite->setColor(m_selectedColor);
-		FillerSprite->setColor(m_selectedColor);
-		break;
-	case New:
-	case InRemove:
-	default:
-	}
+	//switch (CurInfo.node_state) {
+	//case Visited:
+	//	BorderSprite->setColor(m_selectedColor);
+	//	FillerSprite->setColor(sf::Color::White);
+	//	break;
+	//case Selected:
+	//	BorderSprite->setColor(m_selectedColor);
+	//	FillerSprite->setColor(m_selectedColor);
+	//	break;
+	//case New:
+	//case InRemove:
+	//default:
+	//}
 
 	if (CurInfo.is_splitting) {
 
@@ -117,8 +119,8 @@ void NodeRenderer::DrawNode(Node* Cur) {
 	wind->draw(*BorderSprite);
 	wind->draw(*FillerSprite);
 
-	float TopPos = CurInfo.m_coord.y + (BorderSprite->getLocalBounds().height / 2);
-	float LeftPos = CurInfo.m_coord.x - (BorderSprite->getLocalBounds().width / 2);
+	float TopPos = coord.y + (BorderSprite->getLocalBounds().height / 2);
+	float LeftPos = coord.x - (BorderSprite->getLocalBounds().width / 2);
 	float spacing = BorderSprite->getLocalBounds().width / (CurInfo.value_num + 1);
 
 	for (int j = 0; j < CurInfo.value_num; j++) {
@@ -131,4 +133,21 @@ void NodeRenderer::DrawNode(Node* Cur) {
 		wind->draw(m_label);
 	}
 
+}
+
+void NodeRenderer::DrawTree(Node* Root)
+{
+	if (!Root)
+		return;
+
+	DrawNode(Root);
+	DrawNode(Root->getLink(NLeft));
+	DrawNode(Root->getLink(NRight));
+}
+
+sf::Vector2f NodeRenderer::GetPosOnScreen(std::pair<int, int> treeCoord) {
+	float X = MIDDLE_LINE + (treeCoord.first - 0.5) * HORIZONTAL_SPACING;
+	float Y = TOP_LINE + treeCoord.second * VERTICAL_SPACING;
+
+	return sf::Vector2f(X, Y);
 }

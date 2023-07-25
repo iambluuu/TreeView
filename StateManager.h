@@ -11,6 +11,7 @@ enum class StateType {
 };
 
 class StateManager;
+struct SharedContext;
 
 //Clase BaseState
 class BaseState {
@@ -22,9 +23,8 @@ protected:
 	bool m_transcendent;
 
 public:
-	BaseState(StateManager* l_stateManager) {
-		m_stateManager = l_stateManager;
-	}
+	BaseState() {}
+	BaseState(StateManager* l_stateManager) :m_stateManager(l_stateManager), m_transparent(false), m_transcendent(false) {}
 
 	virtual ~BaseState() {}
 

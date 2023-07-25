@@ -1,12 +1,13 @@
 #pragma once
 #include "Window.h"
 #include "StateManager.h"
+#include "UIManager.h"
 
 class App {
 private:
 	StateManager m_stateManager;
-	TextureManager m_textureManager;
 	NodeRenderer m_nodeRenderer;
+	UIManager m_uiManager;
 	Window m_window;
 
 	SharedContext m_context;

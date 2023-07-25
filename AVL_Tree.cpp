@@ -1,5 +1,29 @@
 #include "AVL_Tree.h"
+#include "StateManager.h"
 #include <assert.h> 
+
+
+AVL_Tree::~AVL_Tree() {
+
+}
+
+void AVL_Tree::OnCreate() {
+
+}
+
+void AVL_Tree::OnDestroy() {
+
+}
+
+void AVL_Tree::Activate() {
+
+}
+
+void AVL_Tree::Deactivate() {
+
+}
+
+
 
 void AVL_Tree::Update(const sf::Time& l_time) {
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
@@ -14,6 +38,9 @@ void AVL_Tree::Update(const sf::Time& l_time) {
 }
 
 void AVL_Tree::Draw() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	
+	renderer->DrawTree(m_root);
 
 }
 
@@ -25,6 +52,8 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 
 	if (CurInfo->empty()) {
 		CurInfo->push_back(DEFAULT_NODE_INFO);
+		CurInfo->back().m_shownValue = Cur->getValue();
+		
 	}
 	else {
 		NodeInfo clone = CurInfo->back();
@@ -38,8 +67,8 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 		CurInfo->push_back(clone);
 	}
 
-	AddNewStep(Cur->getLink(NodeLink::NLeft));
-	AddNewStep(Cur->getLink(NodeLink::NRight));
+	AddNewStep(Cur->left);
+	AddNewStep(Cur->right);
 }
 
 void AVL_Tree::ClearStep(Node* Cur) {
@@ -47,24 +76,62 @@ void AVL_Tree::ClearStep(Node* Cur) {
 		return;
 
 	Cur->getInfo()->clear();
-	ClearStep(Cur->getLink(NodeLink::NLeft));
-	ClearStep(Cur->getLink(NodeLink::NRight));
+	ClearStep(Cur->left);
+	ClearStep(Cur->right);
 }
 
-void AVL_Tree::Generate(Node* Cur, int value) {
+void AVL_Tree::ShiftOut(Node* Cur, int value) {
+	NodeInfo* CurInfo = &Cur->getInfo()->back();
 	
+	if (value > 0) {
+		if (Cur->getValue()[0]) {
+
+		}
+	}
+
 }
 
-Node* AVL_Tree::InsertNode(Node* Cur, int value) {
+Node* AVL_Tree::Generate(Node* Cur, int value) {
+	if (!Cur) {
+		Cur = new Node();
+
+		Cur->setValue(value);
+		Cur->getInfo()->push_back(DEFAULT_NODE_INFO);
+		Cur->getInfo()->back().is_appearing = 1;
+		Cur->getInfo()->back().m_shownValue = Cur->getValue();
+
+		return Cur;
+	}
+
+	if (value < Cur->getValue()[0])
+		Cur->left = Generate(Cur->left, value);
+
+	if (value > Cur->getValue()[0])
+		Cur->right = Generate(Cur->right, value);
+
+	return Cur;
+}
+
+Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	AddNewStep(m_root);
+	AddNewStep(m_newNode);
+	m_newNode->getInfo()->back().is_visible = 0;
+	
+	if (!Cur)
+		Cur = m_newNode;
 
 	auto CurInfo = Cur->getInfo();
 	assert(!CurInfo->empty()); //make sure there's a NodeInfo for the current step
 	NodeInfo* CurStepInfo = &CurInfo->back();
 
-	if (!Cur) {
+	if (Cur == m_newNode) {
+		CurStepInfo->m_coord = { ver_depth, hor_depth };
 		CurStepInfo->is_visible = 1;
-		return m_newNode;
+		CurStepInfo->is_appearing = 1;
+
+		ShiftOut(m_root, ver_depth);
+
+		return Cur;
 	}
 	
 	CurStepInfo->node_state = Selected;
@@ -73,28 +140,34 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value) {
 	int CurValue = Cur->getValue(NodeLink::NLeft);
 
 	if (value < CurValue) {
-		Cur->setLink(InsertNode(Cur->getLink(NodeLink::NLeft), value), NodeLink::NLeft);
+		Cur->left = InsertNode(Cur->left, value, CurInfo->back().m_coord.second + 1, CurInfo->back().m_coord.first);
 	}
 	else if (value > CurValue) {
-		Cur->setLink(InsertNode(Cur->getLink(NodeLink::NRight), value), NodeLink::NRight);
+		Cur->right = InsertNode(Cur->right, value, CurInfo->back().m_coord.first + 1, CurInfo->back().m_coord.first + 1);
 	}
 	else {
 		//Case where inserted value already exists
 	}
 
+	Cur->height = std::max(Cur->left->height, Cur->right->height) + 1;
 
 	return Cur;
 }
 
 void AVL_Tree::OnGenerate() {
+	 //Subject to change, should get value from text box;
+	std::vector<int> input;
 
+	for (auto value : input) {
+		m_root = InsertNode(m_root, value, 0, 0);
+	}
 }
 
 void AVL_Tree::OnInsert() {
-	std::vector<int> value(3, 0); //Subject to change, it should get value from text box
-	m_newNode = new Node(value);
+	std::vector<int> input = { 3, 5 }; //Subject to change, it should get value from text box
+	m_newNode = new Node(input);
 
-	InsertNode(m_root, value[0]);
+	InsertNode(m_root, input[0], 0, 0);
 }
 
 void AVL_Tree::RemoveNode(Node* Cur, int value) {

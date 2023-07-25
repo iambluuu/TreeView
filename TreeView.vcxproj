@@ -143,6 +143,9 @@
     <ClCompile Include="AVL_Tree.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
     <ClCompile Include="StateManager.cpp" />
+    <ClCompile Include="TextBox.cpp" />
+    <ClCompile Include="UIManager.cpp" />
+    <ClCompile Include="UI_Element.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="TreeView.cpp" />
   </ItemGroup>
@@ -154,7 +157,9 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="SharedContext.h" />
     <ClInclude Include="StateManager.h" />
-    <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="TextBox.h" />
+    <ClInclude Include="UIManager.h" />
+    <ClInclude Include="UI_Element.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

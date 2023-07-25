@@ -1,10 +1,15 @@
 #include "App.h"
 
-App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context), m_textureManager(cfg_path) {
+App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context), m_nodeRenderer(&m_stateManager), m_uiManager(&m_stateManager) {
 	m_context.m_wind = &m_window;
-	m_context.m_textureManager = &m_textureManager;
 	m_context.m_nodeRenderer = &m_nodeRenderer;
-	m_stateManager.SwitchTo(StateType::HashTable);
+	m_stateManager.SwitchTo(StateType::AVLTree);
+}
+
+App::~App() {}
+
+void App::HandleInput() {
+
 }
 
 void App::Update() {

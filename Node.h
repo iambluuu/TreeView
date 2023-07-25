@@ -12,13 +12,14 @@ enum NodeState {
 };
 
 struct NodeInfo {
-	sf::Vector2f m_coord{ 0, 0 };
+	std::pair<int, int> m_coord{ 0, 0 };
 	std::vector<int> m_shownValue;
 	
 	bool is_moving{ 0 };
 	bool is_visible{ 1 };
 	bool is_stateChanging{ 0 };
 	bool is_splitting{ 0 };
+	bool is_expanding{ 0 };
 	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
 
 	int value_num{ 1 };
@@ -29,11 +30,15 @@ const NodeInfo DEFAULT_NODE_INFO;
 
 class Node {
 private:
-	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
 	std::vector<NodeInfo> m_info;
 	std::vector<int> m_value;
+	sf::IntRect m_zone;
 
 public:
+	int height{ 0 };
+	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
+	Node* par{ nullptr };
+
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
 		m_value = l_value;
 		left = l_left;
@@ -74,8 +79,17 @@ public:
 		}
 	}
 
-	sf::Vector2f getCoord(int l_step) {
-		return m_info[l_step].m_coord;
+	void setValue(int l_val) {
+		m_value.push_back(l_val);
+	}
+
+	void setValue(std::vector<int> l_val) {
+		m_value = l_val;
+		sort(m_value.begin(), m_value.end());
+	}
+
+	std::vector<int> getValue() {
+		return m_value;
 	}
 
 	int getValue(NodeLink l_pos) {
@@ -89,8 +103,9 @@ public:
 		}
 	}
 
-	void setCoord(int l_step, sf::Vector2f l_coord) {
-		m_info[l_step].m_coord = l_coord;
+	void setCoord(std::pair<int, int> l_coord)
+	{
+
 	}
 
 };

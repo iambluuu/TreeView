@@ -16,6 +16,7 @@ private:
 	void Destroy();
 	void Create();
 	void Setup(const std::string& l_title, const sf::Vector2u& l_size);
+
 public:
 	Window();
 	Window(const std::string& l_title, const sf::Vector2u& l_size);

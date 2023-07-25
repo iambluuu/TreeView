@@ -2,14 +2,14 @@
 #include "Window.h"
 #include "NodeRenderer.h"
 
+class NodeRenderer;
+
 struct SharedContext {
 	SharedContext() : 
 		m_wind(nullptr),
-		m_nodeRenderer(nullptr),
-		m_textureManager(nullptr) {}
+		m_nodeRenderer(nullptr) {}
 
 	Window* m_wind;
 	NodeRenderer* m_nodeRenderer;
-	TextureManager* m_textureManager;
 };
 
