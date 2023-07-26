@@ -1,45 +1,118 @@
 #include "TextBox.h"
+#include <iostream>
+
+TextBox::TextBox(UIManager* l_owner) {
+	m_owner = l_owner;
+
+	m_sprite = m_owner->GetSprite(ElementName::TextBox, ElementState::Neutral);
+	m_caret.setFillColor(sf::Color::Black);
+	m_caret.setSize(sf::Vector2f(2, 40));
+	m_caret.setOrigin(m_caret.getLocalBounds().left + m_caret.getLocalBounds().width / 2.f, m_caret.getLocalBounds().top + m_caret.getLocalBounds().height / 2.f);
+	m_text.setFont(*m_owner->GetFont());
+	m_text.setCharacterSize(30);
+	
+	m_hitBox.height = m_sprite->getLocalBounds().height;
+	m_hitBox.width = m_sprite->getLocalBounds().width;
+}
 
 void TextBox::SetText(const std::string& l_string) {
 	m_text.setString(l_string);
 }
 
-void TextBox::HandleInput(sf::Event* l_event) {
-	sf::Vector2f mousePos = sf::Vector2f(l_event->mouseButton.x, l_event->mouseButton.y);
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-
-	if (m_hitBox.contains(sf::Vector2i(mousePos))) {
-		wind->setMouseCursor(*m_owner->GetCursor(sf::Cursor::Type::Text));
-		m_state = ElementState::Focused;
-	}
-	
-	if (l_event->type == sf::Event::MouseButtonPressed) {
-		if (m_state == ElementState::Clicked && !m_hitBox.contains(sf::Vector2i(mousePos))) {
-			m_state = ElementState::Neutral;
-		}
-		else if (m_state == ElementState::Focused && m_hitBox.contains(sf::Vector2i(mousePos))) {
-			m_state = ElementState::Clicked;
-		}
-	}
-
-	if (m_state == ElementState::Clicked && l_event->type == sf::Event::TextEntered && m_string.size() < MAX_CHARS) {
-		char c = l_event->text.unicode;
-		m_string += c;
-		m_text.setString(m_string);
-	}
-
+void TextBox::OnClick() {
+	m_state = ElementState::Clicked;
 }
 
-void TextBox::Update() {
-	
+void TextBox::OnHover() {
+	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	wind->setMouseCursor(*m_owner->GetCursor(sf::Cursor::Type::Text));
+	m_state = ElementState::Focused;
+}
+
+void TextBox::OnRelease() {
+	m_state = ElementState::Neutral;
+}
+
+void TextBox::OnLeave() {
+	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	wind->setMouseCursor(*m_owner->GetCursor(sf::Cursor::Type::Arrow));
+	m_state = ElementState::Neutral;
+}
+
+void TextBox::HandleEvent(sf::Event* l_event) {
+
+	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	sf::Vector2i mousePos = sf::Mouse::getPosition(*wind);
+
+	//std::cerr << "Mouse pos: " << mousePos.x << ", " << mousePos.y << std::endl;
+	//std::cerr << "Hitbox: " << m_hitBox.left << ", " << m_hitBox.top << ", " << m_hitBox.width << ", " << m_hitBox.height << std::endl;
+
+	if (m_state == ElementState::Clicked) {
+		if (!m_hitBox.contains(mousePos) && l_event->type == sf::Event::MouseButtonPressed) {
+			OnRelease();
+		}
+
+
+		if (l_event->type == sf::Event::KeyPressed) {
+			auto KeyCode = l_event->key.code;
+
+			if (KeyCode == sf::Keyboard::Backspace) {
+				if (!m_string.empty()) {
+					std::cerr << m_string << " ";
+					m_string.pop_back();
+					std::cerr << m_string << std::endl;
+				}
+
+				return;
+			}
+		}
+		else if (l_event->type == sf::Event::TextEntered) {
+			auto KeyCode = l_event->text.unicode;
+
+			if (KeyCode == 13) {
+				OnRelease();
+				return;
+			}
+
+			if (KeyCode >= 32 && KeyCode <= 126) {
+				m_string += KeyCode;
+			}
+		}
+	}
+	else if (m_hitBox.contains(mousePos)) {
+			if (l_event->type == sf::Event::MouseButtonReleased) {
+				OnClick();
+			}
+			else {
+				OnHover();
+			}
+	} else {
+		OnLeave();
+	}
+}
+
+void TextBox::Update(float l_dT) {
+	m_hitBox.left = m_pos.x;
+	m_hitBox.top = m_pos.y;
+
+	m_sprite->setPosition(m_pos);
+	m_text.setPosition(m_pos.x + 7, m_pos.y + m_sprite->getLocalBounds().height / 2);
+
+	m_sprite = m_owner->GetSprite(ElementName::TextBox, m_state);
+	m_text.setFillColor(*m_owner->GetColor(ElementName::TextBox, m_state));
+
+	int shownLength = std::min((int)m_string.size(), MAX_CHARS_SHOW);
+	std::string shownString = m_string.substr(m_string.size() - shownLength, shownLength);
+	m_text.setString(shownString);
+	m_text.setOrigin(m_text.getLocalBounds().left, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2);
+	m_caret.setPosition(m_text.getPosition().x + m_text.getGlobalBounds().width + 2, m_text.getPosition().y);
 }
 
 void TextBox::Draw() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	wind->draw(*m_sprite);
 	wind->draw(m_text);
-
 	if (m_state == ElementState::Clicked) {
-		m_caret.setPosition(m_text.getPosition().x + m_text.getGlobalBounds().width + 2, m_text.getPosition().y);
 		wind->draw(m_caret);
 	}
 }

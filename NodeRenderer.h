@@ -10,7 +10,7 @@ using NodeGraphics = std::pair<sf::Sprite, sf::Sprite>;
 
 class NodeRenderer {
 private:
-	std::vector<NodeGraphics> m_nodeGraphics;
+	std::vector<NodeGraphics> m_nodeGraphics{ std::vector<NodeGraphics>(4) };
 	StateManager* m_stateManager{ nullptr };
 
 	sf::Color m_selectedColor{ sf::Color(103, 137, 131) };
@@ -35,7 +35,7 @@ private:
 public:
 	NodeRenderer(StateManager* l_manager) {
 		m_stateManager = l_manager;
-		m_nodeGraphics.reserve(4);
+		m_nodeGraphics.resize(4);
 
 		m_texture.loadFromFile("Assets/Texture/NodeSheet.png");
 		m_font.loadFromFile("Assets/Font/OpenSans-SemiBold.ttf");

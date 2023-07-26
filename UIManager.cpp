@@ -1,25 +1,68 @@
 #include "UIManager.h"
 
-void UIManager::PrepareElements() {
-	
+
+UIManager::UIManager(StateManager* stateManager) {
+	std::cerr << "UIManager safe\n";
+
+	m_elements.resize(5);
+	m_themeManager = new ThemeManager();
+	m_stateManager = stateManager;
+	m_uiState = StateType::AVLTree;
+
+	m_font.loadFromFile("Assets/Font/OpenSans-SemiBold.ttf");
+	DefaultCursor.loadFromSystem(sf::Cursor::Arrow);
+	HandCursor.loadFromSystem(sf::Cursor::Hand);
+	TextCursor.loadFromSystem(sf::Cursor::Text);
+
+	BackgroundTexture1.loadFromFile("Assets/Textures/Background.png");
+
+	PrepareElements();
 }
 
-void UIManager::HandleInput(sf::Event* l_event) {
+UIManager::~UIManager() {
 	for (auto layer : m_elements) {
 		for (auto element : layer) {
-			element->HandleInput(l_event);
+			delete element;
+		}
+	}
+
+	delete m_themeManager;
+}
+
+void UIManager::PrepareElements() {
+	TextBox *box = new TextBox(this);
+
+	AddElement(box);
+}
+
+void UIManager::HandleEvent(sf::Event* l_event) {
+	for (auto layer : m_elements) {
+		for (auto element : layer) {
+			element->HandleEvent(l_event);
 		}
 	}
 }
 
+void UIManager::AddElement(BaseElement* element) {
+	m_elements[static_cast<int>(element->GetLayer())].push_back(element);
+}
 
+void UIManager::LoadTheme(int l_ID) {
+	m_theme = l_ID;
+}
 
-void UIManager::draw() {
-	sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
-	
+void UIManager::Update(const sf::Time& l_time) {
 	for (auto layer : m_elements) {
 		for (auto element : layer) {
-			element->Draw(wind);
+			element->Update(l_time.asMilliseconds());
+		}
+	}
+}
+
+void UIManager::Draw() {
+	for (auto layer : m_elements) {
+		for (auto element : layer) {
+			element->Draw();
 		}
 	}
 }
@@ -34,4 +77,16 @@ sf::Cursor* UIManager::GetCursor(sf::Cursor::Type l_type) {
 		default:
 			return &DefaultCursor;
 	}
+}
+
+sf::Color* UIManager::GetColor(ElementName l_name, ElementState l_state) {
+	return m_themeManager->GetColor(m_theme, l_name, l_state);
+}
+
+sf::Sprite* UIManager::GetSprite(ElementName l_name, ElementState l_state) {
+	return m_themeManager->GetSprite(m_theme, l_name, l_state);
+}
+
+sf::Font* UIManager::GetFont() {
+	return &m_font;
 }

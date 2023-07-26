@@ -2,6 +2,9 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 #include "SFML/System.hpp"
+#include "UIManager.h"
+
+class UIManager;
 
 class Window {
 private:
@@ -12,6 +15,8 @@ private:
 	sf::RenderWindow m_window;
 	bool m_isDone;
 	bool m_isFullscreen;
+
+	UIManager* m_uiManager{ nullptr };
 
 	void Destroy();
 	void Create();
@@ -34,6 +39,10 @@ public:
 
 	void ToggleFullscreen();
 	
+	void SetUIManager(UIManager* l_uiManager) {
+		m_uiManager = l_uiManager;
+	}
+
 	sf::RenderWindow* GetRenderWindow() {
 		return &m_window;
 	}

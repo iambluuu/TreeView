@@ -13,7 +13,7 @@ enum NodeState {
 
 struct NodeInfo {
 	std::pair<int, int> m_coord{ 0, 0 };
-	std::vector<int> m_shownValue;
+	std::vector<int> m_shownValue{ std::vector<int>(3) };
 	
 	bool is_moving{ 0 };
 	bool is_visible{ 1 };

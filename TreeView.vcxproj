@@ -111,6 +111,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +129,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +144,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AVL_Tree.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
+    <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TextBox.cpp" />
     <ClCompile Include="UIManager.cpp" />
@@ -158,6 +161,7 @@
     <ClInclude Include="SharedContext.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="TextBox.h" />
+    <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="UI_Element.h" />
     <ClInclude Include="Utilities.h" />

@@ -23,8 +23,9 @@ void Window::Setup(const std::string& l_title, const sf::Vector2u& l_size) {
 }
 
 void Window::Create() {
-	auto style = (m_isFullscreen ? sf::Style::Fullscreen : sf::Style::Default);
+	auto style = (m_isFullscreen ? sf::Style::Fullscreen : sf::Style::Close);
 	m_window.create({ m_windowSize.x, m_windowSize.y, 32 }, m_windowTitle, style);
+	m_window.setFramerateLimit(m_fps);
 }
 
 void Window::Destroy() {
@@ -38,7 +39,7 @@ void Window::ToggleFullscreen() {
 }
 
 void Window::BeginDraw() {
-	m_window.clear(sf::Color::Black);
+	m_window.clear(sf::Color::White);
 }
 
 bool Window::IsDone() {
@@ -63,7 +64,8 @@ void Window::Update() {
 	while (m_window.pollEvent(E)) {
 		if (E.type == sf::Event::Closed) {
 			m_isDone = 1;
+			return;
 		}
-
+		m_uiManager->HandleEvent(&E);
 	}
 }
