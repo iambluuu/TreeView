@@ -2,10 +2,10 @@
 #include "UI_Element.h"
 #include "UIManager.h"
 
-class UIManager;
-
 class TextBox : public BaseElement {
 private:
+	UIManager* m_owner{ nullptr };
+
 	std::string m_string;
 	sf::RectangleShape m_caret;
 	const int MAX_CHARS = 30;
@@ -14,10 +14,9 @@ private:
 	bool ValidateInput();
 
 public:
-	TextBox(UIManager* l_owner);
+	TextBox(UIManager* m_owner);
 
 	void HandleEvent(sf::Event* l_event);
-
 	void OnHover();
 	void OnClick();
 	void OnRelease();

@@ -9,7 +9,6 @@ int main()
     App mainApp;
 
     while (!mainApp.GetWindow()->IsDone()) {
-        mainApp.HandleInput();
         mainApp.Update();
         mainApp.Render();
         mainApp.LateUpdate();

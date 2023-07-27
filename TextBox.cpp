@@ -1,15 +1,23 @@
 #include "TextBox.h"
 #include <iostream>
 
+class UIManager;
+
 TextBox::TextBox(UIManager* l_owner) {
 	m_owner = l_owner;
 
-	m_sprite = m_owner->GetSprite(ElementName::TextBox, ElementState::Neutral);
+	m_themeManager = l_owner->GetThemeManager();
+	m_layer = 1;
+
+	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, ElementState::Neutral);
+
 	m_caret.setFillColor(sf::Color::Black);
 	m_caret.setSize(sf::Vector2f(2, 40));
 	m_caret.setOrigin(m_caret.getLocalBounds().left + m_caret.getLocalBounds().width / 2.f, m_caret.getLocalBounds().top + m_caret.getLocalBounds().height / 2.f);
-	m_text.setFont(*m_owner->GetFont());
+
+	m_text.setFont(*m_themeManager->GetFont());
 	m_text.setCharacterSize(30);
+	m_text.setString("");
 	
 	m_hitBox.height = m_sprite->getLocalBounds().height;
 	m_hitBox.width = m_sprite->getLocalBounds().width;
@@ -25,7 +33,7 @@ void TextBox::OnClick() {
 
 void TextBox::OnHover() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_owner->GetCursor(sf::Cursor::Type::Text));
+	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Text));
 	m_state = ElementState::Focused;
 }
 
@@ -35,12 +43,11 @@ void TextBox::OnRelease() {
 
 void TextBox::OnLeave() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_owner->GetCursor(sf::Cursor::Type::Arrow));
+	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
 	m_state = ElementState::Neutral;
 }
 
 void TextBox::HandleEvent(sf::Event* l_event) {
-
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*wind);
 
@@ -98,8 +105,8 @@ void TextBox::Update(float l_dT) {
 	m_sprite->setPosition(m_pos);
 	m_text.setPosition(m_pos.x + 7, m_pos.y + m_sprite->getLocalBounds().height / 2);
 
-	m_sprite = m_owner->GetSprite(ElementName::TextBox, m_state);
-	m_text.setFillColor(*m_owner->GetColor(ElementName::TextBox, m_state));
+	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, m_state);
+	m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, m_state));
 
 	int shownLength = std::min((int)m_string.size(), MAX_CHARS_SHOW);
 	std::string shownString = m_string.substr(m_string.size() - shownLength, shownLength);
@@ -110,6 +117,10 @@ void TextBox::Update(float l_dT) {
 
 void TextBox::Draw() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+
+	if (!m_sprite)
+		std::cerr << "oof\n";
+
 	wind->draw(*m_sprite);
 	wind->draw(m_text);
 	if (m_state == ElementState::Clicked) {

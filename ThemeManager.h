@@ -1,6 +1,6 @@
 #pragma once
 #include "SFML/Graphics.hpp"
-#include "UIManager.h"
+#include "UI_Element.h"
 #include <iostream>
 
 enum class ElementName;
@@ -21,32 +21,41 @@ private:
 	sf::Texture DisplayArea2;
 
 	sf::Texture Elements;
+	sf::Font m_font;
+
+	sf::Cursor DefaultCursor;
+	sf::Cursor HandCursor;
+	sf::Cursor TextCursor;
 
 public:
-	ThemeManager() {
-		
-		m_themeColor.resize(2);
-		m_themeSprite.resize(2);
-
-		BG1.loadFromFile("Assets/Texture/Background.png");
-		//BG2.loadFromFile("Assets/Texture/Background2.png");
-		Elements.loadFromFile("Assets/Texture/Elements.png");
-		DisplayArea1.loadFromFile("Assets/Texture/DisplayArea.png");
-
-		Initiate();
-		std::cerr << "ThemeManager Initiated\n";
-
-	}
+	ThemeManager();
 
 	void Initiate();
 	
-	sf::Color* GetColor(int ThemeID, ElementName l_name, ElementState l_state) {
-		ThemeColor* theme = &m_themeColor;
-		return &theme->at(ThemeID)[{l_name, l_state}];
+	sf::Color* GetColor(int ThemeID, ElementName l_name, ElementState l_state);
+
+	sf::Sprite* GetSprite(int ThemeID, ElementName l_name, ElementState l_state);
+
+	sf::Font* GetFont() {
+		return &m_font;
 	}
 
-	sf::Sprite* GetSprite(int ThemeID, ElementName l_name, ElementState l_state) {
-		ThemeSprite* theme = &m_themeSprite;
-		return &theme->at(ThemeID)[{l_name, l_state}];
+	sf::Cursor* GetCursor(sf::Cursor::Type l_type) {
+		switch (l_type)
+		{	
+		case sf::Cursor::Arrow:
+			return &DefaultCursor;
+			break;
+	
+		case sf::Cursor::Text:
+			return &TextCursor;
+			break;
+		case sf::Cursor::Hand:
+			return &HandCursor;
+			break;
+
+		default:
+			break;
+		}
 	}
 };

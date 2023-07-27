@@ -1,30 +1,40 @@
 #pragma once
-#include "UIManager.h"
+#include "ThemeManager.h"
+#include "SFML/Graphics.hpp"
+#include "SFML/Window.hpp"
+#include "SFML/System.hpp"
 
-enum class ElementState { Neutral = 1, Focused, Clicked, Hidden };
+enum class ElementName {
+	DrawerButton = 1, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, ActiveTab, InactiveTab
+};
 
-class UIManager;
+enum class ElementState {
+	Neutral = 1, Focused, Clicked, Hidden
+};;
+
+
+class ThemeManager;
 
 class BaseElement {
+	friend class UIManager;
 protected:
 	sf::Sprite* m_sprite{ nullptr };
 	sf::Text m_text;
-	ElementState m_state;
+	ElementState m_state{ElementState::Neutral};
 
 	int m_layer{ 0 };
+	int m_themeID{ 0 };
 	sf::IntRect m_hitBox;
 	sf::Vector2f m_pos {0.f, 0.f};
-
-	UIManager* m_owner{ nullptr };
+	
+	ThemeManager* m_themeManager{ nullptr };
+	//UIManager* m_owner{ nullptr };
 	
 	//std::unordered_map<StateType, std::function<void()>> m_func;
 
 public:
 	BaseElement() {}
-
-	BaseElement(UIManager* l_owner) {
-		m_owner = l_owner;
-	}
+	BaseElement(ThemeManager* l_themeManager) { m_themeManager = l_themeManager; }
 
 	virtual void HandleEvent(sf::Event* l_event) = 0;
 
@@ -35,4 +45,5 @@ public:
 	virtual void Update(float l_dT) = 0;
 	virtual void Draw() = 0;
 	int GetLayer() { return m_layer; }
+	void SetTheme(int l_themeID) { m_themeID = l_themeID; }
 };

@@ -144,6 +144,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AVL_Tree.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
+    <ClCompile Include="StaticElement.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TextBox.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="SharedContext.h" />
     <ClInclude Include="StateManager.h" />
+    <ClInclude Include="StaticElement.h" />
     <ClInclude Include="TextBox.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="UIManager.h" />
