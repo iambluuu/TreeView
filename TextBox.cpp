@@ -65,9 +65,7 @@ void TextBox::HandleEvent(sf::Event* l_event) {
 
 			if (KeyCode == sf::Keyboard::Backspace) {
 				if (!m_string.empty()) {
-					std::cerr << m_string << " ";
 					m_string.pop_back();
-					std::cerr << m_string << std::endl;
 				}
 
 				return;
