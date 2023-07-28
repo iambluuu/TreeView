@@ -143,7 +143,9 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AVL_Tree.cpp" />
+    <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
+    <ClCompile Include="RandomButton.cpp" />
     <ClCompile Include="StaticElement.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="StateManager.cpp" />
@@ -156,9 +158,11 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="AVL_Tree.h" />
+    <ClInclude Include="Drawer.h" />
     <ClInclude Include="NodeRenderer.h" />
     <ClInclude Include="Hash_Table.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="RandomButton.h" />
     <ClInclude Include="SharedContext.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="StaticElement.h" />

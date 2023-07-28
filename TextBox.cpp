@@ -23,8 +23,8 @@ TextBox::TextBox(UIManager* l_owner) {
 	m_hitBox.width = m_sprite->getLocalBounds().width;
 }
 
-void TextBox::SetText(const std::string& l_string) {
-	m_text.setString(l_string);
+void TextBox::SetString(const std::string& l_string) {
+	m_string = l_string;
 }
 
 void TextBox::OnClick() {
@@ -98,20 +98,48 @@ void TextBox::HandleEvent(sf::Event* l_event) {
 	}
 }
 
+void TextBox::SetPosition(sf::Vector2f l_pos) {
+	m_pos = l_pos;
+	m_hitBox.top = l_pos.y;
+	m_hitBox.left = l_pos.x;
+}
+
+void TextBox::SetTheme(int l_themeID) {
+	m_themeID = l_themeID;
+}
+
+void TextBox::GetShownLength() {
+	int limit = m_sprite->getLocalBounds().width - 14;
+	int l = 0, r = m_string.size();
+	int res = 0;
+
+	while (l <= r) {
+		int mid = (l + r) / 2;
+		m_text.setString(m_string.substr(m_string.size() - mid, mid));
+		if (m_text.getLocalBounds().width <= limit) {
+			res = mid;
+			l = mid + 1;
+		}
+		else {
+			r = mid - 1;
+		}
+	}
+
+	m_text.setString(sf::String(m_string.substr(m_string.size() - res, res)));
+	m_text.setOrigin(m_text.getLocalBounds().left, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2);
+}
+
 void TextBox::Update(float l_dT) {
 	m_hitBox.left = m_pos.x;
 	m_hitBox.top = m_pos.y;
 
-	m_sprite->setPosition(m_pos);
 	m_text.setPosition(m_pos.x + 7, m_pos.y + m_sprite->getLocalBounds().height / 2);
-
-	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, m_state);
 	m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, m_state));
 
-	int shownLength = std::min((int)m_string.size(), MAX_CHARS_SHOW);
-	std::string shownString = m_string.substr(m_string.size() - shownLength, shownLength);
-	m_text.setString(shownString);
-	m_text.setOrigin(m_text.getLocalBounds().left, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2);
+	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, m_state);
+	m_sprite->setPosition(m_pos);
+
+	GetShownLength();
 	m_caret.setPosition(m_text.getPosition().x + m_text.getGlobalBounds().width + 2, m_text.getPosition().y);
 }
 

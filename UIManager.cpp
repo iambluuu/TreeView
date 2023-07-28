@@ -22,12 +22,25 @@ UIManager::~UIManager() {
 }
 
 void UIManager::PrepareElements() {
-	StaticElement* background = new StaticElement(this);
+	StaticElement* background = new StaticElement(this, ElementName::Background);
 	std::cerr << "background created\n";
 	AddElement(background);
 
 	TextBox *box = new TextBox(this);
-	AddElement(box);
+	RandomButton* randomButton = new RandomButton(this, box);
+	Drawer* insertDrawer = new Drawer(this, "Insert");
+
+	insertDrawer->AddElement(0, box);
+	insertDrawer->AddElement(0, randomButton);
+
+	AddElement(insertDrawer);
+	
+
+	StaticElement* displayArea = new StaticElement(this, ElementName::DisplayArea);
+	displayArea->SetLayer(2);
+	displayArea->SetPosition(sf::Vector2f(50, 100));
+	AddElement(displayArea);
+
 	std::cerr << "box created\n";
 
 
@@ -38,6 +51,9 @@ void UIManager::HandleEvent(sf::Event* l_event) {
 	sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
 	for (auto layer : m_elements) {
 		for (auto element : layer) {
+			if (element->GetState() == ElementState::Hidden || element->GetState() == ElementState::Deactivate)
+				continue;
+
 			element->HandleEvent(l_event);
 		}
 	}
@@ -54,6 +70,8 @@ void UIManager::LoadTheme(int l_ID) {
 void UIManager::Update(const sf::Time& l_time) {
 	for (auto layer : m_elements) {
 		for (auto element : layer) {
+			if (element->GetState() == ElementState::Hidden)
+				continue;
 			element->Update(l_time.asMilliseconds());
 		}
 	}
@@ -63,6 +81,9 @@ void UIManager::Draw() {
 	sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
 	for (auto layer : m_elements) {
 		for (auto element : layer) {
+			if (element->GetState() == ElementState::Hidden)
+				continue;
+
 			element->Draw();
 		}
 	}

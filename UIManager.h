@@ -8,6 +8,8 @@
 
 #include "StaticElement.h"
 #include "TextBox.h"
+#include "RandomButton.h"
+#include "Drawer.h"
 
 class BaseElement;
 
