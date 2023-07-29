@@ -86,10 +86,10 @@ void ThemeManager::Initiate()
 	ThemeSprite1->emplace(std::pair{ ElementName::InputButton, ElementState::Clicked }, tmpSprite);
 
 	//Drawer sprite
-	tmpSprite.setTextureRect(sf::IntRect(0, 219, 226, 70));
+	tmpSprite.setTextureRect(sf::IntRect(0, 220, 226, 70));
 	ThemeSprite1->emplace(std::pair{ ElementName::Drawer, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::Drawer, ElementState::Deactivate }, tmpSprite);
-	tmpSprite.setTextureRect(sf::IntRect(226, 219, 226, 70));
+	tmpSprite.setTextureRect(sf::IntRect(226, 220, 226, 70));
 	ThemeSprite1->emplace(std::pair{ ElementName::Drawer, ElementState::Focused }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::Drawer, ElementState::Clicked }, tmpSprite);
 

@@ -51,8 +51,6 @@ void TextBox::HandleEvent(sf::Event* l_event) {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*wind);
 
-	//std::cerr << "Mouse pos: " << mousePos.x << ", " << mousePos.y << std::endl;
-	//std::cerr << "Hitbox: " << m_hitBox.left << ", " << m_hitBox.top << ", " << m_hitBox.width << ", " << m_hitBox.height << std::endl;
 
 	if (m_state == ElementState::Clicked) {
 		if (!m_hitBox.contains(mousePos) && l_event->type == sf::Event::MouseButtonPressed) {

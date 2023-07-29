@@ -24,6 +24,10 @@ Drawer::Drawer(UIManager* l_owner, const std::string& l_title) {
 	m_hitBox.height = m_sprite->getLocalBounds().height;
 }
 
+Drawer::~Drawer() {
+	Clear();
+}
+
 void Drawer::HandleEvent(sf::Event* l_event) {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*wind);
@@ -55,8 +59,9 @@ void Drawer::OnHover() {
 }
 
 void Drawer::OnClick() {
-	std::cerr << "Drawer clicked\n";
-	m_isOpened = 1 - m_isOpened;
+	bool tmp = m_isOpened;
+	m_owner->CloseCloset();
+	m_isOpened = 1 - tmp;
 }
 
 void Drawer::OnRelease() {
@@ -73,8 +78,9 @@ void Drawer::OnLeave() {
 
 void Drawer::SetPosition(sf::Vector2f l_pos) {
 	m_pos = l_pos;
-	m_hitBox.top = m_pos.x;
-	m_hitBox.left = m_pos.y;
+
+	m_hitBox.left = m_pos.x;
+	m_hitBox.top = m_pos.y;
 }
 
 void Drawer::Update(float l_dT) {
@@ -84,8 +90,15 @@ void Drawer::Update(float l_dT) {
 	else {
 		m_elapsed = std::min(ANIMATION_SPEED, m_elapsed + l_dT);
 	}
-
+	
 	float percent = m_elapsed / ANIMATION_SPEED;
+
+	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::Drawer, m_state);
+	m_sprite->setPosition(m_pos);
+
+
+	m_arrow->setPosition(m_pos.x + 30, m_pos.y + m_sprite->getLocalBounds().height / 2);
+	m_text.setPosition(m_pos.x + 30 + m_arrow->getLocalBounds().width, m_pos.y + m_sprite->getLocalBounds().height / 2);
 
 	SetElementPosition(percent);
 	m_arrow->setRotation(90 * percent);
@@ -105,12 +118,17 @@ void Drawer::Draw() {
 		}
 	}
 
-	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::Drawer, m_state);
-	m_sprite->setPosition(m_pos);
-
 	wind->draw(*m_sprite);
 	wind->draw(*m_arrow);
 	wind->draw(m_text);
+}
+
+void Drawer::Clear() {
+	for (int i = 0; i < m_elements.size(); i++) {
+		for (int j = 0; j < m_elements[i].size(); j++) {
+			delete m_elements[i][j];
+		}
+	}
 }
 
 void Drawer::SetTheme(int l_themeID) {
@@ -122,9 +140,8 @@ void Drawer::AddElement(int level, BaseElement* l_element) {
 }
 
 void Drawer::SetElementPosition(const float& l_percent) {
-	std::cerr << l_percent << "\n";
-
 	float level_offset = m_sprite->getLocalBounds().height + VERTICAL_SPACING;
+
 	for (int i = 0; i < m_elements.size(); ++i) {
 		if (m_elements[i].size() == 0) {
 			continue;
@@ -144,7 +161,6 @@ void Drawer::SetElementPosition(const float& l_percent) {
 			}
 		}
 
-
 		float CurrentHeight = level_offset * l_percent;
 		float HorizontalOffset = HORIZONTAL_SPACING;
 		for (int j = 0; j < m_elements[i].size(); ++j) {
@@ -152,11 +168,17 @@ void Drawer::SetElementPosition(const float& l_percent) {
 				m_elements[i][j]->SetState(ElementState::Neutral);
 			}
 
-
 			m_elements[i][j]->SetPosition(sf::Vector2f(m_pos.x + HorizontalOffset * l_percent, m_pos.y + CurrentHeight));
 			HorizontalOffset += m_elements[i][j]->GetSprite()->getLocalBounds().width + HORIZONTAL_SPACING;
 		}
 
+		m_heightSpanned = std::max(m_sprite->getLocalBounds().height + VERTICAL_SPACING, level_offset * l_percent + ELEMENT_HEIGHT + VERTICAL_SPACING);
+
 		level_offset += ELEMENT_HEIGHT + VERTICAL_SPACING;
 	}
+
+}
+
+float Drawer::GetHeightSpanned() const {
+	return m_heightSpanned;
 }

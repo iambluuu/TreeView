@@ -21,6 +21,7 @@ enum class StateType;
 class UIManager {
 private:
 	std::vector<std::vector<BaseElement*>> m_elements;
+	std::vector<Drawer*> m_closet;
 
 	StateManager* m_stateManager;
 	ThemeManager* m_themeManager;
@@ -38,6 +39,7 @@ public:
 	void PrepareElements();
 
 	void HandleEvent(sf::Event* l_event);
+	void HandleEventCloset(sf::Event* l_event);
 
 	sf::Font* GetFont();
 
@@ -45,11 +47,13 @@ public:
 	void LoadTheme(int l_ID);
 
 	void AddElement(BaseElement* element);
-	void AddToToolbar(BaseElement* element);
+	void AddToCloset(Drawer* element);
 
 	void Update(const sf::Time& l_time);
+	void UpdateCloset(const sf::Time& l_time);
 	void Draw();
-	void DrawToolbar();
+	void DrawCloset();
+	void CloseCloset();
 
 	StateManager* GetStateManager() { return m_stateManager; }
 	ThemeManager* GetThemeManager() { return m_themeManager; }
