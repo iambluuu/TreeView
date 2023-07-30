@@ -1,13 +1,16 @@
 #pragma once
 #include "SFML/Graphics.hpp"
 #include "UI_Element.h"
+//#include "NodeRenderer.h"
 #include <iostream>
 
+enum class NodeState;
 enum class ElementName;
 enum class ElementState;
 
 using ThemeColor = std::vector<std::map<std::pair<ElementName, ElementState>, sf::Color>>;
 using ThemeSprite = std::vector<std::map<std::pair<ElementName, ElementState>, sf::Sprite>>;
+
 
 class ThemeManager {
 private:
@@ -32,6 +35,8 @@ public:
 
 	void Initiate();
 	
+	std::tuple<sf::Color, sf::Color, sf::Color>* GetNodeColor(int ThemeID, NodeState l_state);
+
 	sf::Color* GetColor(int ThemeID, ElementName l_name, ElementState l_state);
 
 	sf::Sprite* GetSprite(int ThemeID, ElementName l_name, ElementState l_state);

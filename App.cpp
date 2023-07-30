@@ -3,7 +3,7 @@
 
 enum class StateType;
 
-App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context), m_nodeRenderer(&m_stateManager), m_uiManager(&m_stateManager) {
+App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context),  m_uiManager(&m_stateManager), m_nodeRenderer(&m_stateManager) {
 	m_context.m_wind = &m_window;
 	m_context.m_nodeRenderer = &m_nodeRenderer;
 	m_context.m_uiManager = &m_uiManager;
@@ -25,8 +25,8 @@ void App::Update() {
 
 void App::Render() {
 	m_window.BeginDraw();
-	m_stateManager.Draw();
 	m_uiManager.Draw();
+	m_stateManager.Draw();
 	m_window.EndDraw();
 }
 

@@ -7,6 +7,8 @@ const sf::Color DarkBlue = sf::Color(45, 55, 73);
 const sf::Color LightBlue = sf::Color(53, 66, 89);
 const sf::Color LightBeige = sf::Color(240, 233, 210);
 
+
+
 ThemeManager::ThemeManager() {
 	DefaultCursor.loadFromSystem(sf::Cursor::Arrow);
 	HandCursor.loadFromSystem(sf::Cursor::Hand);
@@ -28,6 +30,8 @@ ThemeManager::ThemeManager() {
 
 }
 
+
+
 sf::Color* ThemeManager::GetColor(int ThemeID, ElementName l_name, ElementState l_state) {
 	ThemeColor* theme = &m_themeColor;
 	return &theme->at(ThemeID)[{l_name, l_state}];
@@ -47,6 +51,8 @@ sf::Sprite* ThemeManager::GetSprite(int ThemeID, ElementName l_name, ElementStat
 void ThemeManager::Initiate()
 {
 	//First Theme
+
+	//Sprite
 	auto ThemeSprite1 = &m_themeSprite[0];
 	sf::Sprite tmpSprite;
 
@@ -77,11 +83,11 @@ void ThemeManager::Initiate()
 	ThemeSprite1->emplace(std::pair{ ElementName::RandomButton, ElementState::Clicked }, tmpSprite);
 
 	//InputButton Sprite
-	tmpSprite.setTextureRect(sf::IntRect(0, 52, 52, 56));
+	tmpSprite.setTextureRect(sf::IntRect(52, 0, 52, 56));
 	ThemeSprite1->emplace(std::pair{ ElementName::InputButton, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::InputButton, ElementState::Deactivate }, tmpSprite);
 
-	tmpSprite.setTextureRect(sf::IntRect(0, 156, 52, 56));
+	tmpSprite.setTextureRect(sf::IntRect(156, 0, 52, 56));
 	ThemeSprite1->emplace(std::pair{ ElementName::InputButton, ElementState::Focused }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::InputButton, ElementState::Clicked }, tmpSprite);
 

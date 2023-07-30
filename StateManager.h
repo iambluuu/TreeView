@@ -41,6 +41,10 @@ public:
 	virtual void Update(const sf::Time& l_time) = 0;
 	virtual void Draw() = 0;
 
+	virtual void TestFunc() = 0;
+
+	virtual void OnInsert(const std::vector<int>& l_data) = 0;
+	
 	void setTransparent(const bool& l_transparent) {
 		m_transparent = l_transparent;
 	}
@@ -72,7 +76,7 @@ private:
 	StateFactory m_stateFactory;
 
 	void CreateState(const StateType& l_type);
-	void RemoveState(const StateType& l_type);
+	void RemoveState(const StateType& l_type);  
 
 	template<class T>
 	void RegisterState(const StateType& l_type) {
@@ -92,6 +96,7 @@ public:
 	void ProcessRequests();
 	SharedContext* GetContext();
 
+	BaseState* GetState(const StateType& l_type);
 	bool HasState(const StateType& l_type);
 	void SwitchTo(const StateType& l_type);
 	void Remove(const StateType& l_type);

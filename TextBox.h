@@ -2,12 +2,16 @@
 #include "UI_Element.h"
 #include "UIManager.h"
 #include "RandomButton.h"
+#include "InputButton.h"
 #include "Drawer.h"
 
 class Drawer;
 class RandomButton;
+class InputButton;
 
 class TextBox : public BaseElement {
+	friend class UIManager;
+	friend class InputButton;
 	friend class RandomButton;
 	friend class Drawer;
 private:

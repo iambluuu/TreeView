@@ -1,6 +1,7 @@
 #pragma once
 #include "TextBox.h"
 #include "RandomButton.h"
+#include "InputButton.h"
 
 class TextBox;
 class RandomButton;

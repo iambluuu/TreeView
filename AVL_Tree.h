@@ -7,8 +7,7 @@ private:
 	int m_nodeNum{ 0 };
 	
 	float m_elapsed{ 0.f };
-	bool m_isReversing{ 0 };
-	bool m_isPausing{ 0 };
+
 	Node* m_root{ nullptr };
 	Node* m_newNode{ nullptr };
 	Node* m_removedNode{ nullptr };
@@ -35,13 +34,16 @@ public:
 
 	void Update(const sf::Time& l_time);
 	void Draw();
+	void ResetNodes(Node* Cur);
 
 	void OnGenerate();
-	void OnInsert();
+	void OnInsert(const std::vector<int>& l_value);
 	void OnRemove(int value);
 
 	void RotateLeft();
 	void RotateRight();
 
 	void PostProcessing();
+
+	void TestFunc();
 };

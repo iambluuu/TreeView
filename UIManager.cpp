@@ -1,4 +1,5 @@
 #include "UIManager.h"
+#include "AVL_Tree.h"
 
 UIManager::UIManager(StateManager* stateManager) {
 	std::cerr << "UIManager safe\n";
@@ -9,6 +10,8 @@ UIManager::UIManager(StateManager* stateManager) {
 	m_uiState = StateType::AVLTree;
 
 	PrepareElements();
+
+	SwitchState(StateType::AVLTree);
 }
 
 UIManager::~UIManager() {
@@ -30,16 +33,31 @@ void UIManager::PrepareElements() {
 	std::cerr << "background created\n";
 	AddElement(background);
 
-	TextBox *box = new TextBox(this);
-	RandomButton* randomButton = new RandomButton(this, box);
+	//Insert Drawer
+	TextBox *insertBox = new TextBox(this);
+	insertBox->max_input_char = 1;
+	RandomButton* insertRandom = new RandomButton(this, insertBox);
+	InputButton* insertInput = new InputButton(this, insertBox, Execute::Insert);
+
 	Drawer* insertDrawer = new Drawer(this, "Insert");
 
-	insertDrawer->AddElement(0, box);
-	insertDrawer->AddElement(0, randomButton);
+	insertDrawer->AddElement(0, insertBox);
+	insertDrawer->AddElement(0, insertRandom);
+	insertDrawer->AddElement(0, insertInput);
 
 	AddToCloset(insertDrawer);
 	
+	//Remove Drawer
+	TextBox* removeBox = new TextBox(this);
+	removeBox->max_input_char = 1;
+	RandomButton* removeRandom = new RandomButton(this, removeBox);
+	InputButton* removeInput = new InputButton(this, removeBox, Execute::Remove);
 	Drawer* removeDrawer = new Drawer(this, "Remove");
+
+	removeDrawer->AddElement(0, removeBox);
+	removeDrawer->AddElement(0, removeRandom);
+	removeDrawer->AddElement(0, removeInput);
+
 	AddToCloset(removeDrawer);
 
 
@@ -78,6 +96,15 @@ void UIManager::AddElement(BaseElement* element) {
 
 void UIManager::AddToCloset(Drawer* element) {
 	m_closet.push_back(element);
+}
+
+void UIManager::SwitchState(StateType l_type) {
+	m_uiState = l_type;
+	LoadUI(l_type);
+}
+
+void UIManager::LoadUI(StateType l_type) {
+	//Load tabs and closet using bitmap
 }
 
 void UIManager::LoadTheme(int l_ID) {

@@ -9,6 +9,7 @@
 #include "StaticElement.h"
 #include "TextBox.h"
 #include "RandomButton.h"
+#include "InputButton.h"
 #include "Drawer.h"
 
 class BaseElement;
@@ -43,7 +44,9 @@ public:
 
 	sf::Font* GetFont();
 
-	void loadUI(StateType l_type);
+	void SwitchState(StateType l_type);
+	
+	void LoadUI(StateType l_type);
 	void LoadTheme(int l_ID);
 
 	void AddElement(BaseElement* element);

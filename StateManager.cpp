@@ -68,6 +68,14 @@ SharedContext* StateManager::GetContext() {
 	return m_context;
 }
 
+BaseState* StateManager::GetState(const StateType& l_type) {
+	for (auto itr : m_states) {
+		if (itr.first == l_type) {
+			return itr.second;
+		}
+	}
+}
+
 bool StateManager::HasState(const StateType& l_type) {
 	for (auto itr : m_states) {
 		if (itr.first == l_type) {

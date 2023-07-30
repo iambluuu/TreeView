@@ -7,23 +7,25 @@ enum NodeLink {
 	NLeft = 1, NRight, NMiddle
 };
 
-enum NodeState {
+enum class NodeState {
 	Selected, Visited, Default, New, InRemove
 };
 
 struct NodeInfo {
-	std::pair<int, int> m_coord{ 0, 0 };
+	
 	std::vector<int> m_shownValue{ std::vector<int>(3) };
 	
 	bool is_moving{ 0 };
-	bool is_visible{ 1 };
+	bool is_visible{ 0 };
 	bool is_stateChanging{ 0 };
 	bool is_splitting{ 0 };
 	bool is_expanding{ 0 };
 	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
 
 	int value_num{ 1 };
-	NodeState node_state{ Default };
+	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
+	std::pair<std::pair<int, int>, std::pair<int, int> > m_coord{ {0, 0}, {0, 0} };
+	
 };
 
 const NodeInfo DEFAULT_NODE_INFO;
@@ -35,12 +37,13 @@ private:
 	sf::IntRect m_zone;
 
 public:
+	NodeInfo m_save;
 	int height{ 0 };
 	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
 	Node* par{ nullptr };
 
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
-		m_value = l_value;
+		m_save.m_shownValue = l_value;
 		left = l_left;
 		right = l_right;
 		middle = l_middle;
@@ -79,6 +82,13 @@ public:
 		}
 	}
 
+	int GetHeight() {
+		int HeightLeft = (left) ? left->height : 0;
+		int HeightRight = (right) ? right->height : 0;
+
+		return (HeightLeft > HeightRight) ? HeightLeft + 1 : HeightRight + 1;
+	}
+
 	void setValue(int l_val) {
 		m_value.push_back(l_val);
 	}
@@ -103,9 +113,19 @@ public:
 		}
 	}
 
-	void setCoord(std::pair<int, int> l_coord)
-	{
+	void SaveState() {
+		m_save = m_info.back();
 
+		m_save.is_appearing = 0;
+		m_save.is_expanding = 0;
+		m_save.is_stateChanging = 0;
+
+		m_save.node_state = { NodeState::Default, NodeState::Default };
+
+		if (m_save.is_moving) {
+			m_save.is_moving = 0;
+			m_save.m_coord.first = m_save.m_coord.second;
+		}
 	}
 
 };

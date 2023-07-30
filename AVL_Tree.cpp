@@ -26,15 +26,10 @@ void AVL_Tree::Deactivate() {
 
 
 void AVL_Tree::Update(const sf::Time& l_time) {
+
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
-	if (!m_isPausing) {
-		float elapsed = l_time.asMilliseconds();
-		if (m_isReversing)
-			elapsed = -elapsed;
-
-		renderer->Update(elapsed);
-	}
+	renderer->Update(l_time.asMilliseconds());
 }
 
 void AVL_Tree::Draw() {
@@ -44,6 +39,17 @@ void AVL_Tree::Draw() {
 
 }
 
+void AVL_Tree::ResetNodes(Node* Cur) {
+	if (!Cur)
+		return;
+
+	Cur->SaveState();
+	Cur->getInfo()->clear();
+
+	ResetNodes(Cur->left);
+	ResetNodes(Cur->right);
+}
+
 void AVL_Tree::AddNewStep(Node* Cur) {
 	if (!Cur)
 		return;
@@ -51,18 +57,28 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 	auto CurInfo = Cur->getInfo();
 
 	if (CurInfo->empty()) {
-		CurInfo->push_back(DEFAULT_NODE_INFO);
-		CurInfo->back().m_shownValue = Cur->getValue();
+		CurInfo->push_back(Cur->m_save);
 		
 	}
 	else {
 		NodeInfo clone = CurInfo->back();
-		clone.is_moving = 0;
 		clone.is_appearing = 0;
-		clone.is_stateChanging = 0;
 		clone.is_expanding = 0;
-		if (clone.node_state == Selected)
-			clone.node_state = Visited;
+
+		if (clone.is_moving) {
+			clone.is_moving = 0;
+			clone.m_coord.first = clone.m_coord.second;
+		}
+
+		if (clone.is_stateChanging) {
+			clone.is_stateChanging = 0;
+			clone.node_state.first = clone.node_state.second;
+		}
+
+		if (clone.node_state.first == NodeState::Selected) {
+			clone.is_stateChanging = 1;
+			clone.node_state.second = NodeState::Visited;
+		}
 
 		CurInfo->push_back(clone);
 	}
@@ -113,6 +129,9 @@ Node* AVL_Tree::Generate(Node* Cur, int value) {
 }
 
 Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
+
+	std::cerr << "Inserting " << value << std::endl;
+	
 	AddNewStep(m_root);
 	AddNewStep(m_newNode);
 	m_newNode->getInfo()->back().is_visible = 0;
@@ -125,31 +144,35 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	NodeInfo* CurStepInfo = &CurInfo->back();
 
 	if (Cur == m_newNode) {
-		CurStepInfo->m_coord = { ver_depth, hor_depth };
+
+		CurStepInfo->m_coord.first = { ver_depth, hor_depth };
+		CurStepInfo->node_state = { NodeState::Selected, NodeState::Selected };
 		CurStepInfo->is_visible = 1;
 		CurStepInfo->is_appearing = 1;
 
-		ShiftOut(m_root, ver_depth);
+		std::cerr << "new node\n";
+
+		//ShiftOut(m_root, ver_depth);
 
 		return Cur;
 	}
 	
-	CurStepInfo->node_state = Selected;
+	CurStepInfo->node_state.second = NodeState::Selected;
 	CurStepInfo->is_stateChanging = 1;
 
-	int CurValue = Cur->getValue(NodeLink::NLeft);
+	int CurValue = Cur->getInfo()->back().m_shownValue[0];
 
 	if (value < CurValue) {
-		Cur->left = InsertNode(Cur->left, value, CurInfo->back().m_coord.second + 1, CurInfo->back().m_coord.first);
+		Cur->left = InsertNode(Cur->left, value, CurInfo->back().m_coord.first.second + 1, CurInfo->back().m_coord.first.first - 1);
 	}
 	else if (value > CurValue) {
-		Cur->right = InsertNode(Cur->right, value, CurInfo->back().m_coord.first + 1, CurInfo->back().m_coord.first + 1);
+		Cur->right = InsertNode(Cur->right, value, CurInfo->back().m_coord.first.second + 1, CurInfo->back().m_coord.first.first + 1);
 	}
 	else {
 		//Case where inserted value already exists
 	}
 
-	Cur->height = std::max(Cur->left->height, Cur->right->height) + 1;
+	Cur->height = Cur->GetHeight();
 
 	return Cur;
 }
@@ -163,11 +186,15 @@ void AVL_Tree::OnGenerate() {
 	}
 }
 
-void AVL_Tree::OnInsert() {
-	std::vector<int> input = { 3, 5 }; //Subject to change, it should get value from text box
-	m_newNode = new Node(input);
+void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
+	m_newNode = new Node(l_value);
+	ResetNodes(m_root);
 
-	InsertNode(m_root, input[0], 0, 0);
+	m_root = InsertNode(m_root, l_value[0], 0, 0);
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	renderer->Reset(m_root->getInfo()->size());
+	
 }
 
 void AVL_Tree::RemoveNode(Node* Cur, int value) {
@@ -186,4 +213,8 @@ void AVL_Tree::PostProcessing() {
 	delete m_removedNode;
 	m_removedNode = nullptr;
 	m_newNode = nullptr;
+}
+
+void AVL_Tree::TestFunc() {
+	std::cerr << "it works\n";
 }
