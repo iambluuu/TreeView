@@ -96,15 +96,34 @@ void AVL_Tree::ClearStep(Node* Cur) {
 	ClearStep(Cur->right);
 }
 
-void AVL_Tree::ShiftOut(Node* Cur, int value) {
-	NodeInfo* CurInfo = &Cur->getInfo()->back();
-	
-	if (value > 0) {
-		if (Cur->getValue()[0]) {
+void AVL_Tree::ShiftRight(int value) {
+	int index = value + ALIGN_OFFSET;
 
-		}
+	while (m_align[index]) {
+		index++;
 	}
 
+	for (int i = index; i > value + ALIGN_OFFSET; i--) {
+		m_align[i] = m_align[i - 1];
+		m_align[i]->getInfo()->back().is_moving = 1;
+		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first + 1;
+	}
+}
+
+void AVL_Tree::ShiftLeft(int value) {
+	// Shift left all value lesser than value
+
+	int index = value + ALIGN_OFFSET;
+
+	while (m_align[index]) {
+		index--;
+	}
+
+	for (int i = index; i < value + ALIGN_OFFSET; i++) {
+		m_align[i] = m_align[i + 1];
+		m_align[i]->getInfo()->back().is_moving = 1;
+		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first - 1;
+	}
 }
 
 Node* AVL_Tree::Generate(Node* Cur, int value) {
@@ -146,13 +165,31 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	if (Cur == m_newNode) {
 
 		CurStepInfo->m_coord.first = { ver_depth, hor_depth };
+		CurStepInfo->m_coord.second = { ver_depth, hor_depth };
 		CurStepInfo->node_state = { NodeState::Selected, NodeState::Selected };
 		CurStepInfo->is_visible = 1;
 		CurStepInfo->is_appearing = 1;
 
 		std::cerr << "new node\n";
 
-		//ShiftOut(m_root, ver_depth);
+		if (m_align[ver_depth +	ALIGN_OFFSET]) {
+
+			if (CurStepInfo->m_shownValue[0] > m_align[ver_depth + ALIGN_OFFSET]->getInfo()->back().m_shownValue[0]) {
+				ShiftRight(ver_depth + 1);
+				m_align[ver_depth + ALIGN_OFFSET + 1] = Cur;
+				CurStepInfo->m_coord.first = { ver_depth + 1, hor_depth };
+				CurStepInfo->m_coord.second = { ver_depth + 1, hor_depth };
+			}
+			else {
+				ShiftLeft(ver_depth - 1);
+				m_align[ver_depth + ALIGN_OFFSET - 1] = Cur;
+				CurStepInfo->m_coord.first = { ver_depth - 1, hor_depth };
+				CurStepInfo->m_coord.second = { ver_depth - 1, hor_depth };
+			}
+		}
+		else {
+			m_align[ver_depth + ALIGN_OFFSET] = Cur;
+		}
 
 		return Cur;
 	}

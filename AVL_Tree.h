@@ -3,6 +3,9 @@
 
 class AVL_Tree : public BaseState {
 private:
+	std::vector<Node*> m_align;
+	const int ALIGN_OFFSET{ 10 };
+
 	const int MAX_NODE_NUM{ 15 };
 	int m_nodeNum{ 0 };
 	
@@ -16,14 +19,18 @@ private:
 	Node* Generate(Node* Cur, int value);
 	void RemoveNode(Node* Cur, int value);
 
-	void ShiftIn(Node* Cur, int value);
-	void ShiftOut(Node* Cur, int value);
+	void ShiftLeft(int value);
+	void ShiftRight(int value);
 
 	void AddNewStep(Node* Cur);
 	void ClearStep(Node* Cur);
 
 public:
-	AVL_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {}
+	AVL_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {
+		m_align.resize(20);
+		fill(m_align.begin(), m_align.end(), nullptr);
+	}
+
 	~AVL_Tree();
 
 	void OnCreate();

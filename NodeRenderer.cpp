@@ -146,11 +146,42 @@ void NodeRenderer::ChangeState(const NodeInfo& l_info, const float percent) {
 }
 
 void NodeRenderer::DespawnNode(const NodeInfo& l_info, float percent) {
-
+	SpawnNode(l_info, 1 - percent);
 }
 
 void NodeRenderer::MoveNode(const NodeInfo& l_info, float percent) {
+	SharedContext* context = m_stateManager->GetContext();
+	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
 
+	NodeGraphics* CurSprite = GetNodeGraphics(l_info.value_num); //do something here 
+	sf::Sprite* BorderSprite = &CurSprite->first;
+	sf::Sprite* FillerSprite = &CurSprite->second;
+
+	m_label.setString(std::to_string(l_info.m_shownValue[0]));
+	m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
+
+	auto color = GetNodeColor(0, l_info.node_state.first); //subject to change, 0 to theme id
+
+	BorderSprite->setColor(std::get<0>(*color));
+	FillerSprite->setColor(std::get<1>(*color));
+	m_label.setFillColor(std::get<2>(*color));
+
+	m_label.setScale(1, 1);
+	BorderSprite->setScale(1, 1);
+	FillerSprite->setScale(1, 1);
+
+	sf::Vector2f startCoord = GetPosOnScreen(l_info.m_coord.first);
+	sf::Vector2f endCoord = GetPosOnScreen(l_info.m_coord.second);
+
+	sf::Vector2f CurCoord = startCoord + (endCoord - startCoord) * percent;
+
+	BorderSprite->setPosition(CurCoord);
+	FillerSprite->setPosition(CurCoord);
+	m_label.setPosition(CurCoord);
+
+	wind->draw(*FillerSprite);
+	wind->draw(*BorderSprite);
+	wind->draw(m_label);
 }
 
 void NodeRenderer::DrawNode(Node* Cur) {
@@ -161,70 +192,68 @@ void NodeRenderer::DrawNode(Node* Cur) {
 	int CurStep = GetStep();
 
 	NodeInfo CurInfo = info->at(CurStep);
+	if (!CurInfo.is_visible)
+		return;
 
 	float CurStepElapsed = m_animationCurrent - STEP_DURATION * CurStep;
 	float percent = CurStepElapsed / STEP_DURATION;
 
-	if (!CurInfo.is_visible)
-		return;
 
-	//switch (CurInfo.node_state) {
-	//case Visited:
-	//	BorderSprite->setColor(m_selectedColor);
-	//	FillerSprite->setColor(sf::Color::White);
-	//	break;
-	//case Selected:
-	//	BorderSprite->setColor(m_selectedColor);
-	//	FillerSprite->setColor(m_selectedColor);
-	//	break;
-	//case New:
-	//case InRemove:
-	//default:
-	//}
+	SharedContext* context = m_stateManager->GetContext();
+	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
 
+	NodeGraphics* CurSprite = GetNodeGraphics(CurInfo.value_num); //do something here 
+	sf::Sprite* BorderSprite = &CurSprite->first;
+	sf::Sprite* FillerSprite = &CurSprite->second;
+
+	m_label.setString(std::to_string(CurInfo.m_shownValue[0]));
+	m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 
 	if (CurInfo.is_splitting) {
 
 		return;
 	}
 
-	if (CurInfo.is_moving) {
-		MoveNode(CurInfo, percent);
-		return;
-	}
-
-	if (CurInfo.is_appearing) {
-		SpawnNode(CurInfo, percent);
-		return;
-	}
-
-	if (CurInfo.is_stateChanging) {
-
-		ChangeState(CurInfo, percent);
-		return;
-	}
-
-
-	SharedContext* context = m_stateManager->GetContext();
-	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
-
-	NodeGraphics* CurSprite = GetNodeGraphics(CurInfo.m_shownValue.size()); //do something here 
-	sf::Sprite* BorderSprite = &CurSprite->first;
-	sf::Sprite* FillerSprite = &CurSprite->second;
 	sf::Vector2f coord = GetPosOnScreen(CurInfo.m_coord.first);
+	if (CurInfo.is_moving) {
+		sf::Vector2f startCoord = GetPosOnScreen(CurInfo.m_coord.first);
+		sf::Vector2f endCoord = GetPosOnScreen(CurInfo.m_coord.second);
 
-	auto color = GetNodeColor(0, CurInfo.node_state.first); //subject to change, 0 to theme id
-
-	BorderSprite->setColor(std::get<0>(*color));
-	FillerSprite->setColor(std::get<1>(*color));
-	m_label.setFillColor(std::get<2>(*color));
-
-	m_label.setScale(1, 1);
-	BorderSprite->setScale(1, 1);
-	FillerSprite->setScale(1, 1);
+		coord = startCoord + (endCoord - startCoord) * percent;
+	}
 
 	BorderSprite->setPosition(coord);
 	FillerSprite->setPosition(coord);
+	m_label.setPosition(coord);
+
+
+	if (CurInfo.is_appearing) {
+		m_label.setScale(percent, percent);
+		BorderSprite->setScale(percent, percent);
+		FillerSprite->setScale(percent, percent);
+	}
+	else {
+		m_label.setScale(1, 1);
+		BorderSprite->setScale(1, 1);
+		FillerSprite->setScale(1, 1);
+	}
+
+	
+	if (CurInfo.is_stateChanging) {
+		auto startColor = GetNodeColor(0, CurInfo.node_state.first); //subject to change, 0 to theme id
+		auto endColor = GetNodeColor(0, CurInfo.node_state.second); //subject to change, 0 to theme id
+
+		BorderSprite->setColor(GetColorTransition(percent, std::get<0>(*startColor), std::get<0>(*endColor)));
+		FillerSprite->setColor(GetColorTransition(percent, std::get<1>(*startColor), std::get<1>(*endColor)));
+		m_label.setFillColor(GetColorTransition(percent, std::get<2>(*startColor), std::get<2>(*endColor)));
+	}
+	else {
+		auto color = GetNodeColor(0, CurInfo.node_state.first); //subject to change, 0 to theme id
+
+		BorderSprite->setColor(std::get<0>(*color));
+		FillerSprite->setColor(std::get<1>(*color));
+		m_label.setFillColor(std::get<2>(*color));
+	}
 
 	wind->draw(*FillerSprite);
 	wind->draw(*BorderSprite);

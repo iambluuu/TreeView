@@ -29,7 +29,7 @@ private:
 	float m_speedupRate{ 0.f };
 	int m_stepNum{ 0 };
 
-	const float TOP_LINE = 200;
+	const float TOP_LINE = 250;
 	const float MIDDLE_LINE = 592;
 	const float HORIZONTAL_SPACING = 46;
 	const float VERTICAL_SPACING = 70;
