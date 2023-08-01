@@ -47,6 +47,10 @@ void InputButton::OnClick() {
 		state->OnInsert(m_textBox->ReadNum());
 		break;
 
+	case Execute::Remove:
+		state->OnRemove(m_textBox->ReadNum()[0]);
+		break;
+
 	default:
 		break;
 	

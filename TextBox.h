@@ -16,6 +16,7 @@ class TextBox : public BaseElement {
 	friend class Drawer;
 private:
 	UIManager* m_owner{ nullptr };
+	InputButton* m_inputButton{ nullptr };
 
 	std::string m_string;
 	sf::RectangleShape m_caret;

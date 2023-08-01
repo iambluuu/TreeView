@@ -17,10 +17,12 @@ private:
 
 	Node* InsertNode(Node* Cur, int value, int hor_depth, int ver_depth);
 	Node* Generate(Node* Cur, int value);
-	void RemoveNode(Node* Cur, int value);
+	Node* RemoveNode(Node* Cur, int value);
 
 	void ShiftLeft(int value);
 	void ShiftRight(int value);
+	void ShiftUp(Node* Cur);
+	void ShiftDown(Node* Cur);
 
 	void AddNewStep(Node* Cur);
 	void ClearStep(Node* Cur);
@@ -47,8 +49,8 @@ public:
 	void OnInsert(const std::vector<int>& l_value);
 	void OnRemove(int value);
 
-	void RotateLeft();
-	void RotateRight();
+	Node* RotateLeft(Node* Cur);
+	Node* RotateRight(Node* Cur);
 
 	void PostProcessing();
 

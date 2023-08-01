@@ -21,10 +21,13 @@ struct NodeInfo {
 	bool is_splitting{ 0 };
 	bool is_expanding{ 0 };
 	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
+	bool is_valueChanging{ 0 };
 
 	int value_num{ 1 };
+	int m_bf{ 0 };
 	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
 	std::pair<std::pair<int, int>, std::pair<int, int> > m_coord{ {0, 0}, {0, 0} };
+	std::pair<int, int> m_valueChange{ 0, 0 };
 	
 };
 
@@ -36,11 +39,15 @@ private:
 	std::vector<int> m_value;
 	sf::IntRect m_zone;
 
+
 public:
+	int m_type{ 0 }; //0 AVL, 1 TT, 2 TTFT, 3 Trie
+
 	NodeInfo m_save;
 	int height{ 0 };
 	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
 	Node* par{ nullptr };
+	
 
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
 		m_save.m_shownValue = l_value;
@@ -89,6 +96,13 @@ public:
 		return (HeightLeft > HeightRight) ? HeightLeft + 1 : HeightRight + 1;
 	}
 
+	int GetBalance() {
+		int HeightLeft = (left) ? left->height : 0;
+		int HeightRight = (right) ? right->height : 0;
+
+		return HeightLeft - HeightRight;
+	}
+
 	void setValue(int l_val) {
 		m_value.push_back(l_val);
 	}
@@ -99,7 +113,7 @@ public:
 	}
 
 	std::vector<int> getValue() {
-		return m_value;
+		return m_info.back().m_shownValue;
 	}
 
 	int getValue(NodeLink l_pos) {
@@ -125,6 +139,16 @@ public:
 		if (m_save.is_moving) {
 			m_save.is_moving = 0;
 			m_save.m_coord.first = m_save.m_coord.second;
+		}
+
+		if (m_save.is_valueChanging) {
+			m_save.is_valueChanging = 0;
+
+			for (auto& v : m_save.m_shownValue)
+				if (v == m_save.m_valueChange.first)
+					v = m_save.m_valueChange.second;
+
+			m_save.m_valueChange.first = m_save.m_valueChange.second;
 		}
 	}
 

@@ -36,7 +36,7 @@ void AVL_Tree::Draw() {
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	
 	renderer->DrawTree(m_root);
-
+	renderer->DrawNode(m_removedNode);
 }
 
 void AVL_Tree::ResetNodes(Node* Cur) {
@@ -62,15 +62,20 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 	}
 	else {
 		NodeInfo clone = CurInfo->back();
-		clone.is_appearing = 0;
 		clone.is_expanding = 0;
+
+		if (clone.is_appearing == 2) {
+			clone.is_visible = 0;
+		}
+
+		clone.is_appearing = 0;
 
 		if (clone.is_moving) {
 			clone.is_moving = 0;
 			clone.m_coord.first = clone.m_coord.second;
 		}
 
-		if (clone.is_stateChanging) {
+		if (clone.is_stateChanging == 1) {
 			clone.is_stateChanging = 0;
 			clone.node_state.first = clone.node_state.second;
 		}
@@ -78,6 +83,12 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 		if (clone.node_state.first == NodeState::Selected) {
 			clone.is_stateChanging = 1;
 			clone.node_state.second = NodeState::Visited;
+		}
+		
+		if (clone.is_valueChanging) {
+			clone.is_valueChanging = 0;
+			clone.m_valueChange.first = clone.m_valueChange.second;
+			clone.m_shownValue[0] = clone.m_valueChange.first;
 		}
 
 		CurInfo->push_back(clone);
@@ -108,12 +119,16 @@ void AVL_Tree::ShiftRight(int value) {
 		m_align[i]->getInfo()->back().is_moving = 1;
 		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first + 1;
 	}
+
+	m_align[value + ALIGN_OFFSET] = nullptr;
 }
 
 void AVL_Tree::ShiftLeft(int value) {
 	// Shift left all value lesser than value
 
 	int index = value + ALIGN_OFFSET;
+
+
 
 	while (m_align[index]) {
 		index--;
@@ -124,6 +139,32 @@ void AVL_Tree::ShiftLeft(int value) {
 		m_align[i]->getInfo()->back().is_moving = 1;
 		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first - 1;
 	}
+
+	m_align[value + ALIGN_OFFSET] = nullptr;
+}
+
+void AVL_Tree::ShiftUp(Node* Cur) {
+	if (!Cur)
+		return;
+
+	NodeInfo* CurInfo = &Cur->getInfo()->back();
+	CurInfo->is_moving = 1;
+	CurInfo->m_coord.second.second = CurInfo->m_coord.first.second - 1;
+
+	ShiftUp(Cur->left);
+	ShiftUp(Cur->right);
+}
+
+void AVL_Tree::ShiftDown(Node* Cur) {
+	if (!Cur)
+		return;
+
+	NodeInfo* CurInfo = &Cur->getInfo()->back();
+	CurInfo->is_moving = 1;
+	CurInfo->m_coord.second.second = CurInfo->m_coord.first.second + 1;
+
+	ShiftDown(Cur->left);
+	ShiftDown(Cur->right);
 }
 
 Node* AVL_Tree::Generate(Node* Cur, int value) {
@@ -191,11 +232,14 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 			m_align[ver_depth + ALIGN_OFFSET] = Cur;
 		}
 
+		Cur->height = 1;
+
 		return Cur;
 	}
-	
+
 	CurStepInfo->node_state.second = NodeState::Selected;
 	CurStepInfo->is_stateChanging = 1;
+	CurStepInfo->m_bf = Cur->GetBalance();
 
 	int CurValue = Cur->getInfo()->back().m_shownValue[0];
 
@@ -210,8 +254,147 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	}
 
 	Cur->height = Cur->GetHeight();
+	int balance = Cur->GetBalance();
+
+	AddNewStep(m_root);
+	CurStepInfo = &CurInfo->back();
+
+	CurStepInfo->is_stateChanging = 1;
+	CurStepInfo->node_state.second = NodeState::Selected;
+	CurStepInfo->m_bf = balance;
+
+	if (balance > 1 && value < Cur->left->getValue()[0]) {
+		return RotateRight(Cur);
+	}
+
+	if (balance < -1 && value > Cur->right->getValue()[0]) {
+		return RotateLeft(Cur);
+	}
+
+	if (balance > 1 && value > Cur->left->getValue()[0]) {
+		Cur->left = RotateLeft(Cur->left);
+		return RotateRight(Cur);
+	}
+
+	if (balance < -1 && value < Cur->right->getValue()[0]) {
+		Cur->right = RotateRight(Cur->right);
+		return RotateLeft(Cur);
+	}
+
 
 	return Cur;
+}
+
+Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
+	if (!Cur)
+		return Cur;
+
+	AddNewStep(m_root);
+
+	auto CurInfo = Cur->getInfo();
+	assert(!CurInfo->empty()); //make sure there's a NodeInfo for the current step
+	NodeInfo* CurStepInfo = &CurInfo->back();
+
+	CurStepInfo->node_state.second = NodeState::Selected;
+	CurStepInfo->is_stateChanging = 1;
+	CurStepInfo->m_bf = Cur->GetBalance();
+
+	int CurValue = Cur->getInfo()->back().m_shownValue[0];
+
+	if (value > CurValue) {
+		Cur->right = RemoveNode(Cur->right, value);
+	}
+	else if (value < CurValue) {
+		Cur->left = RemoveNode(Cur->left, value);
+	}
+	else {
+		if (Cur->left == nullptr || Cur->right == nullptr) {
+			Node* temp = Cur->left ? Cur->left : Cur->right;
+
+			if (temp == nullptr) {
+				Cur->getInfo()->back().is_appearing = 2;
+				m_removedNode = Cur;
+				Cur = nullptr;
+			}
+			else {
+				std::pair<int, int> tempCoord = CurInfo->back().m_coord.first;
+
+				Cur->getInfo()->back().is_appearing = 2;
+				m_removedNode = Cur;
+				temp->getInfo()->back().is_moving = 1;
+				temp->getInfo()->back().m_coord.second = tempCoord;
+				Cur = temp;
+			}
+		}
+		else {
+			Node* temp = Cur->right;
+
+			while (temp->left != nullptr) {
+				AddNewStep(m_root);
+				CurStepInfo = &CurInfo->back();
+				CurStepInfo->is_stateChanging = 0;
+				CurStepInfo->node_state = { NodeState::Selected, NodeState::Selected };
+
+				temp->getInfo()->back().is_stateChanging = 1;
+				temp->getInfo()->back().node_state.second = NodeState::Selected;
+
+				temp = temp->left;
+			}
+
+			AddNewStep(m_root);
+
+			CurStepInfo = &CurInfo->back();
+
+			CurStepInfo->is_valueChanging = 1;
+			CurStepInfo->m_valueChange.first = Cur->getValue()[0];
+			CurStepInfo->m_valueChange.second = temp->getValue()[0];
+
+			CurStepInfo->is_stateChanging = 0;
+			CurStepInfo->node_state = { NodeState::Selected, NodeState::Selected };
+
+			Cur->right = RemoveNode(Cur->right, temp->getValue()[0]);
+		}
+
+		return Cur;
+	}	
+
+	Cur->height = Cur->GetHeight();
+	int balance = Cur->GetBalance();
+
+	std::cerr << "Value: " << Cur->getValue()[0] << std::endl;
+
+	std::cerr << "Balance: " << balance << std::endl;
+	std::cerr << "Height: " << Cur->height << std::endl;
+
+	AddNewStep(m_root);
+	AddNewStep(m_removedNode);
+	CurStepInfo = &CurInfo->back();
+
+	CurStepInfo->is_stateChanging = 1;
+	CurStepInfo->node_state.second = NodeState::Selected;
+	CurStepInfo->m_bf = balance;
+
+	if (balance > 1 && value < Cur->left->getValue()[0]) {
+		return RotateRight(Cur);
+	}
+
+	if (balance < -1 && value > Cur->right->getValue()[0]) {
+		return RotateLeft(Cur);
+	}
+
+	if (balance > 1 && value > Cur->left->getValue()[0]) {
+		Cur->left = RotateLeft(Cur->left);
+		return RotateRight(Cur);
+	}
+
+	if (balance < -1 && value < Cur->right->getValue()[0]) {
+		Cur->right = RotateRight(Cur->right);
+		return RotateLeft(Cur);
+	}
+
+
+	return Cur;
+
 }
 
 void AVL_Tree::OnGenerate() {
@@ -224,6 +407,7 @@ void AVL_Tree::OnGenerate() {
 }
 
 void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
+	PostProcessing();
 	m_newNode = new Node(l_value);
 	ResetNodes(m_root);
 
@@ -234,16 +418,62 @@ void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
 	
 }
 
-void AVL_Tree::RemoveNode(Node* Cur, int value) {
+void AVL_Tree::OnRemove(int value) {
+	PostProcessing();
+	ResetNodes(m_root);
 
+	m_root = RemoveNode(m_root, value);
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	renderer->Reset(m_root->getInfo()->size());
 }
 
-void AVL_Tree::RotateLeft() {
+Node* AVL_Tree::RotateLeft(Node* Cur) {
+	AddNewStep(m_root);
 
+	NodeInfo* CurInfo = &Cur->getInfo()->back();
+
+	Node* Right = Cur->right;
+	Node* RightsLeft = Right->left;
+
+	Right->left = nullptr;
+	ShiftUp(Right);
+
+	Right->left = Cur;
+	Cur->right = nullptr;
+	ShiftDown(Right->left);
+	
+	Cur->right = RightsLeft;
+
+	Cur->height = Cur->GetHeight();
+	std::cerr << "Node: " << Cur->getValue()[0] << " height: " << Cur->height << "\n";
+	Right->height = Right->GetHeight();
+	std::cerr << "Right: " << Right->getValue()[0] << " height: " << Right->height << "\n";
+
+	return Right;
 }
 
-void AVL_Tree::RotateRight() {
+Node* AVL_Tree::RotateRight(Node* Cur) {
+	AddNewStep(m_root);
 
+	NodeInfo* CurInfo = &Cur->getInfo()->back();
+
+	Node* Left = Cur->left;
+	Node* LeftsRight = Left->right;
+
+	Left->right = nullptr;
+	ShiftUp(Left);
+
+	Left->right = Cur;
+	Cur->left = nullptr;
+	ShiftDown(Left->right);
+
+	Cur->left = LeftsRight;
+
+	Cur->height = Cur->GetHeight();
+	Left->height = Left->GetHeight();
+
+	return Left;
 }
 
 void AVL_Tree::PostProcessing() {

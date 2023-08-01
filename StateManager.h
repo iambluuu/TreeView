@@ -44,6 +44,7 @@ public:
 	virtual void TestFunc() = 0;
 
 	virtual void OnInsert(const std::vector<int>& l_data) = 0;
+	virtual void OnRemove(int value) = 0;
 	
 	void setTransparent(const bool& l_transparent) {
 		m_transparent = l_transparent;
@@ -82,7 +83,7 @@ private:
 	void RegisterState(const StateType& l_type) {
 		m_stateFactory[l_type] = [this]() -> BaseState*
 		{
-			return new T(this);
+			return new T (this);
 		};
 	}
 

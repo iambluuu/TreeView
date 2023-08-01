@@ -68,6 +68,17 @@ void TextBox::HandleEvent(sf::Event* l_event) {
 
 				return;
 			}
+
+			if (KeyCode == sf::Keyboard::Escape) {
+				OnRelease();
+				return;
+			}
+
+			if (KeyCode == sf::Keyboard::Return) {
+				m_inputButton->OnClick();
+				OnRelease();
+				return;
+			}
 		}
 		else if (l_event->type == sf::Event::TextEntered) {
 			auto KeyCode = l_event->text.unicode;

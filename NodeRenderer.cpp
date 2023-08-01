@@ -81,109 +81,6 @@ NodeGraphics* NodeRenderer::GetNodeGraphics(int valueNum) {
 	return &m_nodeGraphics[valueNum - 1];
 }
 
-void NodeRenderer::SpawnNode(const NodeInfo& l_info, float percent) {
-
-	SharedContext* context = m_stateManager->GetContext();
-	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
-
-	NodeGraphics* CurSprite = GetNodeGraphics(l_info.value_num); //do something here 
-	sf::Sprite* BorderSprite = &CurSprite->first;
-	sf::Sprite* FillerSprite = &CurSprite->second;
-	sf::Vector2f coord = GetPosOnScreen(l_info.m_coord.first);
-
-	m_label.setString(std::to_string(l_info.m_shownValue[0]));
-	m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
-	m_label.setPosition(coord);
-	
-	auto color = GetNodeColor(0, l_info.node_state.first); //subject to change, 0 to theme id
-	
-	BorderSprite->setColor(std::get<0>(*color));
-	FillerSprite->setColor(std::get<1>(*color));
-	m_label.setFillColor(std::get<2>(*color));
-
-	BorderSprite->setPosition(coord);
-	FillerSprite->setPosition(coord);
-
-	m_label.setScale(percent, percent);
-	BorderSprite->setScale(percent, percent);
-	FillerSprite->setScale(percent, percent);
-
-	wind->draw(*FillerSprite);
-	wind->draw(*BorderSprite);
-	wind->draw(m_label);
-}
-
-void NodeRenderer::ChangeState(const NodeInfo& l_info, const float percent) {
-	SharedContext* context = m_stateManager->GetContext();
-	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
-
-	NodeGraphics* CurSprite = GetNodeGraphics(l_info.value_num); //do something here 
-	sf::Sprite* BorderSprite = &CurSprite->first;
-	sf::Sprite* FillerSprite = &CurSprite->second;
-	sf::Vector2f coord = GetPosOnScreen(l_info.m_coord.first);
-
-	m_label.setString(std::to_string(l_info.m_shownValue[0]));
-	m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
-
-	auto startColor = GetNodeColor(0, l_info.node_state.first); //subject to change, 0 to theme id
-	auto endColor = GetNodeColor(0, l_info.node_state.second); //subject to change, 0 to theme id
-
-	BorderSprite->setColor(GetColorTransition(percent, std::get<0>(*startColor), std::get<0>(*endColor)));
-	FillerSprite->setColor(GetColorTransition(percent, std::get<1>(*startColor), std::get<1>(*endColor)));
-	m_label.setFillColor(GetColorTransition(percent, std::get<2>(*startColor), std::get<2>(*endColor)));
-
-	m_label.setScale(1, 1);
-	BorderSprite->setScale(1, 1);
-	FillerSprite->setScale(1, 1);
-
-	BorderSprite->setPosition(coord);
-	FillerSprite->setPosition(coord);
-	m_label.setPosition(coord);
-
-	wind->draw(*FillerSprite);
-	wind->draw(*BorderSprite);
-	wind->draw(m_label);
-}
-
-void NodeRenderer::DespawnNode(const NodeInfo& l_info, float percent) {
-	SpawnNode(l_info, 1 - percent);
-}
-
-void NodeRenderer::MoveNode(const NodeInfo& l_info, float percent) {
-	SharedContext* context = m_stateManager->GetContext();
-	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
-
-	NodeGraphics* CurSprite = GetNodeGraphics(l_info.value_num); //do something here 
-	sf::Sprite* BorderSprite = &CurSprite->first;
-	sf::Sprite* FillerSprite = &CurSprite->second;
-
-	m_label.setString(std::to_string(l_info.m_shownValue[0]));
-	m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
-
-	auto color = GetNodeColor(0, l_info.node_state.first); //subject to change, 0 to theme id
-
-	BorderSprite->setColor(std::get<0>(*color));
-	FillerSprite->setColor(std::get<1>(*color));
-	m_label.setFillColor(std::get<2>(*color));
-
-	m_label.setScale(1, 1);
-	BorderSprite->setScale(1, 1);
-	FillerSprite->setScale(1, 1);
-
-	sf::Vector2f startCoord = GetPosOnScreen(l_info.m_coord.first);
-	sf::Vector2f endCoord = GetPosOnScreen(l_info.m_coord.second);
-
-	sf::Vector2f CurCoord = startCoord + (endCoord - startCoord) * percent;
-
-	BorderSprite->setPosition(CurCoord);
-	FillerSprite->setPosition(CurCoord);
-	m_label.setPosition(CurCoord);
-
-	wind->draw(*FillerSprite);
-	wind->draw(*BorderSprite);
-	wind->draw(m_label);
-}
-
 void NodeRenderer::DrawNode(Node* Cur) {
 	if (!Cur)
 		return;
@@ -228,9 +125,17 @@ void NodeRenderer::DrawNode(Node* Cur) {
 
 
 	if (CurInfo.is_appearing) {
-		m_label.setScale(percent, percent);
-		BorderSprite->setScale(percent, percent);
-		FillerSprite->setScale(percent, percent);
+		if (CurInfo.is_appearing == 1) {
+			m_label.setScale(percent, percent);
+			BorderSprite->setScale(percent, percent);
+			FillerSprite->setScale(percent, percent);
+		}
+		else {
+			m_label.setScale(1 - percent, 1 - percent);
+			BorderSprite->setScale(1 - percent, 1 - percent);
+			FillerSprite->setScale(1 - percent, 1 - percent);
+		}
+		
 	}
 	else {
 		m_label.setScale(1, 1);
@@ -266,6 +171,30 @@ void NodeRenderer::DrawNode(Node* Cur) {
 	for (int j = 0; j < CurInfo.m_shownValue.size(); j++) {
 		LeftPos += spacing;
 
+		if (CurInfo.is_valueChanging && CurInfo.m_shownValue[j] == CurInfo.m_valueChange.first) {
+			auto color = GetNodeColor(0, CurInfo.node_state.first);
+			
+			sf::Color fading = GetColorTransition(percent, std::get<2>(*color), sf::Color::Transparent);
+
+			m_label.setString(std::to_string(CurInfo.m_valueChange.first));
+			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
+			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
+			m_label.setFillColor(fading);
+
+			wind->draw(m_label);
+
+			sf::Color appearing = GetColorTransition(percent, sf::Color::Transparent, std::get<2>(*color));
+
+			m_label.setString(std::to_string(CurInfo.m_valueChange.second));
+			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
+			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
+			m_label.setFillColor(appearing);
+
+			wind->draw(m_label);
+
+			continue;
+		}
+
 		m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
 		m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 		m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
@@ -273,6 +202,18 @@ void NodeRenderer::DrawNode(Node* Cur) {
 		wind->draw(m_label);
 	}
 
+	if (Cur->m_type == 0 && CurInfo.node_state.second == NodeState::Selected) {
+		m_sideLabel.setString("bf = " + std::to_string(CurInfo.m_bf));
+	
+		if (CurInfo.m_bf > 1 || CurInfo.m_bf < -1)
+			m_sideLabel.setFillColor(sf::Color::Red);
+		else
+			m_sideLabel.setFillColor(sf::Color::Black);
+
+		m_sideLabel.setOrigin(m_sideLabel.getLocalBounds().left + m_sideLabel.getLocalBounds().width / 2, m_sideLabel.getLocalBounds().top + m_sideLabel.getLocalBounds().height / 2);
+		m_sideLabel.setPosition(coord.x - 35, coord.y - 30);
+		wind->draw(m_sideLabel);
+	}
 }
 
 void NodeRenderer::DrawTree(Node* Root)

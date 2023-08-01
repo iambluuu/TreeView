@@ -23,6 +23,7 @@ private:
 	sf::Texture m_texture;
 
 	sf::Text m_label;
+	sf::Text m_sideLabel;
 
 	const float STEP_DURATION{ 500.f };
 	float m_animationCurrent{ 0.f };
@@ -36,6 +37,7 @@ private:
 
 	bool is_paused{ false };
 	bool is_reverse{ false };
+	bool step_by_step{ false };
 
 public:
 	NodeRenderer(StateManager* l_manager) {
@@ -44,10 +46,13 @@ public:
 		m_nodeColor.resize(4);
 
 		m_texture.loadFromFile("Assets/Texture/NodeSheet.png");
+		m_texture.setSmooth(1);
 		m_font.loadFromFile("Assets/Font/monofonto rg.otf");
 
 		m_label.setFont(m_font);
 		m_label.setCharacterSize(20);
+		m_sideLabel.setFont(m_font);
+		m_sideLabel.setCharacterSize(15);
 		
 		PrepareSprite();
 	}

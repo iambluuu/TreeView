@@ -7,8 +7,6 @@ const sf::Color DarkBlue = sf::Color(45, 55, 73);
 const sf::Color LightBlue = sf::Color(53, 66, 89);
 const sf::Color LightBeige = sf::Color(240, 233, 210);
 
-
-
 ThemeManager::ThemeManager() {
 	DefaultCursor.loadFromSystem(sf::Cursor::Arrow);
 	HandCursor.loadFromSystem(sf::Cursor::Hand);

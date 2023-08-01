@@ -38,7 +38,7 @@ void UIManager::PrepareElements() {
 	insertBox->max_input_char = 1;
 	RandomButton* insertRandom = new RandomButton(this, insertBox);
 	InputButton* insertInput = new InputButton(this, insertBox, Execute::Insert);
-
+	insertBox->m_inputButton = insertInput;
 	Drawer* insertDrawer = new Drawer(this, "Insert");
 
 	insertDrawer->AddElement(0, insertBox);
@@ -52,6 +52,7 @@ void UIManager::PrepareElements() {
 	removeBox->max_input_char = 1;
 	RandomButton* removeRandom = new RandomButton(this, removeBox);
 	InputButton* removeInput = new InputButton(this, removeBox, Execute::Remove);
+	removeBox->m_inputButton = removeInput;
 	Drawer* removeDrawer = new Drawer(this, "Remove");
 
 	removeDrawer->AddElement(0, removeBox);
