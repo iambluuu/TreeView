@@ -128,8 +128,6 @@ void AVL_Tree::ShiftLeft(int value) {
 
 	int index = value + ALIGN_OFFSET;
 
-
-
 	while (m_align[index]) {
 		index--;
 	}
@@ -314,7 +312,27 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 			if (temp == nullptr) {
 				Cur->getInfo()->back().is_appearing = 2;
 				m_removedNode = Cur;
-				Cur = nullptr;
+
+				int ver_depth = Cur->getInfo()->back().m_coord.first.first;
+
+				if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
+					while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
+						ver_depth--;
+					}
+
+					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+						ShiftRight(ver_depth);
+				}
+				else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
+					while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
+						ver_depth++;
+					}
+
+					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+						ShiftLeft(ver_depth);
+				}
+
+				return nullptr;
 			}
 			else {
 				std::pair<int, int> tempCoord = CurInfo->back().m_coord.first;
@@ -323,7 +341,28 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 				m_removedNode = Cur;
 				temp->getInfo()->back().is_moving = 1;
 				temp->getInfo()->back().m_coord.second = tempCoord;
-				Cur = temp;
+
+				int ver_depth = Cur->getInfo()->back().m_coord.first.first;
+
+				if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
+					while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
+						ver_depth--;
+					}
+
+					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+						ShiftRight(ver_depth);
+				}
+				else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
+					while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
+						ver_depth++;
+					}
+
+					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+						ShiftLeft(ver_depth);
+				}
+
+				
+				return temp;
 			}
 		}
 		else {
@@ -353,9 +392,9 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 			CurStepInfo->node_state = { NodeState::Selected, NodeState::Selected };
 
 			Cur->right = RemoveNode(Cur->right, temp->getValue()[0]);
-		}
 
-		return Cur;
+			return Cur;
+		}
 	}	
 
 	Cur->height = Cur->GetHeight();
@@ -419,13 +458,17 @@ void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
 }
 
 void AVL_Tree::OnRemove(int value) {
+	if (!m_root)
+		return;
+
 	PostProcessing();
 	ResetNodes(m_root);
 
 	m_root = RemoveNode(m_root, value);
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
-	renderer->Reset(m_root->getInfo()->size());
+
+	renderer->Reset(m_removedNode->getInfo()->size());
 }
 
 Node* AVL_Tree::RotateLeft(Node* Cur) {
