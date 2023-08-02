@@ -30,7 +30,7 @@ void TextBox::SetString(const std::string& l_string) {
 void TextBox::OnClick() {
 	m_state = ElementState::Clicked;
 }
-
+ 
 void TextBox::OnHover() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
 	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Text));

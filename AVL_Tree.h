@@ -7,7 +7,11 @@ private:
 	const int ALIGN_OFFSET{ 10 };
 
 	const int MAX_NODE_NUM{ 15 };
+	const int MAX_WIDTH{ 10 };
+
 	int m_nodeNum{ 0 };
+	int m_leftWidth{ 0 };
+	int m_rightWidth{ 0 };
 	
 	float m_elapsed{ 0.f };
 
@@ -19,17 +23,20 @@ private:
 	Node* Generate(Node* Cur, int value);
 	Node* RemoveNode(Node* Cur, int value);
 
-	void ShiftLeft(int value);
-	void ShiftRight(int value);
+	void ShiftLeftFrom(int value);
+	void ShiftRightFrom(int value);
+	void ShiftLeftTo(int value);
+	void ShiftRightTo(int value);
 	void ShiftUp(Node* Cur);
 	void ShiftDown(Node* Cur);
 
 	void AddNewStep(Node* Cur);
 	void ClearStep(Node* Cur);
+	void Centering();
 
 public:
 	AVL_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {
-		m_align.resize(20);
+		m_align.resize(2 * MAX_WIDTH + 1);
 		fill(m_align.begin(), m_align.end(), nullptr);
 	}
 

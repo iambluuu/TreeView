@@ -4,7 +4,7 @@
 
 
 AVL_Tree::~AVL_Tree() {
-
+	PostProcessing();
 }
 
 void AVL_Tree::OnCreate() {
@@ -107,7 +107,45 @@ void AVL_Tree::ClearStep(Node* Cur) {
 	ClearStep(Cur->right);
 }
 
-void AVL_Tree::ShiftRight(int value) {
+void AVL_Tree::Centering() {
+	if (m_nodeNum == 0) {
+		return;
+	}
+
+	int delta = m_root->getInfo()->back().m_coord.first.first;
+	std::cerr << m_leftWidth << " " << m_rightWidth << " " << delta << std::endl;
+
+	if (delta > 0) {
+		AddNewStep(m_root);
+		for (int i = -m_leftWidth + ALIGN_OFFSET; i <= m_rightWidth + ALIGN_OFFSET; i++) {
+			std::cerr << i << " " << i + delta << std::endl;
+			m_align[i] = m_align[i + delta];
+			m_align[i]->getInfo()->back().is_moving = 1;
+			m_align[i]->getInfo()->back().m_coord.second.first = i - ALIGN_OFFSET;
+		}
+
+		for (int i = m_rightWidth + ALIGN_OFFSET + 1; i <= m_rightWidth + ALIGN_OFFSET + delta; i++) {
+			m_align[i] = nullptr;
+		}
+
+	}
+	else if (delta < 0) {
+		AddNewStep(m_root);
+
+		for (int i = m_rightWidth + ALIGN_OFFSET; i >= -m_leftWidth + ALIGN_OFFSET; i--) {
+			std::cerr << i << " " << i + delta << std::endl;
+			m_align[i] = m_align[i + delta];
+			m_align[i]->getInfo()->back().is_moving = 1;
+			m_align[i]->getInfo()->back().m_coord.second.first = i - ALIGN_OFFSET;
+		}
+
+		for (int i = -m_leftWidth + ALIGN_OFFSET - 1; i >= -m_leftWidth + ALIGN_OFFSET + delta; i--) {
+			m_align[i] = nullptr;
+		}
+	}
+}
+
+void AVL_Tree::ShiftRightFrom(int value) {
 	int index = value + ALIGN_OFFSET;
 
 	while (m_align[index]) {
@@ -123,7 +161,41 @@ void AVL_Tree::ShiftRight(int value) {
 	m_align[value + ALIGN_OFFSET] = nullptr;
 }
 
-void AVL_Tree::ShiftLeft(int value) {
+void AVL_Tree::ShiftLeftFrom(int value) {
+	// Shift left all value lesser than value
+
+	int index = value + ALIGN_OFFSET;
+
+	while (m_align[index]) {
+		index--;
+	}
+
+	for (int i = index; i < value + ALIGN_OFFSET; i++) {
+		m_align[i] = m_align[i + 1];
+		m_align[i]->getInfo()->back().is_moving = 1;
+		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first - 1;
+	}
+
+	m_align[value + ALIGN_OFFSET] = nullptr;
+}
+
+void AVL_Tree::ShiftRightTo(int value) {
+	int index = value + ALIGN_OFFSET;
+
+	while (m_align[index]) {
+		index++;
+	}
+
+	for (int i = index; i > value + ALIGN_OFFSET; i--) {
+		m_align[i] = m_align[i - 1];
+		m_align[i]->getInfo()->back().is_moving = 1;
+		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first + 1;
+	}
+
+	m_align[value + ALIGN_OFFSET] = nullptr;
+}
+
+void AVL_Tree::ShiftLeftTo(int value) {
 	// Shift left all value lesser than value
 
 	int index = value + ALIGN_OFFSET;
@@ -188,7 +260,8 @@ Node* AVL_Tree::Generate(Node* Cur, int value) {
 
 Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 
-	std::cerr << "Inserting " << value << std::endl;
+	//std::cerr << "Inserting " << value << std::endl;
+	std::cerr << "Value: " << value << "Hor: " << hor_depth << " " << "Ver: " << ver_depth << std::endl;
 	
 	AddNewStep(m_root);
 	AddNewStep(m_newNode);
@@ -209,25 +282,62 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 		CurStepInfo->is_visible = 1;
 		CurStepInfo->is_appearing = 1;
 
+		m_nodeNum++;
+		
+		if (m_root) {
+			if (value < m_root->getInfo()->back().m_shownValue[0])
+				m_leftWidth++;
+			else if (value > m_root->getInfo()->back().m_shownValue[0])
+				m_rightWidth++;
+		}
+
+
 		std::cerr << "new node\n";
 
 		if (m_align[ver_depth +	ALIGN_OFFSET]) {
 
-			if (CurStepInfo->m_shownValue[0] > m_align[ver_depth + ALIGN_OFFSET]->getInfo()->back().m_shownValue[0]) {
-				ShiftRight(ver_depth + 1);
-				m_align[ver_depth + ALIGN_OFFSET + 1] = Cur;
-				CurStepInfo->m_coord.first = { ver_depth + 1, hor_depth };
-				CurStepInfo->m_coord.second = { ver_depth + 1, hor_depth };
+			if (value > m_align[ver_depth + ALIGN_OFFSET]->getInfo()->back().m_shownValue[0]) {
+				if (value > m_root->getInfo()->back().m_shownValue[0]) {
+					std::cerr << ver_depth << " " << hor_depth << std::endl;
+
+					ShiftRightFrom(ver_depth + 1);
+					m_align[ver_depth + ALIGN_OFFSET + 1] = Cur;
+					std::cerr << value << " " << ver_depth + ALIGN_OFFSET + 1 << std::endl;
+					CurStepInfo->m_coord.first = { ver_depth + 1, hor_depth };
+					CurStepInfo->m_coord.second = { ver_depth + 1, hor_depth };
+
+				}
+				else {
+					ShiftLeftFrom(ver_depth);
+					m_align[ver_depth + ALIGN_OFFSET] = Cur;
+					std::cerr << value << " " << ver_depth + ALIGN_OFFSET << std::endl;
+
+					CurStepInfo->m_coord.first = { ver_depth, hor_depth };
+					CurStepInfo->m_coord.second = { ver_depth, hor_depth };
+				}
+				
 			}
 			else {
-				ShiftLeft(ver_depth - 1);
-				m_align[ver_depth + ALIGN_OFFSET - 1] = Cur;
-				CurStepInfo->m_coord.first = { ver_depth - 1, hor_depth };
-				CurStepInfo->m_coord.second = { ver_depth - 1, hor_depth };
+				if (value > m_root->getInfo()->back().m_shownValue[0]) {
+					ShiftRightFrom(ver_depth);
+					m_align[ver_depth + ALIGN_OFFSET] = Cur;
+					std::cerr << value << " " << ver_depth + ALIGN_OFFSET << std::endl;
+					CurStepInfo->m_coord.first = { ver_depth, hor_depth };
+					CurStepInfo->m_coord.second = { ver_depth, hor_depth };
+				}
+				else {
+					ShiftLeftFrom(ver_depth - 1);
+					m_align[ver_depth + ALIGN_OFFSET - 1] = Cur;
+					std::cerr << value << " " << ver_depth + ALIGN_OFFSET - 1 << std::endl;
+					CurStepInfo->m_coord.first = { ver_depth - 1, hor_depth };
+					CurStepInfo->m_coord.second = { ver_depth - 1, hor_depth };
+
+				}
 			}
 		}
 		else {
 			m_align[ver_depth + ALIGN_OFFSET] = Cur;
+			std::cerr << value << " " << ver_depth + ALIGN_OFFSET << std::endl;
 		}
 
 		Cur->height = 1;
@@ -242,13 +352,15 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	int CurValue = Cur->getInfo()->back().m_shownValue[0];
 
 	if (value < CurValue) {
-		Cur->left = InsertNode(Cur->left, value, CurInfo->back().m_coord.first.second + 1, CurInfo->back().m_coord.first.first - 1);
+		Cur->left = InsertNode(Cur->left, value, CurStepInfo->m_coord.first.second + 1, CurStepInfo->m_coord.first.first - 1);
 	}
 	else if (value > CurValue) {
-		Cur->right = InsertNode(Cur->right, value, CurInfo->back().m_coord.first.second + 1, CurInfo->back().m_coord.first.first + 1);
+		Cur->right = InsertNode(Cur->right, value, CurStepInfo->m_coord.first.second + 1, CurStepInfo->m_coord.first.first + 1);
 	}
 	else {
 		//Case where inserted value already exists
+		delete m_newNode;
+		m_newNode = nullptr;
 	}
 
 	Cur->height = Cur->GetHeight();
@@ -284,8 +396,10 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 }
 
 Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
-	if (!Cur)
+	if (!Cur) {
+		m_nodeNum++;
 		return Cur;
+	}
 
 	AddNewStep(m_root);
 
@@ -315,22 +429,22 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 
 				int ver_depth = Cur->getInfo()->back().m_coord.first.first;
 
-				if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
-					while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
-						ver_depth--;
-					}
+				//if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
+				//	while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
+				//		ver_depth--;
+				//	}
 
-					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-						ShiftRight(ver_depth);
-				}
-				else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
-					while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
-						ver_depth++;
-					}
+				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+				//		ShiftRight(ver_depth);
+				//}
+				//else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
+				//	while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
+				//		ver_depth++;
+				//	}
 
-					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-						ShiftLeft(ver_depth);
-				}
+				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+				//		ShiftLeft(ver_depth);
+				//}
 
 				return nullptr;
 			}
@@ -344,22 +458,22 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 
 				int ver_depth = Cur->getInfo()->back().m_coord.first.first;
 
-				if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
-					while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
-						ver_depth--;
-					}
+				//if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
+				//	while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
+				//		ver_depth--;
+				//	}
 
-					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-						ShiftRight(ver_depth);
-				}
-				else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
-					while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
-						ver_depth++;
-					}
+				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+				//		ShiftRight(ver_depth);
+				//}
+				//else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
+				//	while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
+				//		ver_depth++;
+				//	}
 
-					if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-						ShiftLeft(ver_depth);
-				}
+				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
+				//		ShiftLeft(ver_depth);
+				//}
 
 				
 				return temp;
@@ -446,11 +560,16 @@ void AVL_Tree::OnGenerate() {
 }
 
 void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
+	if (m_nodeNum > 0 && (m_nodeNum == MAX_NODE_NUM || (l_value[0] < m_root->getInfo()->back().m_shownValue[0] && m_leftWidth == MAX_WIDTH) || (l_value[0] > m_root->getInfo()->back().m_shownValue[0] && m_rightWidth == MAX_WIDTH))) {
+		return;
+	}
+
 	PostProcessing();
 	m_newNode = new Node(l_value);
 	ResetNodes(m_root);
 
 	m_root = InsertNode(m_root, l_value[0], 0, 0);
+	Centering();
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_root->getInfo()->size());
@@ -458,8 +577,10 @@ void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
 }
 
 void AVL_Tree::OnRemove(int value) {
-	if (!m_root)
+	if (m_nodeNum == 0)
 		return;
+
+	m_nodeNum--;
 
 	PostProcessing();
 	ResetNodes(m_root);
@@ -468,7 +589,10 @@ void AVL_Tree::OnRemove(int value) {
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
-	renderer->Reset(m_removedNode->getInfo()->size());
+	if (!m_root)
+		renderer->Reset(m_removedNode->getInfo()->size());
+	else
+		renderer->Reset(m_root->getInfo()->size());
 }
 
 Node* AVL_Tree::RotateLeft(Node* Cur) {
@@ -489,9 +613,12 @@ Node* AVL_Tree::RotateLeft(Node* Cur) {
 	Cur->right = RightsLeft;
 
 	Cur->height = Cur->GetHeight();
-	std::cerr << "Node: " << Cur->getValue()[0] << " height: " << Cur->height << "\n";
 	Right->height = Right->GetHeight();
-	std::cerr << "Right: " << Right->getValue()[0] << " height: " << Right->height << "\n";
+
+	if (Cur == m_root) {
+		m_rightWidth -= Right->getInfo()->back().m_coord.first.first;
+		m_leftWidth += Right->getInfo()->back().m_coord.first.first;
+	}
 
 	return Right;
 }
@@ -515,6 +642,11 @@ Node* AVL_Tree::RotateRight(Node* Cur) {
 
 	Cur->height = Cur->GetHeight();
 	Left->height = Left->GetHeight();
+
+	if (Cur == m_root) {
+		m_leftWidth -= std::abs(Left->getInfo()->back().m_coord.first.first);
+		m_rightWidth += std::abs(Left->getInfo()->back().m_coord.first.first);
+	}
 
 	return Left;
 }

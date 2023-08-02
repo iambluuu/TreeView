@@ -164,6 +164,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="AVL_Tree.h" />
     <ClInclude Include="Drawer.h" />
+    <ClInclude Include="PlayBar.h" />
     <ClInclude Include="InputButton.h" />
     <ClInclude Include="NodeRenderer.h" />
     <ClInclude Include="Hash_Table.h" />
