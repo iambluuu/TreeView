@@ -5,7 +5,8 @@
 #include "SFML/System.hpp"
 
 enum class ElementName {
-	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, ActiveTab, InactiveTab
+	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, ActiveTab, InactiveTab,
+	PlayBar, PlayBarPlayed, PlayButton, PauseButton, StopButton, NextButton, PrevButton
 };
 
 enum class ElementState {

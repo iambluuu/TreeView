@@ -27,7 +27,7 @@ private:
 
 	const float STEP_DURATION{ 500.f };
 	float m_animationCurrent{ 0.f };
-	float m_speedupRate{ 0.f };
+	float m_speedupRate{ 1.f };
 	int m_stepNum{ 0 };
 
 	const float TOP_LINE = 250;
@@ -82,5 +82,21 @@ public:
 	int GetStep();
 	void SetStepNum(int val) {
 		m_stepNum++;
+	}
+
+	void SetSpeedupRate(float val) {
+		m_speedupRate = val;
+	}
+
+	void SetStepByStep(bool val) {
+		step_by_step = val;
+	}
+
+	float GetProgress() {
+		return m_animationCurrent / STEP_DURATION;
+	}
+
+	void SetProgress(float percent) {
+		m_animationCurrent = percent * STEP_DURATION;
 	}
 };

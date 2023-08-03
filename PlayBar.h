@@ -10,7 +10,10 @@ class PlayBar : public BaseElement {
 	friend class UIManager;
 	friend class NodeRenderer;
 
-	private:
+private:
+	UIManager* m_owner{ nullptr };
+	NodeRenderer* m_nodeRenderer{ nullptr };
+	sf::Sprite* m_playedSprite{ nullptr };
 	
 public:
 	PlayBar(UIManager* m_owner);

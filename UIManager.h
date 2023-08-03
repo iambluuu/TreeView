@@ -11,6 +11,7 @@
 #include "RandomButton.h"
 #include "InputButton.h"
 #include "Drawer.h"
+#include "PlayBar.h"
 
 class BaseElement;
 

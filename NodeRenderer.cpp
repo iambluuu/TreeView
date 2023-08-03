@@ -66,9 +66,9 @@ void NodeRenderer::Update(const float& l_fT) {
 		return;
 
 	if (!is_reverse)
-		m_animationCurrent = std::min(m_animationCurrent + l_fT, m_stepNum * STEP_DURATION);
+		m_animationCurrent = std::min(m_animationCurrent + l_fT * m_speedupRate, m_stepNum * STEP_DURATION);
 	else 
-		m_animationCurrent = std::max(m_animationCurrent - l_fT, 0.f);
+		m_animationCurrent = std::max(m_animationCurrent - l_fT * m_speedupRate, 0.f);
 
 }
 

@@ -150,6 +150,7 @@
     <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="InputButton.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
+    <ClCompile Include="PlayBar.cpp" />
     <ClCompile Include="RandomButton.cpp" />
     <ClCompile Include="StaticElement.cpp" />
     <ClCompile Include="ThemeManager.cpp" />

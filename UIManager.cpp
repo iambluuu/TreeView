@@ -61,11 +61,16 @@ void UIManager::PrepareElements() {
 
 	AddToCloset(removeDrawer);
 
+	//Display
 
 	StaticElement* displayArea = new StaticElement(this, ElementName::DisplayArea);
 	displayArea->SetLayer(2);
 	displayArea->SetPosition(sf::Vector2f(32, 156));
 	AddElement(displayArea);
+
+	//PlayBar* playBar = new PlayBar(this);
+	//playBar->SetPosition(sf::Vector2f(32, 857));
+	//AddElement(playBar);
 
 }
 
