@@ -69,6 +69,12 @@
     <ClCompile Include="InputButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaButtons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI_Element.h">
@@ -124,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="Utilities.h">
       <Filter>Header Files\General</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaButtons.h">
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

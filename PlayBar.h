@@ -12,8 +12,8 @@ class PlayBar : public BaseElement {
 
 private:
 	UIManager* m_owner{ nullptr };
-	NodeRenderer* m_nodeRenderer{ nullptr };
 	sf::Sprite* m_playedSprite{ nullptr };
+	float m_percent{ 0.f };
 	
 public:
 	PlayBar(UIManager* m_owner);

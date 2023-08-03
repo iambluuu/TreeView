@@ -5,7 +5,7 @@
 
 const sf::Color DarkBlue = sf::Color(45, 55, 73);
 const sf::Color LightBlue = sf::Color(53, 66, 89);
-const sf::Color LightBeige = sf::Color(240, 233, 210);
+const sf::Color LightBeige = sf::Color(240, 233, 210);	
 
 ThemeManager::ThemeManager() {
 	DefaultCursor.loadFromSystem(sf::Cursor::Arrow);
@@ -109,6 +109,15 @@ void ThemeManager::Initiate()
 	tmpSprite.setTexture(DisplayArea1);
 	tmpSprite.setTextureRect(sf::IntRect(0, 157, 1120, 691));
 	ThemeSprite1->emplace(std::pair{ ElementName::DisplayArea, ElementState::Neutral }, tmpSprite);
+
+	//Playbar sprite
+
+	tmpSprite.setTextureRect(sf::IntRect(0, 848, 1120, 20));
+	ThemeSprite1->emplace(std::pair{ ElementName::PlayBar, ElementState::Neutral }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::PlayBar, ElementState::Clicked }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(0, 868, 1120, 20));
+	ThemeSprite1->emplace(std::pair{ ElementName::PlayBar, ElementState::Focused }, tmpSprite);
 
 
 }

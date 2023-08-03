@@ -93,10 +93,13 @@ public:
 	}
 
 	float GetProgress() {
-		return m_animationCurrent / STEP_DURATION;
+		if (m_stepNum == 0)
+			return 0.f;
+
+		return m_animationCurrent / (STEP_DURATION * m_stepNum);
 	}
 
 	void SetProgress(float percent) {
-		m_animationCurrent = percent * STEP_DURATION;
+		m_animationCurrent = percent * STEP_DURATION * m_stepNum;
 	}
 };

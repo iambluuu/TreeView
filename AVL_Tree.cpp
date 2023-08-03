@@ -182,17 +182,17 @@ void AVL_Tree::ShiftLeftFrom(int value) {
 void AVL_Tree::ShiftRightTo(int value) {
 	int index = value + ALIGN_OFFSET;
 
-	while (m_align[index]) {
-		index++;
+	while (index >= 0 && m_align[index]) {
+		index--;
 	}
 
-	for (int i = index; i > value + ALIGN_OFFSET; i--) {
+	for (int i = value + ALIGN_OFFSET; i > index; i--) {
 		m_align[i] = m_align[i - 1];
 		m_align[i]->getInfo()->back().is_moving = 1;
 		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first + 1;
 	}
 
-	m_align[value + ALIGN_OFFSET] = nullptr;
+	m_align[index] = nullptr;
 }
 
 void AVL_Tree::ShiftLeftTo(int value) {
