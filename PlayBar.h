@@ -29,7 +29,5 @@ public:
 	void Draw();
 
 	void SetTheme(int l_themeID);
-	void SetString(const std::string& l_text);
-	void GetShownLength();
 };
 
