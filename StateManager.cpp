@@ -24,6 +24,10 @@ StateManager::~StateManager() {
 	}
 }
 
+void StateManager::HandleEvent(sf::Event* l_event) {
+	m_states.back().second->HandleEvent(l_event);
+}
+
 void StateManager::Update(const sf::Time& l_time) {
 	if (m_states.empty())
 		return;

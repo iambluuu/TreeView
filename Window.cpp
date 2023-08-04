@@ -66,6 +66,8 @@ void Window::Update() {
 			m_isDone = 1;
 			return;
 		}
+		m_stateManager->HandleEvent(&E);
 		m_uiManager->HandleEvent(&E);
+		
 	}
 }

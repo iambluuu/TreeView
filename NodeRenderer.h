@@ -29,6 +29,8 @@ private:
 	float m_animationCurrent{ 0.f };
 	float m_speedupRate{ 1.f };
 	int m_stepNum{ 0 };
+	int m_curStep{ 0 };
+	int m_limitStep{ 0 };
 
 	const float TOP_LINE = 250;
 	const float MIDDLE_LINE = 592;
@@ -62,6 +64,13 @@ public:
 	void PrepareSprite();
 	NodeGraphics* GetNodeGraphics(int valueNum);
 
+	void OnForward();
+	void OnBackward();
+	void OnPlay();
+	void OnSkipForward();
+	void OnSkipBackward();
+
+	void HandleEvent(sf::Event* l_event);
 	void Update(const float& l_fT);
 	void Reset(const int& l_stepNum);
 	

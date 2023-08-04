@@ -3,8 +3,10 @@
 #include "SFML/Window.hpp"
 #include "SFML/System.hpp"
 #include "UIManager.h"
+#include "StateManager.h"
 
 class UIManager;
+class StateManager;
 
 class Window {
 private:
@@ -17,6 +19,7 @@ private:
 	bool m_isFullscreen;
 
 	UIManager* m_uiManager{ nullptr };
+	StateManager* m_stateManager{ nullptr };
 
 	void Destroy();
 	void Create();
@@ -41,6 +44,10 @@ public:
 	
 	void SetUIManager(UIManager* l_uiManager) {
 		m_uiManager = l_uiManager;
+	}
+
+	void SetStateManager(StateManager* l_stateManager) {
+		m_stateManager = l_stateManager;
 	}
 
 	sf::RenderWindow* GetRenderWindow() {

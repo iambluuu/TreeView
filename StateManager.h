@@ -38,6 +38,7 @@ public:
 	virtual void Activate() = 0;
 	virtual void Deactivate() = 0;
 
+	virtual void HandleEvent(sf::Event* l_event) = 0;
 	virtual void Update(const sf::Time& l_time) = 0;
 	virtual void Draw() = 0;
 
@@ -91,6 +92,7 @@ public:
 	StateManager(SharedContext* l_context);
 	~StateManager();
 
+	void HandleEvent(sf::Event* l_event);
 	void Update(const sf::Time& l_time);
 	void Draw();
 

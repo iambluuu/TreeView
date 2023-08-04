@@ -56,20 +56,108 @@ void NodeRenderer::PrepareSprite() {
 }
 
 void NodeRenderer::Reset(const int& l_stepNum) {
-
+	
+	m_curStep = 0;
 	m_animationCurrent = 0;
 	m_stepNum = l_stepNum;
+	m_limitStep = l_stepNum;
+}
+
+void NodeRenderer::OnPlay() {
+	is_paused = !is_paused;
+	is_reverse = 0;
+	step_by_step = 0;
+
+	std::cerr << "Is Paused: " << is_paused << std::endl;
+}
+
+void NodeRenderer::OnForward() {
+	is_paused = 1;
+
+	if (!step_by_step || is_reverse) {
+		m_limitStep = std::min(m_curStep + 1, m_stepNum);
+
+		if (!step_by_step)
+			m_animationCurrent = m_limitStep * STEP_DURATION;
+
+		step_by_step = 1;
+		is_reverse = 0;
+		return;
+	}
+
+	if (m_limitStep == m_stepNum) {
+		m_animationCurrent = m_stepNum * STEP_DURATION;
+		return;
+	}
+
+
+	m_limitStep++;
+	m_animationCurrent = (m_limitStep - 1) * STEP_DURATION;
+}
+
+void NodeRenderer::OnBackward() {
+	is_paused = 1;
+
+	if (!step_by_step || !is_reverse) {
+		m_limitStep = m_curStep;
+
+		if (!step_by_step)
+			m_animationCurrent = m_limitStep * STEP_DURATION;
+
+		step_by_step = 1;
+		is_reverse = 1;
+		return;
+	}
+
+	if (m_limitStep == 0) {
+		m_animationCurrent = 0;
+		return;
+	}
+
+	m_animationCurrent = m_limitStep * STEP_DURATION;
+	m_limitStep--;
+}
+
+void NodeRenderer:: HandleEvent(sf::Event* l_event) {
+
+	if (l_event->type == sf::Event::KeyPressed) {
+		switch (l_event->key.code) {
+		case sf::Keyboard::Space:
+			OnPlay();
+			break;
+		case sf::Keyboard::Right:
+			OnForward();
+			break;
+		case sf::Keyboard::Left:
+			OnBackward();
+			break;
+		}
+	}
 }
 
 void NodeRenderer::Update(const float& l_fT) {
-	if (is_paused)
-		return;
 
-	if (!is_reverse)
-		m_animationCurrent = std::min(m_animationCurrent + l_fT * m_speedupRate, m_stepNum * STEP_DURATION);
-	else 
-		m_animationCurrent = std::max(m_animationCurrent - l_fT * m_speedupRate, 0.f);
 
+	if (step_by_step) {
+		if (m_animationCurrent > m_limitStep * STEP_DURATION) {
+			m_animationCurrent = std::max(m_animationCurrent - l_fT * m_speedupRate, m_limitStep * STEP_DURATION);
+		}
+		else {
+			m_animationCurrent = std::min(m_animationCurrent + l_fT * m_speedupRate, m_limitStep * STEP_DURATION);
+		}
+	}
+	else {
+		if (is_paused)
+			return;
+
+		if (!is_reverse)
+			m_animationCurrent = std::min(m_animationCurrent + l_fT * m_speedupRate, m_stepNum * STEP_DURATION);
+		else
+			m_animationCurrent = std::max(m_animationCurrent - l_fT * m_speedupRate, 0.f);
+	}
+
+
+	m_curStep = GetStep();
 }
 
 int NodeRenderer::GetStep() {
@@ -86,7 +174,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 		return;
 
 	std::vector<NodeInfo>* info = Cur->getInfo();
-	int CurStep = GetStep();
+	int CurStep = m_curStep;
 
 	NodeInfo CurInfo = info->at(CurStep);
 	if (!CurInfo.is_visible)

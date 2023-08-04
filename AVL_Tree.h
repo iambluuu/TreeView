@@ -48,6 +48,7 @@ public:
 	void Activate() ;
 	void Deactivate();
 
+	void HandleEvent(sf::Event* l_event);
 	void Update(const sf::Time& l_time);
 	void Draw();
 	void ResetNodes(Node* Cur);

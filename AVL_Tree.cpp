@@ -23,6 +23,12 @@ void AVL_Tree::Deactivate() {
 
 }
 
+void AVL_Tree::HandleEvent(sf::Event* l_event) {
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	renderer->HandleEvent(l_event);
+}
 
 
 void AVL_Tree::Update(const sf::Time& l_time) {
@@ -182,35 +188,29 @@ void AVL_Tree::ShiftLeftFrom(int value) {
 void AVL_Tree::ShiftRightTo(int value) {
 	int index = value + ALIGN_OFFSET;
 
-	while (index >= 0 && m_align[index]) {
-		index--;
-	}
+	while (index > 0 && m_align[index - 1]) {
+		m_align[index] = m_align[index - 1];
+		m_align[index]->getInfo()->back().is_moving = 1;
+		m_align[index]->getInfo()->back().m_coord.second.first = m_align[index]->getInfo()->back().m_coord.first.first + 1;
 
-	for (int i = value + ALIGN_OFFSET; i > index; i--) {
-		m_align[i] = m_align[i - 1];
-		m_align[i]->getInfo()->back().is_moving = 1;
-		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first + 1;
+		index--;
 	}
 
 	m_align[index] = nullptr;
 }
 
 void AVL_Tree::ShiftLeftTo(int value) {
-	// Shift left all value lesser than value
-
 	int index = value + ALIGN_OFFSET;
 
-	while (m_align[index]) {
-		index--;
+	while (index < MAX_WIDTH + ALIGN_OFFSET - 1 && m_align[index + 1]) {
+		m_align[index] = m_align[index + 1];
+		m_align[index]->getInfo()->back().is_moving = 1;
+		m_align[index]->getInfo()->back().m_coord.second.first = m_align[index]->getInfo()->back().m_coord.first.first - 1;
+
+		index++;
 	}
 
-	for (int i = index; i < value + ALIGN_OFFSET; i++) {
-		m_align[i] = m_align[i + 1];
-		m_align[i]->getInfo()->back().is_moving = 1;
-		m_align[i]->getInfo()->back().m_coord.second.first = m_align[i]->getInfo()->back().m_coord.first.first - 1;
-	}
-
-	m_align[value + ALIGN_OFFSET] = nullptr;
+	m_align[index] = nullptr;
 }
 
 void AVL_Tree::ShiftUp(Node* Cur) {
@@ -427,25 +427,13 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 				Cur->getInfo()->back().is_appearing = 2;
 				m_removedNode = Cur;
 
-				int ver_depth = Cur->getInfo()->back().m_coord.first.first;
-
-				//if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
-				//	while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
-				//		ver_depth--;
-				//	}
-
-				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-				//		ShiftRight(ver_depth);
-				//}
-				//else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
-				//	while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
-				//		ver_depth++;
-				//	}
-
-				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-				//		ShiftLeft(ver_depth);
-				//}
-
+				if (Cur->getInfo()->back().m_coord.first.first < m_root->getInfo()->back().m_coord.first.first) {
+					ShiftRightTo(Cur->getInfo()->back().m_coord.first.first);
+				}
+				else {
+					ShiftLeftTo(Cur->getInfo()->back().m_coord.first.first);
+				}
+			
 				return nullptr;
 			}
 			else {
@@ -453,28 +441,15 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 
 				Cur->getInfo()->back().is_appearing = 2;
 				m_removedNode = Cur;
-				temp->getInfo()->back().is_moving = 1;
-				temp->getInfo()->back().m_coord.second = tempCoord;
 
-				int ver_depth = Cur->getInfo()->back().m_coord.first.first;
+				ShiftUp(temp);
 
-				//if (ver_depth < m_root->getInfo()->back().m_coord.first.first) {
-				//	while (ver_depth + ALIGN_OFFSET - 1 > 0 && m_align[ver_depth + ALIGN_OFFSET - 1]) {
-				//		ver_depth--;
-				//	}
-
-				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-				//		ShiftRight(ver_depth);
-				//}
-				//else if (ver_depth > m_root->getInfo()->back().m_coord.first.first) {
-				//	while (ver_depth + ALIGN_OFFSET + 1 < m_align.size() && m_align[ver_depth + ALIGN_OFFSET + 1]) {
-				//		ver_depth++;
-				//	}
-
-				//	if (ver_depth != Cur->getInfo()->back().m_coord.first.first)
-				//		ShiftLeft(ver_depth);
-				//}
-
+				if (Cur->getInfo()->back().m_coord.first.first < m_root->getInfo()->back().m_coord.first.first) {
+					ShiftRightTo(Cur->getInfo()->back().m_coord.first.first);
+				}
+				else {
+					ShiftLeftTo(Cur->getInfo()->back().m_coord.first.first);
+				}
 				
 				return temp;
 			}
