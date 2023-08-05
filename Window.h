@@ -11,6 +11,7 @@ class StateManager;
 class Window {
 private:
 	int m_fps;
+	int m_cursorType{ 0 }; // 0 - normal, 1 - hand, 2 - text
 
 	std::string m_windowTitle;
 	sf::Vector2u m_windowSize;
@@ -34,6 +35,7 @@ public:
 	void EndDraw(); //display the changes
 
 	void Update();
+	void UpdateCursor();
 	void Draw(sf::Drawable& l_drawable);
 
 	bool IsDone();
@@ -52,5 +54,9 @@ public:
 
 	sf::RenderWindow* GetRenderWindow() {
 		return &m_window;
+	}
+
+	void setCursorType(int l_cursorType) {
+		m_cursorType |= l_cursorType;
 	}
 };

@@ -29,13 +29,13 @@ void PlayBar::OnClick() {
 }
 
 void PlayBar::OnHover() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Hand));
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 }
 
 void PlayBar::OnLeave() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Hand));
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 }
 
 void PlayBar::OnRelease() {

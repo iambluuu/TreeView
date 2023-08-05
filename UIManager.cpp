@@ -19,6 +19,10 @@ UIManager::~UIManager() {
 		drawer->Clear();
 	}
 
+	for (auto mediabutton: m_mediaButtons) {
+		delete mediabutton;
+	}
+
 	for (auto layer : m_elements) {
 		for (auto element : layer) {
 			delete element;
@@ -72,6 +76,25 @@ void UIManager::PrepareElements() {
 	playBar->SetPosition(sf::Vector2f(32, 808));
 	AddElement(playBar);
 
+	//Media Buttons
+	MediaButton* playButton = new MediaButton(this, ElementName::Pause);
+	playButton->SetPosition(sf::Vector2f(567, 839));
+	MediaButton* forwardButton = new MediaButton(this, ElementName::Forward);
+	forwardButton->SetPosition(sf::Vector2f(667, 839));
+	MediaButton* backwardButton = new MediaButton(this, ElementName::Backward);
+	backwardButton->SetPosition(sf::Vector2f(467, 839));
+	MediaButton* skipForwardButton = new MediaButton(this, ElementName::SkipForward);
+	skipForwardButton->SetPosition(sf::Vector2f(767, 839));
+	MediaButton* skipBackwardButton = new MediaButton(this, ElementName::SkipBackward);
+	skipBackwardButton->SetPosition(sf::Vector2f(357, 839));
+
+
+	AddMediaButton(playButton);
+	AddMediaButton(forwardButton);
+	AddMediaButton(backwardButton);
+	AddMediaButton(skipForwardButton);
+	AddMediaButton(skipBackwardButton);
+
 }
 
 void UIManager::HandleEvent(sf::Event* l_event) {
@@ -85,6 +108,7 @@ void UIManager::HandleEvent(sf::Event* l_event) {
 	}
 
 	HandleEventCloset(l_event);
+	HandleEventMediaButtons(l_event);
 }
 
 void UIManager::HandleEventCloset(sf::Event* l_event) {
@@ -96,12 +120,25 @@ void UIManager::HandleEventCloset(sf::Event* l_event) {
 	}
 }
 
+void UIManager::HandleEventMediaButtons(sf::Event* l_event) {
+	for (auto button : m_mediaButtons) {
+		if (button->GetState() == ElementState::Hidden || button->GetState() == ElementState::Deactivate)
+			continue;
+
+		button->HandleEvent(l_event);
+	}
+}
+
 void UIManager::AddElement(BaseElement* element) {
 	m_elements[element->GetLayer()].push_back(element);
 }
 
 void UIManager::AddToCloset(Drawer* element) {
 	m_closet.push_back(element);
+}
+
+void UIManager::AddMediaButton(MediaButton* element) {
+	m_mediaButtons.push_back(element);
 }
 
 void UIManager::SwitchState(StateType l_type) {
@@ -122,11 +159,13 @@ void UIManager::Update(const sf::Time& l_time) {
 		for (auto element : layer) {
 			if (element->GetState() == ElementState::Hidden)
 				continue;
+
 			element->Update(l_time.asMilliseconds());
 		}
 	}
 
 	UpdateCloset(l_time);
+	UpdateMediaButtons(l_time);
 }
 
 void UIManager::Draw() {
@@ -140,13 +179,16 @@ void UIManager::Draw() {
 	}
 
 	DrawCloset();
+	DrawMediaButtons();
 }
 
 void UIManager::UpdateCloset(const sf::Time& l_time) {
+
 	float time = l_time.asMilliseconds();
 	for (auto drawer : m_closet) {
 		if (drawer->GetState() == ElementState::Hidden)
 			continue;
+
 		drawer->Update(time);
 	}
 }
@@ -164,5 +206,25 @@ void UIManager::DrawCloset() {
 void UIManager::CloseCloset() {
 	for (auto drawer : m_closet) {
 		drawer->m_isOpened = 0;
+	}
+}
+
+void UIManager::UpdateMediaButtons(const sf::Time& l_time) {
+	for (auto button : m_mediaButtons) {
+		if (button->GetState() == ElementState::Hidden)
+			continue;
+
+		button->Update(l_time.asMilliseconds());
+	}
+}
+
+void UIManager::DrawMediaButtons() {
+
+	for (auto button : m_mediaButtons) {
+
+		if (button->GetState() == ElementState::Hidden)
+			continue;
+
+		button->Draw();
 	}
 }

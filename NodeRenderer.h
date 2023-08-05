@@ -69,6 +69,7 @@ public:
 	void OnPlay();
 	void OnSkipForward();
 	void OnSkipBackward();
+	void OnReplay();
 
 	void HandleEvent(sf::Event* l_event);
 	void Update(const float& l_fT);
@@ -89,6 +90,11 @@ public:
 	sf::Vector2f GetPosOnScreen(std::pair<int, int> treeCoord);
 	sf::Color GetColorTransition(float percent, const sf::Color& start, const sf::Color& end);
 	int GetStep();
+
+	bool IsPaused() {
+		return is_paused;
+	}
+
 	void SetStepNum(int val) {
 		m_stepNum++;
 	}

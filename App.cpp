@@ -1,5 +1,4 @@
 #include "App.h"
-#include "StateManager.h"
 
 enum class StateType;
 

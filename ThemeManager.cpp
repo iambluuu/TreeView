@@ -22,6 +22,7 @@ ThemeManager::ThemeManager() {
 	Elements.loadFromFile("Assets/Texture/Elements.png");
 	Elements.setSmooth(1);
 	DisplayArea1.loadFromFile("Assets/Texture/DisplayArea.png");
+	DisplayArea1.setSmooth(1);
 
 	Initiate();
 	std::cerr << "ThemeManager Initiated\n";
@@ -119,5 +120,40 @@ void ThemeManager::Initiate()
 	tmpSprite.setTextureRect(sf::IntRect(0, 868, 1120, 20));
 	ThemeSprite1->emplace(std::pair{ ElementName::PlayBar, ElementState::Focused }, tmpSprite);
 
+	//Media Buttons sprite
 
+	tmpSprite.setTextureRect(sf::IntRect(0, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Play, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(350, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Play, ElementState::Focused }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(50, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::SkipBackward, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(400, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::SkipBackward, ElementState::Focused }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(100, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::SkipForward, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(450, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::SkipForward, ElementState::Focused }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(150, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Backward, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(500, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Backward, ElementState::Focused }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(200, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Forward, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(550, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Forward, ElementState::Focused }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(250, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Pause, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(600, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Pause, ElementState::Focused }, tmpSprite);
+
+	tmpSprite.setTextureRect(sf::IntRect(300, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Replay, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(650, 888, 50, 50));
+	ThemeSprite1->emplace(std::pair{ ElementName::Replay, ElementState::Focused }, tmpSprite);
 }

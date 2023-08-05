@@ -8,10 +8,10 @@ int main()
     srand(time(0));
     App mainApp;
 
-    while (!mainApp.GetWindow()->IsDone()) {
-        mainApp.Update();
-        mainApp.Render();
-        mainApp.LateUpdate();
-    }
+    //while (!mainApp.GetWindow()->IsDone()) {
+    //    mainApp.Update();
+    //    mainApp.Render();
+    //    mainApp.LateUpdate();
+    //}
 }
     

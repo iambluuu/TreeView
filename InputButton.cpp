@@ -41,7 +41,6 @@ void InputButton::OnClick() {
 	StateType CurState = m_owner->GetState();
 	BaseState* state = m_owner->GetStateManager()->GetState(CurState);
 	
-
 	switch (m_execute) {
 	case Execute::Insert:
 		state->OnInsert(m_textBox->ReadNum());
@@ -59,8 +58,9 @@ void InputButton::OnClick() {
 }
 
 void InputButton::OnHover() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Hand));
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
+
 	m_state = ElementState::Focused;
 }
 
@@ -69,8 +69,6 @@ void InputButton::OnRelease() {
 }
 
 void InputButton::OnLeave() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
 	m_state = ElementState::Neutral;
 }
 

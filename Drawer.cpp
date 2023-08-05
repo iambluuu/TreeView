@@ -53,8 +53,8 @@ void Drawer::HandleEvent(sf::Event* l_event) {
 }
 
 void Drawer::OnHover() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Hand));
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Focused;
 }
 
@@ -65,14 +65,10 @@ void Drawer::OnClick() {
 }
 
 void Drawer::OnRelease() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
 	m_state = ElementState::Neutral;
 }
 
 void Drawer::OnLeave() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
 	m_state = ElementState::Neutral;
 }
 

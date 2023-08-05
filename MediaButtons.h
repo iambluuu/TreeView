@@ -6,22 +6,15 @@
 class UIManager;
 class NodeRenderer;
 
-enum class MediaFunction {
-	Play,
-	Pause,
-	Forward,
-	SkipForward,
-	Backward,
-	SkipBackward
-};
-
 class MediaButton : public BaseElement
 {
 	friend class UIManager;
 	friend class NodeRenderer;
-
+private:
+	UIManager* m_owner;
+	ElementName m_name;
 public:
-	MediaButton(UIManager* m_owner, MediaFunction l_function);
+	MediaButton(UIManager* m_owner, ElementName l_name);
 	~MediaButton();
 
 	void HandleEvent(sf::Event* l_event);
@@ -33,6 +26,9 @@ public:
 	void Update(float l_dT);
 	void Draw();
 
+	ElementName GetName() { return m_name; }
+
+	void SetState(ElementState l_state) { m_state = l_state;}
 	void SetTheme(int l_themeID);
 
 };

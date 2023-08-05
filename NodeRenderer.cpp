@@ -118,7 +118,41 @@ void NodeRenderer::OnBackward() {
 	m_limitStep--;
 }
 
-void NodeRenderer:: HandleEvent(sf::Event* l_event) {
+void NodeRenderer::OnSkipBackward() {
+
+	std::cerr << "Skipbackward" << std::endl;
+	is_paused = 1;
+	is_reverse = 1;
+	step_by_step = 0;
+
+	m_animationCurrent = 0;
+	m_limitStep = 0;
+
+	m_curStep = 0;
+}
+
+void NodeRenderer::OnSkipForward() {
+	std::cerr << "Skipforward" << std::endl;
+
+	is_paused = 1;
+	is_reverse = 0;
+	step_by_step = 0;
+
+	m_animationCurrent = m_stepNum * STEP_DURATION;
+	m_limitStep = m_stepNum;
+	m_curStep = m_stepNum - 1;
+}
+
+void NodeRenderer::OnReplay() {
+	is_paused = 0;
+	is_reverse = 0;
+	step_by_step = 0;
+
+	m_animationCurrent = 0;
+	m_limitStep = 0;
+}
+
+void NodeRenderer::HandleEvent(sf::Event* l_event) {
 
 	if (l_event->type == sf::Event::KeyPressed) {
 		switch (l_event->key.code) {

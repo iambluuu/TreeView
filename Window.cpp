@@ -60,6 +60,8 @@ void Window::Draw(sf::Drawable& l_drawable) {
 
 void Window::Update() {
 	sf::Event E;
+	
+	m_cursorType = 0;
 
 	while (m_window.pollEvent(E)) {
 		if (E.type == sf::Event::Closed) {
@@ -68,6 +70,24 @@ void Window::Update() {
 		}
 		m_stateManager->HandleEvent(&E);
 		m_uiManager->HandleEvent(&E);
-		
+	}
+
+	UpdateCursor();
+}
+
+void Window::UpdateCursor() {
+	ThemeManager* m_themeManager = m_uiManager->GetThemeManager();
+
+	switch (m_cursorType) {
+		case 0:
+			m_window.setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
+			break;
+		case 1:
+			m_window.setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Hand));
+			break;
+		case 2:
+		case 3:
+			m_window.setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Text));
+			break;
 	}
 }

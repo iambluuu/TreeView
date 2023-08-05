@@ -32,8 +32,8 @@ void TextBox::OnClick() {
 }
  
 void TextBox::OnHover() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Text));
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(2);
 	m_state = ElementState::Focused;
 }
 
@@ -42,8 +42,7 @@ void TextBox::OnRelease() {
 }
 
 void TextBox::OnLeave() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
-	wind->setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
+
 	m_state = ElementState::Neutral;
 }
 
