@@ -97,6 +97,15 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 			clone.m_shownValue[0] = clone.m_valueChange.first;
 		}
 
+		for (int i = 0; i < 3; i++) {
+			if (!clone.m_arrowCoord[i])
+				continue;
+
+			if (clone.m_arrowCoord[i]->getInfo()->back().is_appearing == 2) {
+				clone.m_arrowCoord[i] = nullptr;
+			}
+		}
+
 		CurInfo->push_back(clone);
 	}
 
@@ -353,9 +362,11 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 
 	if (value < CurValue) {
 		Cur->left = InsertNode(Cur->left, value, CurStepInfo->m_coord.first.second + 1, CurStepInfo->m_coord.first.first - 1);
+		Cur->getInfo()->back().m_arrowCoord[0] = Cur->left;
 	}
 	else if (value > CurValue) {
 		Cur->right = InsertNode(Cur->right, value, CurStepInfo->m_coord.first.second + 1, CurStepInfo->m_coord.first.first + 1);
+		Cur->getInfo()->back().m_arrowCoord[2] = Cur->right;
 	}
 	else {
 		//Case where inserted value already exists
@@ -423,7 +434,18 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 		if (Cur->left == nullptr || Cur->right == nullptr) {
 			Node* temp = Cur->left ? Cur->left : Cur->right;
 
+			if (value < m_root->getInfo()->back().m_shownValue[0]) {
+				m_leftWidth--;
+			}
+			else {
+				m_rightWidth--;
+			}
+
 			if (temp == nullptr) {
+				CurStepInfo->node_state.second = NodeState::Selected;
+				CurStepInfo->is_stateChanging = 1;
+
+				AddNewStep(m_root);
 				Cur->getInfo()->back().is_appearing = 2;
 				m_removedNode = Cur;
 
@@ -456,6 +478,11 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 		}
 		else {
 			Node* temp = Cur->right;
+
+			AddNewStep(m_root);
+
+			temp->getInfo()->back().node_state.second = NodeState::Selected;
+			temp->getInfo()->back().is_stateChanging = 1;
 
 			while (temp->left != nullptr) {
 				AddNewStep(m_root);
@@ -582,10 +609,12 @@ Node* AVL_Tree::RotateLeft(Node* Cur) {
 	ShiftUp(Right);
 
 	Right->left = Cur;
+	Right->getInfo()->back().m_arrowCoord[0] = Right->left;
 	Cur->right = nullptr;
 	ShiftDown(Right->left);
 	
 	Cur->right = RightsLeft;
+	Cur->getInfo()->back().m_arrowCoord[2] = Cur->right;
 
 	Cur->height = Cur->GetHeight();
 	Right->height = Right->GetHeight();
@@ -610,10 +639,12 @@ Node* AVL_Tree::RotateRight(Node* Cur) {
 	ShiftUp(Left);
 
 	Left->right = Cur;
+	Left->getInfo()->back().m_arrowCoord[2] = Left->right;
 	Cur->left = nullptr;
 	ShiftDown(Left->right);
 
 	Cur->left = LeftsRight;
+	Cur->getInfo()->back().m_arrowCoord[0] = Cur->left;
 
 	Cur->height = Cur->GetHeight();
 	Left->height = Left->GetHeight();

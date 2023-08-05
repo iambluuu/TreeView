@@ -36,11 +36,10 @@ void InputButton::SetRandom() {
 }
 
 void InputButton::OnClick() {
-	//m_textBox->m_string.clear();
-
 	StateType CurState = m_owner->GetState();
-	BaseState* state = m_owner->GetStateManager()->GetState(CurState);
-	
+	BaseState* state = nullptr;
+	state = m_owner->GetStateManager()->GetState(CurState);
+
 	switch (m_execute) {
 	case Execute::Insert:
 		state->OnInsert(m_textBox->ReadNum());
@@ -59,16 +58,20 @@ void InputButton::OnClick() {
 
 void InputButton::OnHover() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
-	wind->setCursorType(1);
+	wind->setCursorType(2);
 
 	m_state = ElementState::Focused;
 }
 
 void InputButton::OnRelease() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
 void InputButton::OnLeave() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 

@@ -57,6 +57,6 @@ public:
 	}
 
 	void setCursorType(int l_cursorType) {
-		m_cursorType |= l_cursorType;
+		m_cursorType = std::max(m_cursorType, l_cursorType);
 	}
 };

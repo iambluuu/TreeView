@@ -76,16 +76,18 @@ void Window::Update() {
 }
 
 void Window::UpdateCursor() {
+	if (m_cursorType == 0)
+		return;
+
 	ThemeManager* m_themeManager = m_uiManager->GetThemeManager();
 
 	switch (m_cursorType) {
-		case 0:
+		case 1:
 			m_window.setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Arrow));
 			break;
-		case 1:
+		case 2:
 			m_window.setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Hand));
 			break;
-		case 2:
 		case 3:
 			m_window.setMouseCursor(*m_themeManager->GetCursor(sf::Cursor::Text));
 			break;

@@ -221,6 +221,63 @@ void NodeRenderer::DrawNode(Node* Cur) {
 	SharedContext* context = m_stateManager->GetContext();
 	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
 
+	//Draw Arrows
+
+	for (int i = 0; i < 3; i++) {
+		Node* Dest = CurInfo.m_arrowCoord[i];
+
+		if (!Dest || !Dest->getInfo()->at(CurStep).is_visible)
+			continue;
+
+		auto DestInfo = Dest->getInfo()->at(CurStep);
+
+		sf::Vector2f startCoord = GetPosOnScreen(CurInfo.m_coord.first);
+
+		if (CurInfo.is_moving) {
+			sf::Vector2f First = GetPosOnScreen(CurInfo.m_coord.first);
+			sf::Vector2f Last = GetPosOnScreen(CurInfo.m_coord.second);
+
+			startCoord = First + (Last - First) * percent;
+		}
+
+		sf::Vector2f endCoord = GetPosOnScreen(DestInfo.m_coord.first);
+
+		if (DestInfo.is_moving) {
+			sf::Vector2f First = GetPosOnScreen(DestInfo.m_coord.first);
+			sf::Vector2f Last = GetPosOnScreen(DestInfo.m_coord.second);
+
+			endCoord = First + (Last - First) * percent;
+		}
+
+		float dist = sqrt(pow(startCoord.x - endCoord.x, 2) + pow(startCoord.y - endCoord.y, 2)) - 23;
+		float angle = atan2(endCoord.y - startCoord.y, endCoord.x - startCoord.x);
+
+		auto startColor = GetNodeColor(0, DestInfo.node_state.first); //subject to change, 0 to theme id
+		auto endColor = GetNodeColor(0, DestInfo.node_state.second); //subject to change, 0 to theme id
+
+		m_line.setSize(sf::Vector2f(dist, 3));
+		if (DestInfo.is_appearing == 1)
+			m_line.setSize(sf::Vector2f(dist * percent, 3));
+		else if (DestInfo.is_appearing == 2) {
+			m_line.setSize(sf::Vector2f(dist * (1 - percent), 3));
+		}
+
+		m_line.setOrigin(m_line.getLocalBounds().left, m_line.getLocalBounds().top + m_line.getLocalBounds().height / 2);
+		m_line.setPosition(startCoord);
+		m_line.setRotation(angle * 180 / 3.14159265358979323846);
+		m_line.setFillColor(std::get<0>(*startColor));
+
+		wind->draw(m_line);
+
+		if (CurInfo.is_stateChanging) {
+			m_line.setSize(sf::Vector2f(dist * percent, 3));
+			m_line.setFillColor(std::get<0>(*endColor));
+			wind->draw(m_line);
+		}
+	}
+
+	//Draw Node shape
+
 	NodeGraphics* CurSprite = GetNodeGraphics(CurInfo.value_num); //do something here 
 	sf::Sprite* BorderSprite = &CurSprite->first;
 	sf::Sprite* FillerSprite = &CurSprite->second;
@@ -234,6 +291,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 	}
 
 	sf::Vector2f coord = GetPosOnScreen(CurInfo.m_coord.first);
+
 	if (CurInfo.is_moving) {
 		sf::Vector2f startCoord = GetPosOnScreen(CurInfo.m_coord.first);
 		sf::Vector2f endCoord = GetPosOnScreen(CurInfo.m_coord.second);
@@ -296,7 +354,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 		if (CurInfo.is_valueChanging && CurInfo.m_shownValue[j] == CurInfo.m_valueChange.first) {
 			auto color = GetNodeColor(0, CurInfo.node_state.first);
 			
-			sf::Color fading = GetColorTransition(percent, std::get<2>(*color), sf::Color::Transparent);
+			sf::Color fading = GetColorTransition(percent, std::get<2>(*color), sf::Color(255, 255, 255, 0));
 
 			m_label.setString(std::to_string(CurInfo.m_valueChange.first));
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
@@ -305,7 +363,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 
 			wind->draw(m_label);
 
-			sf::Color appearing = GetColorTransition(percent, sf::Color::Transparent, std::get<2>(*color));
+			sf::Color appearing = GetColorTransition(percent, sf::Color(255, 255, 255, 0), std::get<2>(*color));
 
 			m_label.setString(std::to_string(CurInfo.m_valueChange.second));
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
@@ -322,6 +380,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 		m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 
 		wind->draw(m_label);
+
 	}
 
 	if (Cur->m_type == 0 && CurInfo.node_state.second == NodeState::Selected) {
@@ -336,6 +395,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 		m_sideLabel.setPosition(coord.x - 35, coord.y - 30);
 		wind->draw(m_sideLabel);
 	}
+
 }
 
 void NodeRenderer::DrawTree(Node* Root)
@@ -376,6 +436,13 @@ sf::Color NodeRenderer::GetColorTransition(float percent, const sf::Color& start
 	}
 	else {
 		res.b = start.b + (end.b - start.b) * percent;
+	}
+
+	if (start.a > end.a) {
+		res.a = start.b - (start.b - end.a) * percent;
+	}
+	else {
+		res.a = start.a + (end.a - start.a) * percent;
 	}
 
 	return res;

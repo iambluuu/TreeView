@@ -33,16 +33,19 @@ void TextBox::OnClick() {
  
 void TextBox::OnHover() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
-	wind->setCursorType(2);
+	wind->setCursorType(3);
 	m_state = ElementState::Focused;
 }
 
 void TextBox::OnRelease() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
 void TextBox::OnLeave() {
-
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 

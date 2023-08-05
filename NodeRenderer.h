@@ -25,6 +25,8 @@ private:
 	sf::Text m_label;
 	sf::Text m_sideLabel;
 
+	sf::RectangleShape m_line;
+
 	const float STEP_DURATION{ 500.f };
 	float m_animationCurrent{ 0.f };
 	float m_speedupRate{ 1.f };

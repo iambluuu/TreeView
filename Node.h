@@ -11,10 +11,13 @@ enum class NodeState {
 	Selected, Visited, Default, New, InRemove
 };
 
+class Node;
+
 struct NodeInfo {
 	
 	std::vector<int> m_shownValue{ std::vector<int>(3) };
-	
+	std::vector<Node*> m_arrowCoord{ std::vector<Node*>(3, nullptr)};
+
 	bool is_moving{ 0 };
 	bool is_visible{ 0 };
 	bool is_stateChanging{ 0 };
@@ -28,7 +31,7 @@ struct NodeInfo {
 	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
 	std::pair<std::pair<int, int>, std::pair<int, int> > m_coord{ {0, 0}, {0, 0} };
 	std::pair<int, int> m_valueChange{ 0, 0 };
-	
+	std::vector<Node*> m_arrowChange{ std::vector<Node*>(3)};
 };
 
 const NodeInfo DEFAULT_NODE_INFO;
@@ -47,7 +50,7 @@ public:
 	int height{ 0 };
 	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
 	Node* par{ nullptr };
-	
+
 
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
 		m_save.m_shownValue = l_value;
@@ -77,7 +80,7 @@ public:
 			break;
 		}
 	}
-	
+
 	Node* getLink(NodeLink l_link) {
 		switch (l_link) {
 		case NodeLink::NLeft:
@@ -149,6 +152,15 @@ public:
 					v = m_save.m_valueChange.second;
 
 			m_save.m_valueChange.first = m_save.m_valueChange.second;
+		}
+
+		for (int i = 0; i < 3; i++) {
+			if (!m_save.m_arrowCoord[i])
+				continue;
+
+			if (m_save.m_arrowCoord[i]->getInfo()->back().is_appearing == 2) {
+				m_save.m_arrowCoord[i] = nullptr;
+			}
 		}
 	}
 

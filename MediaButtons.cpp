@@ -31,7 +31,7 @@ void MediaButton::HandleEvent(sf::Event* l_event) {
 
 void MediaButton::OnHover() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
-	wind->setCursorType(1);
+	wind->setCursorType(2);
 	m_state = ElementState::Focused;
 }
 
@@ -50,7 +50,6 @@ void MediaButton::OnClick() {
 
 	case ElementName::Pause:
 		nodeRenderer->OnPlay();
-		m_name = ElementName::Play;
 		break;
 	case ElementName::Forward:
 		nodeRenderer->OnForward();
@@ -74,6 +73,8 @@ void MediaButton::OnRelease() {
 }
 
 void MediaButton::OnLeave() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
@@ -88,12 +89,12 @@ void MediaButton::SetPosition(sf::Vector2f l_pos) {
 void MediaButton::Update(float l_dT) {
 	NodeRenderer* nodeRenderer = m_owner->GetStateManager()->GetContext()->m_nodeRenderer;
 
-	if (nodeRenderer->GetProgress() == 1 && (m_name == ElementName::Play || m_name == ElementName::Pause)) {
+	if (nodeRenderer->GetProgress() == 1 && (m_name == ElementName::Play || m_name == ElementName::Pause || m_name == ElementName::Replay)) {
 		m_name = ElementName::Replay;
 	}
-	else if (nodeRenderer->IsPaused() && m_name == ElementName::Pause)
+	else if (nodeRenderer->IsPaused() && (m_name == ElementName::Pause || m_name == ElementName::Replay))
 		m_name = ElementName::Play;
-	else if (!nodeRenderer->IsPaused() && m_name == ElementName::Play)
+	else if (!nodeRenderer->IsPaused() && (m_name == ElementName::Play || m_name == ElementName::Replay))
 		m_name = ElementName::Pause;
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, m_name, m_state);

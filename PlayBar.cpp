@@ -30,7 +30,7 @@ void PlayBar::OnClick() {
 
 void PlayBar::OnHover() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
-	wind->setCursorType(1);
+	wind->setCursorType(2);
 }
 
 void PlayBar::OnLeave() {

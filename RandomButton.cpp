@@ -42,15 +42,19 @@ void RandomButton::OnClick() {
 
 void RandomButton::OnHover() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
-	wind->setCursorType(1);
+	wind->setCursorType(2);
 	m_state = ElementState::Focused;
 }
 
 void RandomButton::OnRelease() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
 void RandomButton::OnLeave() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
