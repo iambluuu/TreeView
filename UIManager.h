@@ -81,4 +81,6 @@ public:
 	StateManager* GetStateManager() { return m_stateManager; }
 	ThemeManager* GetThemeManager() { return m_themeManager; }
 	StateType GetState() { return m_uiState; }
+
+	int GetThemeID() { return m_theme; }
 };

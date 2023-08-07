@@ -21,8 +21,8 @@ void Window::Setup(const std::string& l_title, const sf::Vector2u& l_size) {
 	m_isDone = false;
 
 	Create();
-
-	m_view.setCenter(1600, 450);
+	
+	MoveView(DefaultOffset);
 	m_window.setView(m_view);
 }
 
@@ -43,7 +43,10 @@ void Window::ToggleFullscreen() {
 }
 
 void Window::BeginDraw() {
-	m_window.clear(sf::Color::White);
+	int themeID = m_stateManager->GetContext()->m_uiManager->GetThemeID();
+	auto color = m_stateManager->GetContext()->m_uiManager->GetThemeManager()->GetColor(themeID, ElementName::BackgroundColor, ElementState::Neutral);
+
+	m_window.clear(*color);
 }
 
 bool Window::IsDone() {
@@ -97,3 +100,20 @@ void Window::UpdateCursor() {
 			break;
 	}
 }
+
+void Window::MoveView(sf::Vector2f delta) {
+	m_offset += delta;
+	sf::Vector2f temp = m_view.getCenter();
+
+	m_view.setCenter(temp + delta);
+}
+
+void Window::ResetView() {
+	m_offset = DefaultOffset;
+	m_view.setCenter(DefaultOffset + sf::Vector2f(800, 450));
+}
+
+sf::Vector2f Window::GetOffset() {
+	return m_offset;
+}
+

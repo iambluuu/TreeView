@@ -139,14 +139,16 @@ void TextBox::GetShownLength() {
 }
 
 void TextBox::Update(float l_dT) {
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
+
 	m_hitBox.left = m_pos.x;
 	m_hitBox.top = m_pos.y;
 
-	m_text.setPosition(m_pos.x + 7, m_pos.y + m_sprite->getLocalBounds().height / 2);
+	m_text.setPosition(m_pos.x + 7 + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 2 + offset.y);
 	m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, m_state));
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, m_state);
-	m_sprite->setPosition(m_pos);
+	m_sprite->setPosition(m_pos + offset);
 
 	GetShownLength();
 	m_caret.setPosition(m_text.getPosition().x + m_text.getGlobalBounds().width + 2, m_text.getPosition().y);

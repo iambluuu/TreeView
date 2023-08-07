@@ -76,11 +76,13 @@ void InputButton::OnLeave() {
 }
 
 void InputButton::Update(float l_dT) {
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
+
 	m_hitBox.left = m_pos.x;
 	m_hitBox.top = m_pos.y;
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, m_name, m_state);
-	m_sprite->setPosition(m_pos);
+	m_sprite->setPosition(m_pos + offset);
 }
 
 void InputButton::Draw() {

@@ -97,7 +97,11 @@ void PlayBar::Update(float l_dT) {
 }
 
 void PlayBar::Draw() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	Window* window = m_owner->GetStateManager()->GetContext()->m_wind;
+	sf::RenderWindow* wind = window->GetRenderWindow();
+
+	m_sprite->setPosition(m_pos + window->GetOffset());
+	m_playedSprite->setPosition(m_pos + window->GetOffset());
 	wind->draw(*m_sprite);
 	wind->draw(*m_playedSprite);
 }

@@ -88,16 +88,20 @@ void GoToButton::HandleEvent(sf::Event* l_event) {
 
 void GoToButton::Draw() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
+
+	m_sprite->setPosition(m_pos + offset);
+	m_text.setOrigin(m_text.getLocalBounds().left + m_text.getLocalBounds().width / 2, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2.f);
+	m_text.setPosition(m_pos.x + m_sprite->getLocalBounds().width / 2 + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 6 * 5 + offset.y);
+
 	wind->Draw(*m_sprite);
 	wind->Draw(m_text);
 }
 
 void GoToButton::SetPosition(sf::Vector2f l_pos) {
 	m_pos = l_pos;
-	m_sprite->setPosition(l_pos);
 	m_hitBox.left = l_pos.x;
 	m_hitBox.top = l_pos.y;
 
-	m_text.setOrigin(m_text.getLocalBounds().left + m_text.getLocalBounds().width / 2, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2.f);
-	m_text.setPosition(m_pos.x + m_sprite->getLocalBounds().width / 2, m_pos.y + m_sprite->getLocalBounds().height / 6 * 5);
+
 }

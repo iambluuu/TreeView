@@ -8,6 +8,8 @@ enum class ElementName {
 	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, ActiveTab, InactiveTab,
 	PlayBar,
 
+	BackgroundColor,
+
 	Play,
 	Replay,
 	Pause,

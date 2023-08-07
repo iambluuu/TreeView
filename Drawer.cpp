@@ -84,6 +84,8 @@ void Drawer::SetPosition(sf::Vector2f l_pos) {
 }
 
 void Drawer::Update(float l_dT) {
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset(); //View offset
+
 	if (!m_isOpened) {
 		m_elapsed = std::max(0.0f, m_elapsed - l_dT);
 	}
@@ -94,11 +96,11 @@ void Drawer::Update(float l_dT) {
 	float percent = m_elapsed / ANIMATION_SPEED;
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::Drawer, m_state);
-	m_sprite->setPosition(m_pos);
+	m_sprite->setPosition(m_pos + offset);
 
 
-	m_arrow->setPosition(m_pos.x + 30, m_pos.y + m_sprite->getLocalBounds().height / 2);
-	m_text.setPosition(m_pos.x + 30 + m_arrow->getLocalBounds().width, m_pos.y + m_sprite->getLocalBounds().height / 2);
+	m_arrow->setPosition(m_pos.x + 30 + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 2 + offset.y);
+	m_text.setPosition(m_pos.x + 30 + m_arrow->getLocalBounds().width + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 2 + offset.y);
 
 	SetElementPosition(percent);
 	m_arrow->setRotation(90 * percent);
@@ -106,6 +108,7 @@ void Drawer::Update(float l_dT) {
 
 void Drawer::Draw() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
 	
 	for (int i = 0; i < m_elements.size(); i++) {
 		for (int j = 0; j < m_elements[i].size(); j++) {

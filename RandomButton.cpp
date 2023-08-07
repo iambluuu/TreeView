@@ -63,15 +63,16 @@ void RandomButton::Update(float l_dT) {
 	m_hitBox.top = m_pos.y;
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, m_name, m_state);
-	m_sprite->setPosition(m_pos);
 }
 
 void RandomButton::Draw() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
 
 	if (!m_sprite)
 		std::cerr << "oof\n";
 
+	m_sprite->setPosition(m_pos + offset);
 	wind->draw(*m_sprite);
 }
 

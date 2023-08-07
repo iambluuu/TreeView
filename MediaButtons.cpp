@@ -78,9 +78,8 @@ void MediaButton::OnLeave() {
 	m_state = ElementState::Neutral;
 }
 
-void MediaButton::SetPosition(sf::Vector2f l_pos) {
+void MediaButton::SetPosition(sf::Vector2f l_pos) {	
 	m_pos = l_pos;
-	m_sprite->setPosition(l_pos);
 
 	m_hitBox.left = l_pos.x;
 	m_hitBox.top = l_pos.y;
@@ -102,7 +101,10 @@ void MediaButton::Update(float l_dT) {
 }
 
 void MediaButton::Draw() {
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+
+	m_sprite->setPosition(m_pos + offset);
 
 	wind->draw(*m_sprite);
 }

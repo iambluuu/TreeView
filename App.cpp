@@ -26,8 +26,8 @@ void App::Update() {
 
 void App::Render() {
 	m_window.BeginDraw();
-	m_uiManager.Draw();
 	m_stateManager.Draw();
+	m_uiManager.Draw();
 	m_window.EndDraw();
 }
 

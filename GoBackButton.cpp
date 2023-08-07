@@ -54,12 +54,15 @@ void GoBackButton::HandleEvent(sf::Event* l_event) {
 
 void GoBackButton::Draw() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
+
+	m_sprite->setPosition(m_pos + offset);
 	wind->Draw(*m_sprite);
 }
 
 void GoBackButton::SetPosition(sf::Vector2f l_pos) {
 	m_pos = l_pos;
-	m_sprite->setPosition(l_pos);
+
 	m_hitBox.left = l_pos.x;
 	m_hitBox.top = l_pos.y;
 }

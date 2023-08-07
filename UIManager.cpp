@@ -68,13 +68,13 @@ void UIManager::PrepareElements() {
 
 	//Display
 
-	StaticElement* displayArea = new StaticElement(this, ElementName::DisplayArea);
-	displayArea->SetLayer(2);
-	displayArea->SetPosition(sf::Vector2f(32, 104));
-	AddElement(displayArea);
+	//StaticElement* displayArea = new StaticElement(this, ElementName::DisplayArea);
+	//displayArea->SetLayer(2);
+	//displayArea->SetPosition(sf::Vector2f(32, 104));
+	//AddElement(displayArea);
 
 	PlayBar* playBar = new PlayBar(this);
-	playBar->SetPosition(sf::Vector2f(800 + 32, 808));
+	playBar->SetPosition(sf::Vector2f(32, 808));
 	AddElement(playBar);
 
 	//Media Buttons

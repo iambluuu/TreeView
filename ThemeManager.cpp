@@ -177,4 +177,7 @@ void ThemeManager::Initiate()
 	ThemeSprite1->emplace(std::pair{ ElementName::GoTo, ElementState::Neutral }, tmpSprite);
 	tmpSprite.setTextureRect(sf::IntRect(394, 0, 394, 293));
 	ThemeSprite1->emplace(std::pair{ ElementName::GoTo, ElementState::Focused }, tmpSprite);
+
+	//Background color
+	ThemeColor1->emplace(std::pair{ElementName::BackgroundColor, ElementState::Neutral }, LightBeige);
 }

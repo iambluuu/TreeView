@@ -26,7 +26,9 @@ void StaticElement::SetPosition(sf::Vector2f l_pos) {
 void StaticElement::Update(float l_dT){}
 
 void StaticElement::Draw() {
-	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
+	Window* window = m_owner->GetStateManager()->GetContext()->m_wind;
+	sf::RenderWindow* wind = window->GetRenderWindow();
+	m_sprite->setPosition(m_pos + window->GetOffset());
 	wind->draw(*m_sprite);
 }
 

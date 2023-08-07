@@ -10,8 +10,12 @@ class StateManager;
 
 class Window {
 private:
+	const sf::Vector2f DefaultOffset = sf::Vector2f(1500, 0);
+
 	int m_fps;
 	int m_cursorType{ 0 }; // 0 - normal, 1 - hand, 2 - text
+
+	sf::Vector2f m_offset;
 
 	std::string m_windowTitle;
 	sf::Vector2u m_windowSize;
@@ -45,6 +49,9 @@ public:
 	sf::Vector2i GetWindowSize();
 
 	void ToggleFullscreen();
+
+	void MoveView(sf::Vector2f delta);
+	void ResetView();
 	
 	void SetUIManager(UIManager* l_uiManager) {
 		m_uiManager = l_uiManager;
@@ -61,4 +68,6 @@ public:
 	void setCursorType(int l_cursorType) {
 		m_cursorType = std::max(m_cursorType, l_cursorType);
 	}
+
+	sf::Vector2f GetOffset();
 };
