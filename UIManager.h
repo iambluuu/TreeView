@@ -13,6 +13,8 @@
 #include "Drawer.h"
 #include "PlayBar.h"
 #include "MediaButtons.h"
+#include "GoBackButton.h"
+#include "GoToButton.h"
 
 class BaseElement;
 
@@ -22,8 +24,17 @@ class MediaButton;
 
 enum class StateType;
 
+struct UIData {
+	int closetMask{ 0 };
+	int tabMask{ 0 };
+
+	bool isMenu{ false };
+};
+
 class UIManager {
 private:
+	std::map<StateType, UIData> m_uiData;
+
 	std::vector<std::vector<BaseElement*>> m_elements;
 	std::vector<Drawer*> m_closet;
 	std::vector<MediaButton*> m_mediaButtons;
@@ -42,6 +53,7 @@ public:
 	~UIManager();
 
 	void PrepareElements();
+	void PrepareStateUI();
 
 	void HandleEvent(sf::Event* l_event);
 	void HandleEventCloset(sf::Event* l_event);

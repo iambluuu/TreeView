@@ -14,7 +14,12 @@ enum class ElementName {
 	Forward,
 	SkipForward,
 	Backward,
-	SkipBackward
+	SkipBackward,
+
+	GoBack,
+	GoTo,
+
+	MenuBackground,
 };
 
 enum class ElementState {

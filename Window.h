@@ -22,6 +22,8 @@ private:
 	UIManager* m_uiManager{ nullptr };
 	StateManager* m_stateManager{ nullptr };
 
+	sf::View m_view;
+
 	void Destroy();
 	void Create();
 	void Setup(const std::string& l_title, const sf::Vector2u& l_size);

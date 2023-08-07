@@ -42,11 +42,11 @@ void InputButton::OnClick() {
 
 	switch (m_execute) {
 	case Execute::Insert:
-		state->OnInsert(m_textBox->ReadNum());
+		state->OnInsert(m_textBox->ReadString());
 		break;
 
 	case Execute::Remove:
-		state->OnRemove(m_textBox->ReadNum()[0]);
+		state->OnRemove(m_textBox->ReadString());
 		break;
 
 	default:

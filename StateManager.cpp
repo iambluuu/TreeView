@@ -1,12 +1,14 @@
 #include "StateManager.h"
+#include "Menu.h"
 #include "AVL_Tree.h"
 #include "Hash_Table.h"
+
 
 StateManager::StateManager(SharedContext* l_shareContext)
 {
 	m_context = l_shareContext;
 
-	//RegisterState<Main_Menu>(StateType::MainMenu);
+	RegisterState<Menu>(StateType::Menu);
 	//RegisterState<Hash_Table>(StateType::HashTable);
 	//RegisterState<Binary_Tree>(StateType::BinaryTree);
 	RegisterState<AVL_Tree>(StateType::AVLTree);
@@ -14,6 +16,9 @@ StateManager::StateManager(SharedContext* l_shareContext)
 	//RegisterState<TTF_Tree>(StateType::TTFTree);
 	//RegisterState<Trie>(StateType::Trie);
 	//RegisterState<Graph>(StateType::Graph);
+
+	CreateState(StateType::Menu);
+	CreateState(StateType::AVLTree);
 
 }
 
@@ -106,6 +111,8 @@ void StateManager::ProcessRequests() {
 }
 
 void StateManager::SwitchTo(const StateType& l_type) {
+	std::cerr << "Attempting to switch state to: " << (int)l_type << "\n";
+
 	for (auto itr = m_states.begin(); itr < m_states.end(); itr++) {
 		if (itr->first == l_type) {
 			m_states.back().second->Deactivate();
@@ -114,6 +121,11 @@ void StateManager::SwitchTo(const StateType& l_type) {
 			m_states.erase(itr);
 			m_states.emplace_back(tmpType, tmpState);
 			m_states.back().second->Activate();
+			
+			std::cerr << "Switch State to: " << (int)l_type << "\n";
+
+			m_context->m_uiManager->SwitchState(l_type);
+			m_context->m_nodeRenderer->SetState(l_type);
 
 			return;
 		}
@@ -122,6 +134,8 @@ void StateManager::SwitchTo(const StateType& l_type) {
 	if (!m_states.empty()) {
 		m_states.back().second->Deactivate();
 	}
+
+	std::cerr << "Create State: " << (int)l_type << "\n";
 
 	CreateState(l_type);
 	m_states.back().second->Activate();

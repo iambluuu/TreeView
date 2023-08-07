@@ -6,7 +6,7 @@ private:
 	std::vector<Node*> m_align;
 	const int ALIGN_OFFSET{ 10 };
 
-	const int MAX_NODE_NUM{ 15 };
+	const int MAX_NODE_NUM{ 21 };
 	const int MAX_WIDTH{ 10 };
 
 	int m_nodeNum{ 0 };
@@ -34,6 +34,8 @@ private:
 	void ClearStep(Node* Cur);
 	void Centering();
 
+	bool ValidateInput(const std::string& l_value, std::vector<int>& res);
+
 public:
 	AVL_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {
 		m_align.resize(2 * MAX_WIDTH + 1);
@@ -54,8 +56,8 @@ public:
 	void ResetNodes(Node* Cur);
 
 	void OnGenerate();
-	void OnInsert(const std::vector<int>& l_value);
-	void OnRemove(int value);
+	void OnInsert(const std::string& l_value);
+	void OnRemove(const std::string& l_value);
 
 	Node* RotateLeft(Node* Cur);
 	Node* RotateRight(Node* Cur);

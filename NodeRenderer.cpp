@@ -52,6 +52,9 @@ void NodeRenderer::PrepareSprite() {
 
 	m_nodeGraphics[3] = std::make_pair(Border, Fill);
 
+	//Arrows
+	m_arrowSprite.setTexture(m_arrowTexture);
+	
 	std::cerr << "NodeRenderer: Sprite prepared" << m_nodeGraphics.size() << std::endl;
 }
 
@@ -203,7 +206,7 @@ NodeGraphics* NodeRenderer::GetNodeGraphics(int valueNum) {
 	return &m_nodeGraphics[valueNum - 1];
 }
 
-void NodeRenderer::DrawNode(Node* Cur) {
+void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	if (!Cur)
 		return;
 
@@ -223,7 +226,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 
 	//Draw Arrows
 
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < CurInfo.m_arrowCoord.size(); i++) {
 		Node* Dest = CurInfo.m_arrowCoord[i];
 
 		if (!Dest || !Dest->getInfo()->at(CurStep).is_visible)
@@ -249,30 +252,33 @@ void NodeRenderer::DrawNode(Node* Cur) {
 			endCoord = First + (Last - First) * percent;
 		}
 
-		float dist = sqrt(pow(startCoord.x - endCoord.x, 2) + pow(startCoord.y - endCoord.y, 2)) - 23;
+		float dist = sqrt(pow(startCoord.x - endCoord.x, 2) + pow(startCoord.y - endCoord.y, 2)) - 20;
 		float angle = atan2(endCoord.y - startCoord.y, endCoord.x - startCoord.x);
 
 		auto startColor = GetNodeColor(0, DestInfo.node_state.first); //subject to change, 0 to theme id
 		auto endColor = GetNodeColor(0, DestInfo.node_state.second); //subject to change, 0 to theme id
 
-		m_line.setSize(sf::Vector2f(dist, 3));
+		sf::Sprite* arrow = &m_arrowSprite;
+
+		arrow->setTextureRect(sf::IntRect(229 - dist, directed * 22, dist, 22));
+
 		if (DestInfo.is_appearing == 1)
-			m_line.setSize(sf::Vector2f(dist * percent, 3));
+			arrow->setTextureRect(sf::IntRect(229 - dist * percent, directed * 22, dist * percent, 22));
 		else if (DestInfo.is_appearing == 2) {
-			m_line.setSize(sf::Vector2f(dist * (1 - percent), 3));
+			arrow->setTextureRect(sf::IntRect(229 - dist * (1 - percent), directed * 22, dist * (1 - percent), 22));
 		}
 
-		m_line.setOrigin(m_line.getLocalBounds().left, m_line.getLocalBounds().top + m_line.getLocalBounds().height / 2);
-		m_line.setPosition(startCoord);
-		m_line.setRotation(angle * 180 / 3.14159265358979323846);
-		m_line.setFillColor(std::get<0>(*startColor));
+		arrow->setOrigin(arrow->getLocalBounds().left, arrow->getLocalBounds().top + arrow->getLocalBounds().height / 2);
+		arrow->setPosition(startCoord);
+		arrow->setRotation(angle * 180 / 3.14159265358979323846);
+		arrow->setColor(std::get<0>(*startColor));
 
-		wind->draw(m_line);
+		wind->draw(*arrow);
 
-		if (CurInfo.is_stateChanging) {
-			m_line.setSize(sf::Vector2f(dist * percent, 3));
-			m_line.setFillColor(std::get<0>(*endColor));
-			wind->draw(m_line);
+		if (DestInfo.is_stateChanging) {
+			arrow->setTextureRect(sf::IntRect(0, directed * 22, dist * percent, 22));
+			arrow->setColor(std::get<0>(*endColor));
+			wind->draw(*arrow);
 		}
 	}
 
@@ -281,9 +287,6 @@ void NodeRenderer::DrawNode(Node* Cur) {
 	NodeGraphics* CurSprite = GetNodeGraphics(CurInfo.value_num); //do something here 
 	sf::Sprite* BorderSprite = &CurSprite->first;
 	sf::Sprite* FillerSprite = &CurSprite->second;
-
-	m_label.setString(std::to_string(CurInfo.m_shownValue[0]));
-	m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 
 	if (CurInfo.is_splitting) {
 
@@ -356,7 +359,13 @@ void NodeRenderer::DrawNode(Node* Cur) {
 			
 			sf::Color fading = GetColorTransition(percent, std::get<2>(*color), sf::Color(255, 255, 255, 0));
 
-			m_label.setString(std::to_string(CurInfo.m_valueChange.first));
+			if (m_curState == StateType::Trie) {
+				std::string tmp = "";
+				tmp.push_back(CurInfo.m_valueChange.first + 'a');
+				m_label.setString(tmp);
+			}
+			else
+				m_label.setString(std::to_string(CurInfo.m_valueChange.first));
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 			m_label.setFillColor(fading);
@@ -365,7 +374,13 @@ void NodeRenderer::DrawNode(Node* Cur) {
 
 			sf::Color appearing = GetColorTransition(percent, sf::Color(255, 255, 255, 0), std::get<2>(*color));
 
-			m_label.setString(std::to_string(CurInfo.m_valueChange.second));
+			if (m_curState == StateType::Trie) {
+				std::string tmp = "";
+				tmp.push_back(CurInfo.m_valueChange.second + 'a');
+				m_label.setString(tmp);
+			}
+			else
+				m_label.setString(std::to_string(CurInfo.m_valueChange.second));
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 			m_label.setFillColor(appearing);
@@ -375,7 +390,12 @@ void NodeRenderer::DrawNode(Node* Cur) {
 			continue;
 		}
 
-		m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
+		if (m_curState == StateType::Trie) {
+			std::string tmp = "";
+			tmp.push_back(CurInfo.m_shownValue[j] + 'a');
+			m_label.setString(tmp);
+		} else
+			m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
 		m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 		m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 
@@ -383,7 +403,7 @@ void NodeRenderer::DrawNode(Node* Cur) {
 
 	}
 
-	if (Cur->m_type == 0 && CurInfo.node_state.second == NodeState::Selected) {
+	if (m_curState == StateType::AVLTree && CurInfo.node_state.second == NodeState::Selected) {
 		m_sideLabel.setString("bf = " + std::to_string(CurInfo.m_bf));
 	
 		if (CurInfo.m_bf > 1 || CurInfo.m_bf < -1)
@@ -403,7 +423,7 @@ void NodeRenderer::DrawTree(Node* Root)
 	if (!Root)
 		return;
 
-	DrawNode(Root);
+	DrawNode(Root, 0);
 	DrawTree(Root->left);
 	DrawTree(Root->right);
 }

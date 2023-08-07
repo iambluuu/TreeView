@@ -20,6 +20,9 @@ private:
 	sf::Texture BG1;
 	sf::Texture BG2;
 
+	sf::Texture MenuBG;
+	sf::Texture MenuWidget;
+
 	sf::Texture DisplayArea1;
 	sf::Texture DisplayArea2;
 

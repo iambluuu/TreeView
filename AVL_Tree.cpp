@@ -23,6 +23,38 @@ void AVL_Tree::Deactivate() {
 
 }
 
+bool AVL_Tree::ValidateInput(const std::string& l_value, std::vector<int>& res) {
+	if (l_value.empty()) {
+		return false;
+	}
+
+	int num = 0;
+	int sign = 1;
+	int i = 0;
+
+	if (l_value[0] == '-') {
+		sign *= -1;
+		i++;
+	}
+
+	for (; i < l_value.size(); i++) {
+		if (l_value[i] < '0' || l_value[i] > '9') {
+			return false;
+		}
+
+		num = num * 10 + l_value[i] - '0';
+	}
+
+	num *= sign;
+	if (num > 999 || num < -999) {
+		return false;
+	}
+
+	res.push_back(num);
+
+	return true;
+}
+
 void AVL_Tree::HandleEvent(sf::Event* l_event) {
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
@@ -42,7 +74,7 @@ void AVL_Tree::Draw() {
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	
 	renderer->DrawTree(m_root);
-	renderer->DrawNode(m_removedNode);
+	renderer->DrawNode(m_removedNode, 0);
 }
 
 void AVL_Tree::ResetNodes(Node* Cur) {
@@ -561,16 +593,23 @@ void AVL_Tree::OnGenerate() {
 	}
 }
 
-void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
+void AVL_Tree::OnInsert(const std::string& l_value) {
+	std::vector<int> input;
+
+	if (!ValidateInput(l_value, input)) {
+		return;
+	}
+	
 	if (m_nodeNum > 0 && (m_nodeNum == MAX_NODE_NUM || (l_value[0] < m_root->getInfo()->back().m_shownValue[0] && m_leftWidth == MAX_WIDTH) || (l_value[0] > m_root->getInfo()->back().m_shownValue[0] && m_rightWidth == MAX_WIDTH))) {
 		return;
 	}
 
 	PostProcessing();
-	m_newNode = new Node(l_value);
+
+	m_newNode = new Node(input);
 	ResetNodes(m_root);
 
-	m_root = InsertNode(m_root, l_value[0], 0, 0);
+	m_root = InsertNode(m_root, input[0], 0, 0);
 	Centering();
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
@@ -578,7 +617,12 @@ void AVL_Tree::OnInsert(const std::vector<int>& l_value) {
 	
 }
 
-void AVL_Tree::OnRemove(int value) {
+void AVL_Tree::OnRemove(const std::string& l_value) {
+	std::vector<int> input;
+	if (!ValidateInput(l_value, input)) {
+		return;
+	}
+	
 	if (m_nodeNum == 0)
 		return;
 
@@ -587,7 +631,7 @@ void AVL_Tree::OnRemove(int value) {
 	PostProcessing();
 	ResetNodes(m_root);
 
-	m_root = RemoveNode(m_root, value);
+	m_root = RemoveNode(m_root, input[0]);
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 

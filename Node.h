@@ -16,7 +16,7 @@ class Node;
 struct NodeInfo {
 	
 	std::vector<int> m_shownValue{ std::vector<int>(3) };
-	std::vector<Node*> m_arrowCoord{ std::vector<Node*>(3, nullptr)};
+	std::vector<Node*> m_arrowCoord{ std::vector<Node*>(26, nullptr)};
 
 	bool is_moving{ 0 };
 	bool is_visible{ 0 };
@@ -44,15 +44,15 @@ private:
 
 
 public:
-	int m_type{ 0 }; //0 AVL, 1 TT, 2 TTFT, 3 Trie
-
 	NodeInfo m_save;
 	int height{ 0 };
 	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
+	Node* child[26];
 	Node* par{ nullptr };
 
 
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
+		memset(child, 0, sizeof(child));
 		m_save.m_shownValue = l_value;
 		left = l_left;
 		right = l_right;

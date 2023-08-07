@@ -19,6 +19,11 @@ ThemeManager::ThemeManager() {
 
 	BG1.loadFromFile("Assets/Texture/Background.png");
 	//BG2.loadFromFile("Assets/Texture/Background2.png");
+
+	MenuBG.loadFromFile("Assets/Texture/MenuBackground.png");
+
+	MenuWidget.loadFromFile("Assets/Texture/MenuWidget.png");
+
 	Elements.loadFromFile("Assets/Texture/Elements.png");
 	Elements.setSmooth(1);
 	DisplayArea1.loadFromFile("Assets/Texture/DisplayArea.png");
@@ -28,8 +33,6 @@ ThemeManager::ThemeManager() {
 	std::cerr << "ThemeManager Initiated\n";
 
 }
-
-
 
 sf::Color* ThemeManager::GetColor(int ThemeID, ElementName l_name, ElementState l_state) {
 	ThemeColor* theme = &m_themeColor;
@@ -156,4 +159,22 @@ void ThemeManager::Initiate()
 	ThemeSprite1->emplace(std::pair{ ElementName::Replay, ElementState::Neutral }, tmpSprite);
 	tmpSprite.setTextureRect(sf::IntRect(650, 888, 50, 50));
 	ThemeSprite1->emplace(std::pair{ ElementName::Replay, ElementState::Focused }, tmpSprite);
+
+	//Go back Button
+	tmpSprite.setTextureRect(sf::IntRect(0, 938, 75, 75));
+	ThemeSprite1->emplace(std::pair{ ElementName::GoBack, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(75, 938, 75, 75));
+	ThemeSprite1->emplace(std::pair{ ElementName::GoBack, ElementState::Focused }, tmpSprite);
+
+	//Menu background
+
+	tmpSprite.setTexture(MenuBG, true);
+	ThemeSprite1->emplace(std::pair{ ElementName::MenuBackground, ElementState::Neutral }, tmpSprite);
+
+	//Menu buttons
+	tmpSprite.setTexture(MenuWidget);
+	tmpSprite.setTextureRect(sf::IntRect(0, 0, 394, 293));
+	ThemeSprite1->emplace(std::pair{ ElementName::GoTo, ElementState::Neutral }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(394, 0, 394, 293));
+	ThemeSprite1->emplace(std::pair{ ElementName::GoTo, ElementState::Focused }, tmpSprite);
 }

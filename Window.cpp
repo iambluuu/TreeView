@@ -5,7 +5,7 @@ Window::Window() {
 	Setup("Window", sf::Vector2u(1600, 900));
 }
 
-Window::Window(const std::string& l_title, const sf::Vector2u& l_size) {
+Window::Window(const std::string& l_title, const sf::Vector2u& l_size) : m_view(sf::FloatRect(0, 0, 1600, 900)) {
 	m_fps = 60;
 	Setup(l_title, l_size);
 }
@@ -19,7 +19,11 @@ void Window::Setup(const std::string& l_title, const sf::Vector2u& l_size) {
 	m_windowTitle = l_title;
 	m_isFullscreen = false;
 	m_isDone = false;
+
 	Create();
+
+	m_view.setCenter(1600, 450);
+	m_window.setView(m_view);
 }
 
 void Window::Create() {

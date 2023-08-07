@@ -10,17 +10,22 @@ class ThemeManager;
 using NodeGraphics = std::pair<sf::Sprite, sf::Sprite>;
 using NodeColor = std::vector<std::map<NodeState, std::tuple<sf::Color, sf::Color, sf::Color>>>;
 
+enum class StateType;
+
 class NodeRenderer {
 private:
 	std::vector<NodeGraphics> m_nodeGraphics;
+	sf::Sprite m_arrowSprite;
 	NodeColor m_nodeColor;
 
 	StateManager* m_stateManager{ nullptr };
 	//ThemeManager* m_themeManager{ nullptr };
 
+	StateType m_curState;
 
 	sf::Font m_font;
 	sf::Texture m_texture;
+	sf::Texture m_arrowTexture;
 
 	sf::Text m_label;
 	sf::Text m_sideLabel;
@@ -51,6 +56,10 @@ public:
 
 		m_texture.loadFromFile("Assets/Texture/NodeSheet.png");
 		m_texture.setSmooth(1);
+
+		m_arrowTexture.loadFromFile("Assets/Texture/Arrow.png");
+		m_arrowTexture.setSmooth(1);
+
 		m_font.loadFromFile("Assets/Font/monofonto rg.otf");
 
 		m_label.setFont(m_font);
@@ -85,7 +94,7 @@ public:
 	void MoveNode(const NodeInfo& l_info, float percent);
 	
 	void DrawTree(Node* Root);
-	void DrawNode(Node* Cur);
+	void DrawNode(Node* Cur, bool Directed);
 	void DrawArrow();
 
 	std::tuple<sf::Color, sf::Color, sf::Color>* GetNodeColor(int ThemeID, NodeState l_state);
@@ -118,5 +127,10 @@ public:
 
 	void SetProgress(float percent) {
 		m_animationCurrent = percent * STEP_DURATION * m_stepNum;
+		m_curStep = GetStep();
+	}
+
+	void SetState(StateType l_type) {
+		m_curState = l_type;
 	}
 };

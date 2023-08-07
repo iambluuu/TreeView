@@ -158,6 +158,8 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AVL_Tree.cpp" />
     <ClCompile Include="Drawer.cpp" />
+    <ClCompile Include="GoBackButton.cpp" />
+    <ClCompile Include="GoToButton.cpp" />
     <ClCompile Include="InputButton.cpp" />
     <ClCompile Include="MediaButtons.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
@@ -176,7 +178,10 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="AVL_Tree.h" />
     <ClInclude Include="Drawer.h" />
+    <ClInclude Include="GoBackButton.h" />
+    <ClInclude Include="GoToButton.h" />
     <ClInclude Include="MediaButtons.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="PlayBar.h" />
     <ClInclude Include="InputButton.h" />
     <ClInclude Include="NodeRenderer.h" />

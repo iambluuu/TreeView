@@ -7,7 +7,7 @@
 #include <functional>
 
 enum class StateType {
-	MainMenu = 1, HashTable, BinaryTree, AVLTree, TTTree, TTFTree, Trie, Graph, Exit
+	Menu = 1, HashTable, Heap, AVLTree, TTFTree, Trie, Graph, Exit
 };
 
 class StateManager;
@@ -42,10 +42,8 @@ public:
 	virtual void Update(const sf::Time& l_time) = 0;
 	virtual void Draw() = 0;
 
-	virtual void TestFunc() = 0;
-
-	virtual void OnInsert(const std::vector<int>& l_data) = 0;
-	virtual void OnRemove(int value) = 0;
+	virtual void OnInsert(const std::string& l_value) = 0;
+	virtual void OnRemove(const std::string& l_value) = 0;
 	
 	void setTransparent(const bool& l_transparent) {
 		m_transparent = l_transparent;
