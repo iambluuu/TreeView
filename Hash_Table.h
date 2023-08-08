@@ -13,8 +13,6 @@ private:
 
 	void AddNodeStep(Node* node);
 	void AddNewStep();
-	
-	CreateChaining
 
 	void InsertChaining(int value);
 	void InsertLinearProbing(int value);

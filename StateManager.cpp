@@ -148,7 +148,6 @@ void StateManager::CreateState(const StateType& l_type) {
 
 	BaseState* l_state = newState->second(); //call function to create new base state
 	m_states.emplace_back(l_type, l_state);
-	l_state->OnCreate();
 }
 
 void StateManager::RemoveState(const StateType& l_type) {
