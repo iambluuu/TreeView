@@ -7,7 +7,7 @@
 #include <functional>
 
 enum class StateType {
-	Menu = 1, HashTable, Heap, AVLTree, TTFTree, Trie, Graph, Exit
+	Menu = 1, Hash_Table, Heap, AVLTree, TTFTree, Trie, Graph, Exit
 };
 
 class StateManager;
@@ -32,7 +32,7 @@ public:
 		return m_stateManager;
 	}
 
-	virtual void OnCreate() = 0;
+	virtual void OnCreate(const std::string& l_numbers, const std::string& l_value) = 0;
 	virtual void OnDestroy() = 0;
 
 	virtual void Activate() = 0;

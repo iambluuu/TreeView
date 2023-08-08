@@ -38,11 +38,40 @@ void UIManager::PrepareElements() {
 	std::cerr << "background created\n";
 	AddElement(background);
 
+	//Create Drawer for hash table
+
+	TextBox *h_inputNumbers = new TextBox(this, "n =");
+	TextBox *h_inputValue = new TextBox(this, "m =");
+
+	RandomButton* h_randomButton = new RandomButton(this, h_inputNumbers, h_inputValue);
+	InputButton* h_inputButton = new InputButton(this, h_inputValue, h_inputNumbers, Execute::Create);
+
+	Drawer * h_drawer = new Drawer(this, "Create");
+	h_drawer->AddElement(0, h_inputNumbers);
+	h_drawer->AddElement(1, h_inputValue);
+	h_drawer->AddElement(1, h_randomButton);
+	h_drawer->AddElement(1, h_inputButton);
+
+	AddToCloset(h_drawer);
+
+	//Create Drawer
+
+	TextBox* createValues= new TextBox(this, "v =");
+	RandomButton* createRandom = new RandomButton(this, createValues, nullptr);
+	InputButton* createInput = new InputButton(this, createValues, nullptr, Execute::Create);
+
+	Drawer* createDrawer = new Drawer(this, "Create");
+	createDrawer->AddElement(0, createValues);
+	createDrawer->AddElement(0, createRandom);
+	createDrawer->AddElement(0, createInput);
+
+	AddToCloset(createDrawer);
+
 	//Insert Drawer
-	TextBox *insertBox = new TextBox(this);
+	TextBox *insertBox = new TextBox(this, "v =");
 	insertBox->max_input_char = 1;
-	RandomButton* insertRandom = new RandomButton(this, insertBox);
-	InputButton* insertInput = new InputButton(this, insertBox, Execute::Insert);
+	RandomButton* insertRandom = new RandomButton(this, insertBox, nullptr);
+	InputButton* insertInput = new InputButton(this, insertBox, nullptr, Execute::Insert);
 	insertBox->m_inputButton = insertInput;
 	Drawer* insertDrawer = new Drawer(this, "Insert");
 
@@ -53,10 +82,10 @@ void UIManager::PrepareElements() {
 	AddToCloset(insertDrawer);
 	
 	//Remove Drawer
-	TextBox* removeBox = new TextBox(this);
+	TextBox* removeBox = new TextBox(this, "v =");
 	removeBox->max_input_char = 1;
-	RandomButton* removeRandom = new RandomButton(this, removeBox);
-	InputButton* removeInput = new InputButton(this, removeBox, Execute::Remove);
+	RandomButton* removeRandom = new RandomButton(this, removeBox, nullptr);
+	InputButton* removeInput = new InputButton(this, removeBox, nullptr, Execute::Remove);
 	removeBox->m_inputButton = removeInput;
 	Drawer* removeDrawer = new Drawer(this, "Remove");
 
@@ -65,6 +94,16 @@ void UIManager::PrepareElements() {
 	removeDrawer->AddElement(0, removeInput);
 
 	AddToCloset(removeDrawer);
+
+	//Search Drawer
+	TextBox* searchBox = new TextBox(this, "v =");
+	searchBox->max_input_char = 1;
+	RandomButton* searchRandom = new RandomButton(this, searchBox, nullptr);
+	InputButton* searchInput = new InputButton(this, searchBox, nullptr, Execute::Search);
+	searchBox->m_inputButton = searchInput;
+	Drawer* searchDrawer = new Drawer(this, "Search");
+
+	AddToCloset(searchDrawer);
 
 	//Display
 
@@ -95,6 +134,19 @@ void UIManager::PrepareElements() {
 	AddMediaButton(skipForwardButton);
 	AddMediaButton(skipBackwardButton);
 
+	//View Buttons
+	ViewButton* viewUp = new ViewButton(this, ElementName::ViewUp);
+	ViewButton* viewDown = new ViewButton(this, ElementName::ViewDown);
+	ViewButton* viewLeft = new ViewButton(this, ElementName::ViewLeft);
+	ViewButton* viewRight = new ViewButton(this, ElementName::ViewRight);
+	ViewButton* resetView = new ViewButton(this, ElementName::ResetView);
+
+	AddElement(viewUp);
+	AddElement(viewDown);
+	AddElement(viewLeft);
+	AddElement(viewRight);
+	AddElement(resetView);
+
 	//GoBack Button
 	GoBackButton* goBackButton = new GoBackButton(this);
 
@@ -115,7 +167,7 @@ void UIManager::PrepareElements() {
 void UIManager::PrepareStateUI() {
 	UIData data;
 
-	//Closet Mask: 0001 - Insert, 0010 - Remove, 0100 - Search
+	//Closet Mask: 00001 - Create(HashTable), 00010 - Create(Normal), 00100 - Insert, 01000 - Remove, 10000 - Search
 
 	//Menu
 	data.closetMask = 0;
@@ -125,11 +177,16 @@ void UIManager::PrepareStateUI() {
 	m_uiData.emplace(StateType::Menu, data);
 
 	//AVL Tree
-	data.closetMask = 3;
+	data.closetMask = 30;
 	data.isMenu = 0;
 	data.tabMask = 0;
 
 	m_uiData.emplace(StateType::AVLTree, data);
+
+	//Hash Table
+	data.closetMask = 29;
+	data.isMenu = 0;
+	data.tabMask = 0; //Subject to change, HT has 3 modes
 
 }
 

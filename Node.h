@@ -58,9 +58,18 @@ public:
 		right = l_right;
 		middle = l_middle;
 	}
+
+	Node(int value) {
+		m_save.m_shownValue.push_back(value);
+
+		left = nullptr;
+		right = nullptr;
+		middle = nullptr;
+	}
+
 	~Node() {
 		if (left || right || middle)
-			std::cerr << "oof";
+			std::cerr << "You forgot to clean the tree";
 	}
 
 	std::vector<NodeInfo>* getInfo() {

@@ -10,9 +10,10 @@ class RandomButton : public BaseElement {
 private:
 	UIManager* m_owner{ nullptr };
 	TextBox* m_textBox{ nullptr };
+	TextBox* m_textBox2{ nullptr };
 
 public:
-	RandomButton(UIManager* m_owner, TextBox* l_textBox);
+	RandomButton(UIManager* m_owner, TextBox* l_textBox, TextBox* l_textBox2);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();

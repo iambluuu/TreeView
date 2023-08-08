@@ -19,6 +19,7 @@ private:
 	InputButton* m_inputButton{ nullptr };
 
 	std::string m_string;
+	std::string m_defaultString;
 	sf::RectangleShape m_caret;
 	const int MAX_CHARS = 30;
 	int max_input_char = 15;
@@ -26,7 +27,7 @@ private:
 	bool ValidateInput();
 
 public:
-	TextBox(UIManager* m_owner);
+	TextBox(UIManager* m_owner, const std::string& l_defaultString);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();

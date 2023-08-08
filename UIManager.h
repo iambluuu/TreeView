@@ -15,6 +15,7 @@
 #include "MediaButtons.h"
 #include "GoBackButton.h"
 #include "GoToButton.h"
+#include "ViewButton.h"
 
 class BaseElement;
 

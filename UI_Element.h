@@ -22,6 +22,12 @@ enum class ElementName {
 	GoTo,
 
 	MenuBackground,
+
+	ViewUp,
+	ViewDown,
+	ViewLeft,
+	ViewRight,
+	ResetView
 };
 
 enum class ElementState {

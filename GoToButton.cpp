@@ -23,7 +23,7 @@ GoToButton::GoToButton(UIManager* l_owner, StateType l_type)
 		m_text.setString("Heap");
 		break;
 
-	case StateType::HashTable:
+	case StateType::Hash_Table:
 		m_text.setString("Hash Table");
 		break;
 

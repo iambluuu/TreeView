@@ -13,13 +13,14 @@ class InputButton : public BaseElement {
 private:
 	UIManager* m_owner{ nullptr };
 	TextBox* m_textBox{ nullptr };
+	TextBox* m_numberTextbox { nullptr };
 	Execute m_execute;
 
 	//std::map<StateType, std::function<void()> > m_func;
 
 public:
 
-	InputButton(UIManager* m_owner, TextBox* l_textBox, Execute l_execute);
+	InputButton(UIManager* m_owner, TextBox* l_textBox, TextBox* l_numberTextbox, Execute l_execute);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();

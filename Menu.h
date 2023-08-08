@@ -6,7 +6,7 @@ public:
 	Menu(StateManager* stateManager) : BaseState(stateManager) {}
 	~Menu() {}
 
-	void OnCreate() {}
+	void OnCreate(const std::string& l_numbers, const std::string& l_value) {}
 	void OnDestroy() {}
 
 	void Activate() {}

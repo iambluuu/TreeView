@@ -3,7 +3,7 @@
 
 class UIManager;
 
-TextBox::TextBox(UIManager* l_owner) {
+TextBox::TextBox(UIManager* l_owner, const std::string& l_defaultString) {
 	m_owner = l_owner;
 
 	m_themeManager = l_owner->GetThemeManager();
@@ -11,13 +11,15 @@ TextBox::TextBox(UIManager* l_owner) {
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, ElementState::Neutral);
 
+	m_defaultString = l_defaultString;
+
 	m_caret.setFillColor(sf::Color::Black);
 	m_caret.setSize(sf::Vector2f(2, 40));
 	m_caret.setOrigin(m_caret.getLocalBounds().left + m_caret.getLocalBounds().width / 2.f, m_caret.getLocalBounds().top + m_caret.getLocalBounds().height / 2.f);
 
 	m_text.setFont(*m_themeManager->GetFont());
 	m_text.setCharacterSize(30);
-	m_text.setString("");
+	m_text.setString(m_defaultString);
 	
 	m_hitBox.height = m_sprite->getLocalBounds().height;
 	m_hitBox.width = m_sprite->getLocalBounds().width;
@@ -77,7 +79,8 @@ void TextBox::HandleEvent(sf::Event* l_event) {
 			}
 
 			if (KeyCode == sf::Keyboard::Return) {
-				m_inputButton->OnClick();
+				if (m_inputButton)
+					m_inputButton->OnClick();
 				OnRelease();
 				return;
 			}
@@ -146,6 +149,11 @@ void TextBox::Update(float l_dT) {
 
 	m_text.setPosition(m_pos.x + 7 + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 2 + offset.y);
 	m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, m_state));
+
+	if (m_state == ElementState::Neutral && m_string.empty()) {
+		m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, ElementState::Focused));
+		m_text.setString(m_defaultString);
+	}
 
 	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::TextBox, m_state);
 	m_sprite->setPosition(m_pos + offset);

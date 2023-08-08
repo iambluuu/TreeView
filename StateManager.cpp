@@ -9,10 +9,8 @@ StateManager::StateManager(SharedContext* l_shareContext)
 	m_context = l_shareContext;
 
 	RegisterState<Menu>(StateType::Menu);
-	//RegisterState<Hash_Table>(StateType::HashTable);
-	//RegisterState<Binary_Tree>(StateType::BinaryTree);
+	RegisterState<HashTable>(StateType::Hash_Table);
 	RegisterState<AVL_Tree>(StateType::AVLTree);
-	//RegisterState<TT_Tree>(StateType::TTTree);
 	//RegisterState<TTF_Tree>(StateType::TTFTree);
 	//RegisterState<Trie>(StateType::Trie);
 	//RegisterState<Graph>(StateType::Graph);

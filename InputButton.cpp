@@ -3,9 +3,10 @@
 
 class UIManager;
 
-InputButton::InputButton(UIManager* l_owner, TextBox* l_textBox, Execute l_execute) {
+InputButton::InputButton(UIManager* l_owner, TextBox* l_textBox, TextBox* l_numberTextBox = nullptr, Execute l_execute) {
 	m_owner = l_owner;
 	m_textBox = l_textBox;
+	m_numberTextbox = l_numberTextBox;
 	m_execute = l_execute;
 
 	m_name = ElementName::InputButton;
@@ -47,6 +48,13 @@ void InputButton::OnClick() {
 
 	case Execute::Remove:
 		state->OnRemove(m_textBox->ReadString());
+		break;
+
+	case Execute::Create:
+		if (m_numberTextbox)
+			state->OnCreate(m_numberTextbox->ReadString(), m_textBox->ReadString());
+		else
+			state->OnCreate("", m_textBox->ReadString());
 		break;
 
 	default:

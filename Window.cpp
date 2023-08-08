@@ -106,11 +106,14 @@ void Window::MoveView(sf::Vector2f delta) {
 	sf::Vector2f temp = m_view.getCenter();
 
 	m_view.setCenter(temp + delta);
+
+	m_window.setView(m_view);
 }
 
 void Window::ResetView() {
 	m_offset = DefaultOffset;
 	m_view.setCenter(DefaultOffset + sf::Vector2f(800, 450));
+	m_window.setView(m_view);
 }
 
 sf::Vector2f Window::GetOffset() {

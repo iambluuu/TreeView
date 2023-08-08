@@ -364,8 +364,12 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 				tmp.push_back(CurInfo.m_valueChange.first + 'a');
 				m_label.setString(tmp);
 			}
-			else
-				m_label.setString(std::to_string(CurInfo.m_valueChange.first));
+			else {
+				if (CurInfo.m_valueChange.first == 0)
+					m_label.setString("");
+				else
+					m_label.setString(std::to_string(CurInfo.m_valueChange.first));
+			}
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 			m_label.setFillColor(fading);
@@ -379,8 +383,13 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 				tmp.push_back(CurInfo.m_valueChange.second + 'a');
 				m_label.setString(tmp);
 			}
-			else
-				m_label.setString(std::to_string(CurInfo.m_valueChange.second));
+			else {
+				if (CurInfo.m_valueChange.second == 0) 
+					m_label.setString("");
+				else
+					m_label.setString(std::to_string(CurInfo.m_valueChange.second));
+			}
+
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 			m_label.setFillColor(appearing);
@@ -394,8 +403,14 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 			std::string tmp = "";
 			tmp.push_back(CurInfo.m_shownValue[j] + 'a');
 			m_label.setString(tmp);
-		} else
-			m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
+		}
+		else {
+			if (CurInfo.m_shownValue[j] == 0)
+				m_label.setString("");
+			else
+				m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
+		}
+
 		m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 		m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 

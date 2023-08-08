@@ -7,7 +7,7 @@ AVL_Tree::~AVL_Tree() {
 	PostProcessing();
 }
 
-void AVL_Tree::OnCreate() {
+void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 
 }
 

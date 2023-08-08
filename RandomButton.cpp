@@ -4,9 +4,10 @@
 class UIManager;
 
 
-RandomButton::RandomButton(UIManager* l_owner, TextBox* l_textBox) {
+RandomButton::RandomButton(UIManager* l_owner, TextBox* l_textBox, TextBox* l_textBox2) {
 	m_owner = l_owner;
 	m_textBox = l_textBox;
+	m_textBox2 = l_textBox2;
 
 	m_name = ElementName::RandomButton;
 	m_themeManager = l_owner->GetThemeManager();
@@ -24,9 +25,30 @@ void RandomButton::SetPosition(sf::Vector2f l_pos) {
 }
 
 void RandomButton::SetRandom() {
+	if (m_textBox2) {
+		int n =  rand() % 10 + 10;
+		m_textBox->SetString(std::to_string(n));
+		int m = rand() % (n / 2) + 1;
+		m_textBox2->SetString(std::to_string(m));
+		return;
+	}
+
+
 	int n = rand() % m_textBox->max_input_char + 1;
 
 	for (int i = 0; i < n; i++) {
+		if (m_owner->GetState() == StateType::Trie) {
+			int length = rand() % 5 + 1;
+
+			for (int j = 0; j < length; j++) {
+				char c = rand() % 26 + 'a';
+				m_textBox->m_string += c;
+			}
+
+			m_textBox->m_string += ", ";
+			continue;
+		}
+
 		int x = rand() % 99 + 1;
 		m_textBox->m_string += std::to_string(x) + ", ";
 	}
@@ -37,6 +59,10 @@ void RandomButton::SetRandom() {
 
 void RandomButton::OnClick() {
 	m_textBox->m_string.clear();
+	if (m_textBox2) {
+		m_textBox2->m_string.clear();
+	}
+
 	SetRandom();
 }
 

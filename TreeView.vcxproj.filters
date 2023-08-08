@@ -93,6 +93,12 @@
     <ClCompile Include="GoToButton.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ViewButton.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Hash_Table.cpp">
+      <Filter>Source Files\States</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI_Element.h">
@@ -159,6 +165,9 @@
       <Filter>Header Files\States</Filter>
     </ClInclude>
     <ClInclude Include="GoToButton.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewButton.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>
