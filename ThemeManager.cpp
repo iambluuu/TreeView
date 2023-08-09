@@ -164,19 +164,24 @@ void ThemeManager::Initiate()
 	tmpSprite.setTextureRect(sf::IntRect(700, 888, 50, 50));
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewUp, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewUp, ElementState::Focused }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::ViewUp, ElementState::Clicked }, tmpSprite);
 	tmpSprite.setTextureRect(sf::IntRect(750, 888, 50, 50));
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewDown, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewDown, ElementState::Focused }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::ViewDown, ElementState::Clicked }, tmpSprite);
 	tmpSprite.setTextureRect(sf::IntRect(800, 888, 50, 50));
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewLeft, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewLeft, ElementState::Focused }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::ViewLeft, ElementState::Clicked }, tmpSprite);
 	tmpSprite.setTextureRect(sf::IntRect(850, 888, 50, 50));
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewRight, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::ViewRight, ElementState::Focused }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::ViewRight, ElementState::Clicked }, tmpSprite);
 	
 	tmpSprite.setTextureRect(sf::IntRect(900, 888, 50, 50));
 	ThemeSprite1->emplace(std::pair{ ElementName::ResetView, ElementState::Neutral }, tmpSprite);
 	ThemeSprite1->emplace(std::pair{ ElementName::ResetView, ElementState::Focused }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::ResetView, ElementState::Clicked }, tmpSprite);
 
 	//Go back Button
 	tmpSprite.setTextureRect(sf::IntRect(0, 938, 75, 75));

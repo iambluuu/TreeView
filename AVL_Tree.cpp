@@ -5,6 +5,7 @@
 
 AVL_Tree::~AVL_Tree() {
 	PostProcessing();
+	ClearTree(m_root);
 }
 
 void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value) {
@@ -22,6 +23,18 @@ void AVL_Tree::Activate() {
 void AVL_Tree::Deactivate() {
 
 }
+
+void AVL_Tree::ClearTree(Node * Cur) {
+	if (!Cur)
+		return;
+
+	ClearTree(Cur->left);
+	Cur->left = nullptr;
+	ClearTree(Cur->right);
+	Cur->right = nullptr;
+	delete Cur;
+}
+
 
 bool AVL_Tree::ValidateInput(const std::string& l_value, std::vector<int>& res) {
 	if (l_value.empty()) {

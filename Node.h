@@ -28,6 +28,7 @@ struct NodeInfo {
 
 	int value_num{ 1 };
 	int m_bf{ 0 };
+	int m_index{ -1 };
 	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
 	std::pair<std::pair<int, int>, std::pair<int, int> > m_coord{ {0, 0}, {0, 0} };
 	std::pair<int, int> m_valueChange{ 0, 0 };
@@ -60,7 +61,7 @@ public:
 	}
 
 	Node(int value) {
-		m_save.m_shownValue.push_back(value);
+		m_save.m_shownValue[0] = value;
 
 		left = nullptr;
 		right = nullptr;
@@ -157,8 +158,11 @@ public:
 			m_save.is_valueChanging = 0;
 
 			for (auto& v : m_save.m_shownValue)
-				if (v == m_save.m_valueChange.first)
+				if (v == m_save.m_valueChange.first) {
 					v = m_save.m_valueChange.second;
+					if (m_save.m_valueChange.first == 0)
+						break;
+				}
 
 			m_save.m_valueChange.first = m_save.m_valueChange.second;
 		}
@@ -170,6 +174,8 @@ public:
 			if (m_save.m_arrowCoord[i]->getInfo()->back().is_appearing == 2) {
 				m_save.m_arrowCoord[i] = nullptr;
 			}
+
+
 		}
 	}
 

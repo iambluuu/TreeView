@@ -1,7 +1,5 @@
 #include "Hash_Table.h"
 
-
-
 HashTable::~HashTable() {
 	ClearNodes(m_probingNodes);
 	ClearNodes(m_chainingNodes);
@@ -20,8 +18,30 @@ void HashTable::ClearChain(Node* Cur) {
 		return;
 
 	ClearChain(Cur->left);
+	Cur->left = nullptr;
+
 	delete Cur;
-	Cur = nullptr;
+}
+
+void HashTable::ResetNodes() {
+	std::vector<Node*>* nodes;
+
+	if (m_mode) {
+		nodes = &m_probingNodes;
+	}
+	else {
+		nodes = &m_chainingNodes;
+	}
+
+	for (int i = 0; i < nodes->size(); i++) {
+		Node* Cur = (*nodes)[i];
+
+		while (Cur) {
+			Cur->SaveState();
+			Cur->getInfo()->clear();
+			Cur = Cur->left;
+		}
+	}
 }
 
 bool HashTable::ValidateInput(const std::string& l_value, int& resValue) {
@@ -160,7 +180,7 @@ void HashTable::InsertNode(int l_value) {
 
 		int index = l_value % n;
 
-		while (m_probingNodes[index]) {
+		while (m_probingNodes[index]->m_save.m_shownValue[0] != 0) {
 			index = (index + 1) % n;
 		}
 
@@ -170,7 +190,7 @@ void HashTable::InsertNode(int l_value) {
 		n = m_probingNodes.size();
 		int index = l_value % n;
 
-		while (m_probingNodes[index]) {
+		while (m_probingNodes[index]->m_save.m_shownValue[0] != 0) {
 			index = (index * index) % n;
 		}
 
@@ -200,10 +220,21 @@ void HashTable::InsertChaining(int l_value) {
 
 	while (Cur->left) {
 		Cur = Cur->left;
+		AddNewStep();
+		AddNodeStep(newNode);
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.first = NodeState::Default;
+		Cur->getInfo()->back().node_state.second = NodeState::Selected;
 	}
-	Cur->left = newNode;
 
+	Cur->left = newNode;
 	AddNewStep();
+
+	Cur->getInfo()->back().m_arrowCoord[0] = newNode;
+	newNode->getInfo()->back().m_coord.first = { Cur->getInfo()->back().m_coord.first.first, Cur->getInfo()->back().m_coord.first.second + 1 };
+	newNode->getInfo()->back().m_coord.second = { Cur->getInfo()->back().m_coord.first.first, Cur->getInfo()->back().m_coord.first.second + 1 };
+	newNode->getInfo()->back().node_state.first = NodeState::Selected;
+	newNode->getInfo()->back().node_state.second = NodeState::Selected;
 	newNode->getInfo()->back().is_visible = 1;
 	newNode->getInfo()->back().is_appearing = 1;
 
@@ -214,21 +245,52 @@ void HashTable::InsertLinearProbing(int l_value) {
 	int n = m_probingNodes.size();
 	int index = l_value % n;
 
-	Node* newNode = new Node(l_value);
+	AddNewStep();
+	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 
-	if (!m_probingNodes[index]) {
-		m_probingNodes[index] = newNode;
-		return;
-	}
+	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] != 0) {
+		index = (index + 1) % n;
 
-	int i = 1;
-	while (m_probingNodes[(index + i) % n]) {
-		i++;
+		AddNewStep();
+		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+		m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
+
 	}
 
 	AddNewStep();
-	m_probingNodes[(index + i) % n] = newNode;
-	newNode->getInfo()->back().is_appearing = 1;
+	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
+	m_probingNodes[index]->getInfo()->back().m_valueChange.first = 0;
+	m_probingNodes[index]->getInfo()->back().m_valueChange.second = l_value;
+	m_probingNodes[index]->getInfo()->back().is_valueChanging = 1;
+}
+
+void HashTable::InsertQuadraticProbing(int l_value) {
+	int n = m_probingNodes.size();
+	int index = l_value % n;
+
+	AddNewStep();
+	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
+
+	int i = 1;
+	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] != 0 && i < n) {
+		index = (l_value + i * i) % n;
+		i++;
+
+		AddNewStep();
+		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+		m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
+
+	}
+
+	AddNewStep();
+	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
+	m_probingNodes[index]->getInfo()->back().m_valueChange.first = 0;
+	m_probingNodes[index]->getInfo()->back().m_valueChange.second = l_value;
+	m_probingNodes[index]->getInfo()->back().is_valueChanging = 1;
 }
 
 void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_value) {
@@ -263,15 +325,29 @@ void HashTable::OnInsert(const std::string& l_value) {
 		return;
 	}
 
+	ResetNodes();
+
 	if (m_mode == 0) {
 		// chaining
+		InsertChaining(resValue);
 		
 	}
 	else if (m_mode == 1) {
 		// linear probing
+		InsertLinearProbing(resValue);
 	}
 	else {
 		// quadratic probing
+		InsertQuadraticProbing(resValue);
+	}
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	if (m_mode) {
+		renderer->Reset(m_probingNodes[0]->getInfo()->size());
+	}
+	else {
+		renderer->Reset(m_chainingNodes[0]->getInfo()->size());
 	}
 }
 
@@ -319,14 +395,36 @@ void HashTable::Create(int n, int m) {
 	AddNewStep();
 	for (int i = 0; i < nodes->size(); i++) {
 		Node* Cur = (*nodes)[i];
+
 		if (!Cur)
 			continue;
 
-		while (Cur) {
+		Cur->getInfo()->back().m_index = i;
+
+		if (!m_mode) {
+			int curY = DEFAULT_COORD.y;
+			int curX = DEFAULT_COORD.x + i;
+			while (Cur) {
+				Cur->getInfo()->back().m_coord.first = std::make_pair(curX, curY);
+				Cur->getInfo()->back().m_coord.second = std::make_pair(curX, curY);
+				Cur->getInfo()->back().m_arrowCoord[0] = Cur->left;
+				Cur->getInfo()->back().is_visible = 1;
+				Cur->getInfo()->back().is_appearing = 1;
+				Cur = Cur->left;
+
+				curY++;
+			}
+		}
+		else {
+			int curX = DEFAULT_COORD.x + i % NODE_PER_ROW;
+			int curY = DEFAULT_COORD.y + i / NODE_PER_ROW;
+
+			Cur->getInfo()->back().m_coord.first = std::make_pair(curX, curY);
+			Cur->getInfo()->back().m_coord.second = std::make_pair(curX, curY);
 			Cur->getInfo()->back().is_visible = 1;
 			Cur->getInfo()->back().is_appearing = 1;
-			Cur = Cur->left;
 		}
+
 	}
 }
 

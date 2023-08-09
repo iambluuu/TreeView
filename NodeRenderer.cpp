@@ -194,7 +194,6 @@ void NodeRenderer::Update(const float& l_fT) {
 
 
 	m_curStep = GetStep();
-	std::cerr << "Update Cur Step: " << m_curStep << std::endl;
 }
 
 int NodeRenderer::GetStep() {
@@ -212,8 +211,6 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 	std::vector<NodeInfo>* info = Cur->getInfo();
 	int CurStep = m_curStep;
-
-	std::cerr << "Cur Step: " << CurStep << std::endl;
 
 	NodeInfo CurInfo = info->at(CurStep);
 	if (!CurInfo.is_visible)
@@ -398,6 +395,9 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 			wind->draw(m_label);
 
+			if (CurInfo.m_valueChange.first == 0)
+				break;
+
 			continue;
 		}
 
@@ -420,6 +420,7 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 	}
 
+	//Balance factor of AVL
 	if (m_curState == StateType::AVLTree && CurInfo.node_state.second == NodeState::Selected) {
 		m_sideLabel.setString("bf = " + std::to_string(CurInfo.m_bf));
 	
@@ -433,6 +434,18 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		wind->draw(m_sideLabel);
 	}
 
+
+	// number notation of HASH TABLE
+
+	if (m_curState == StateType::Hash_Table) {
+		if (Cur->getInfo()->back().m_index >= 0) {
+			m_label.setFillColor(sf::Color::Red);
+			m_label.setString(std::to_string(Cur->getInfo()->back().m_index));
+			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
+			m_label.setPosition(coord.x, coord.y - 35);
+			wind->draw(m_label);
+		}
+	}
 }
 
 void NodeRenderer::DrawTree(Node* Root)

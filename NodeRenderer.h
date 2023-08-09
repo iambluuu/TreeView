@@ -39,9 +39,9 @@ private:
 	int m_curStep{ 0 };
 	int m_limitStep{ 0 };
 
-	const float TOP_LINE = 250;
+	const float TOP_LINE = 200;
 	const float MIDDLE_LINE = 592 + 1500;
-	const float HORIZONTAL_SPACING = 46;
+	const float HORIZONTAL_SPACING = 56;
 	const float VERTICAL_SPACING = 70;
 
 	bool is_paused{ false };

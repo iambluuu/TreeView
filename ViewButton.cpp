@@ -35,23 +35,27 @@ ViewButton::~ViewButton() {
 }
 
 void ViewButton::OnClick() {
+	if (m_state != ElementState::Clicked) {
+		m_state = ElementState::Clicked;
+	}
+
 	Window* window = m_owner->GetStateManager()->GetContext()->m_wind;
 
 	switch (m_name) {
 	case ElementName::ViewUp:
-		window->MoveView(sf::Vector2f(0, -20));
+		window->MoveView(sf::Vector2f(0, -5));
 		break;
 
 	case ElementName::ViewDown:
-		window->MoveView(sf::Vector2f(0, 20));
+		window->MoveView(sf::Vector2f(0, 5));
 		break;
 
 	case ElementName::ViewLeft:
-		window->MoveView(sf::Vector2f(-20, 0));
+		window->MoveView(sf::Vector2f(-5, 0));
 		break;
 
 	case ElementName::ViewRight:
-		window->MoveView(sf::Vector2f(20, 0));
+		window->MoveView(sf::Vector2f(5, 0));
 		break;
 
 	case ElementName::ResetView:
@@ -68,11 +72,13 @@ void ViewButton::OnHover() {
 void ViewButton::OnRelease() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
 	wind->setCursorType(1);
+	m_state = ElementState::Neutral;
 }
 
 void ViewButton::OnLeave() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
 	wind->setCursorType(1);
+	m_state = ElementState::Neutral;
 }
 
 void ViewButton::HandleEvent(sf::Event* l_event) {
@@ -81,6 +87,13 @@ void ViewButton::HandleEvent(sf::Event* l_event) {
 
 	if (m_hitBox.contains(mousePos)) {
 		OnHover();
+
+		if (l_event->type == sf::Event::MouseButtonReleased) {
+			if (l_event->key.code == sf::Mouse::Left) {
+				OnRelease();
+			}
+		}
+
 		if (l_event->type == sf::Event::MouseButtonPressed) {
 			if (l_event->key.code == sf::Mouse::Left)
 				OnClick();
@@ -92,7 +105,9 @@ void ViewButton::HandleEvent(sf::Event* l_event) {
 }
 
 void ViewButton::Update(float l_dT) {
-
+	if (m_state == ElementState::Clicked) {
+		OnClick();
+	}
 }
 
 void ViewButton::Draw() {

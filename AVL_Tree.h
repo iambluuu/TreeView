@@ -36,6 +36,7 @@ private:
 
 	bool ValidateInput(const std::string& l_value, std::vector<int>& res);
 
+	void ClearTree(Node* Cur);
 public:
 	AVL_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {
 		m_align.resize(2 * MAX_WIDTH + 1);

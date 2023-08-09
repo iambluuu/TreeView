@@ -159,6 +159,10 @@ void UIManager::PrepareElements() {
 	GoToButton* goToAVLTree = new GoToButton(this, StateType::AVLTree);
 	goToAVLTree->SetPosition(sf::Vector2f(628, 262));
 	AddElement(goToAVLTree);
+
+	GoToButton* goToHashTable = new GoToButton(this, StateType::Hash_Table);
+	goToHashTable->SetPosition(sf::Vector2f(128, 262));
+	AddElement(goToHashTable);
 }
 
 void UIManager::PrepareStateUI() {
