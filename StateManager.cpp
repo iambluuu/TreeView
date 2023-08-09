@@ -17,6 +17,7 @@ StateManager::StateManager(SharedContext* l_shareContext)
 
 	CreateState(StateType::Menu);
 	CreateState(StateType::AVLTree);
+	CreateState(StateType::Hash_Table);
 
 }
 

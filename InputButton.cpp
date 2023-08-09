@@ -3,7 +3,7 @@
 
 class UIManager;
 
-InputButton::InputButton(UIManager* l_owner, TextBox* l_textBox, TextBox* l_numberTextBox = nullptr, Execute l_execute) {
+InputButton::InputButton(UIManager* l_owner, TextBox* l_numberTextBox, TextBox* l_textBox, Execute l_execute) {
 	m_owner = l_owner;
 	m_textBox = l_textBox;
 	m_numberTextbox = l_numberTextBox;

@@ -20,7 +20,7 @@ private:
 
 public:
 
-	InputButton(UIManager* m_owner, TextBox* l_textBox, TextBox* l_numberTextbox, Execute l_execute);
+	InputButton(UIManager* m_owner, TextBox* l_numberTextbox, TextBox* l_textBox, Execute l_execute);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();

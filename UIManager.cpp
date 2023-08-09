@@ -7,12 +7,9 @@ UIManager::UIManager(StateManager* stateManager) {
 	m_elements.resize(5);
 	m_themeManager = new ThemeManager;
 	m_stateManager = stateManager;
-	m_uiState = StateType::AVLTree;
 
 	PrepareElements();
 	PrepareStateUI();
-
-	SwitchState(StateType::AVLTree);
 }
 
 UIManager::~UIManager() {
@@ -44,7 +41,7 @@ void UIManager::PrepareElements() {
 	TextBox *h_inputValue = new TextBox(this, "m =");
 
 	RandomButton* h_randomButton = new RandomButton(this, h_inputNumbers, h_inputValue);
-	InputButton* h_inputButton = new InputButton(this, h_inputValue, h_inputNumbers, Execute::Create);
+	InputButton* h_inputButton = new InputButton(this, h_inputNumbers, h_inputValue, Execute::Create);
 
 	Drawer * h_drawer = new Drawer(this, "Create");
 	h_drawer->AddElement(0, h_inputNumbers);
@@ -58,7 +55,7 @@ void UIManager::PrepareElements() {
 
 	TextBox* createValues= new TextBox(this, "v =");
 	RandomButton* createRandom = new RandomButton(this, createValues, nullptr);
-	InputButton* createInput = new InputButton(this, createValues, nullptr, Execute::Create);
+	InputButton* createInput = new InputButton(this, nullptr, createValues, Execute::Create);
 
 	Drawer* createDrawer = new Drawer(this, "Create");
 	createDrawer->AddElement(0, createValues);
@@ -71,7 +68,7 @@ void UIManager::PrepareElements() {
 	TextBox *insertBox = new TextBox(this, "v =");
 	insertBox->max_input_char = 1;
 	RandomButton* insertRandom = new RandomButton(this, insertBox, nullptr);
-	InputButton* insertInput = new InputButton(this, insertBox, nullptr, Execute::Insert);
+	InputButton* insertInput = new InputButton(this, nullptr, insertBox, Execute::Insert);
 	insertBox->m_inputButton = insertInput;
 	Drawer* insertDrawer = new Drawer(this, "Insert");
 
@@ -85,7 +82,7 @@ void UIManager::PrepareElements() {
 	TextBox* removeBox = new TextBox(this, "v =");
 	removeBox->max_input_char = 1;
 	RandomButton* removeRandom = new RandomButton(this, removeBox, nullptr);
-	InputButton* removeInput = new InputButton(this, removeBox, nullptr, Execute::Remove);
+	InputButton* removeInput = new InputButton(this, nullptr, removeBox, Execute::Remove);
 	removeBox->m_inputButton = removeInput;
 	Drawer* removeDrawer = new Drawer(this, "Remove");
 
@@ -99,7 +96,7 @@ void UIManager::PrepareElements() {
 	TextBox* searchBox = new TextBox(this, "v =");
 	searchBox->max_input_char = 1;
 	RandomButton* searchRandom = new RandomButton(this, searchBox, nullptr);
-	InputButton* searchInput = new InputButton(this, searchBox, nullptr, Execute::Search);
+	InputButton* searchInput = new InputButton(this, nullptr, searchBox, Execute::Search);
 	searchBox->m_inputButton = searchInput;
 	Drawer* searchDrawer = new Drawer(this, "Search");
 
@@ -188,6 +185,8 @@ void UIManager::PrepareStateUI() {
 	data.isMenu = 0;
 	data.tabMask = 0; //Subject to change, HT has 3 modes
 
+	m_uiData.emplace(StateType::Hash_Table, data);
+
 }
 
 void UIManager::HandleEvent(sf::Event* l_event) {
@@ -235,6 +234,8 @@ void UIManager::AddMediaButton(MediaButton* element) {
 }
 
 void UIManager::SwitchState(StateType l_type) {
+	std::cerr << "Switching UI to state: " << (int)l_type << std::endl;
+
 	m_uiState = l_type;
 	LoadUI(l_type);
 }

@@ -174,7 +174,6 @@ void NodeRenderer::HandleEvent(sf::Event* l_event) {
 
 void NodeRenderer::Update(const float& l_fT) {
 
-
 	if (step_by_step) {
 		if (m_animationCurrent > m_limitStep * STEP_DURATION) {
 			m_animationCurrent = std::max(m_animationCurrent - l_fT * m_speedupRate, m_limitStep * STEP_DURATION);
@@ -195,6 +194,7 @@ void NodeRenderer::Update(const float& l_fT) {
 
 
 	m_curStep = GetStep();
+	std::cerr << "Update Cur Step: " << m_curStep << std::endl;
 }
 
 int NodeRenderer::GetStep() {
@@ -212,6 +212,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 	std::vector<NodeInfo>* info = Cur->getInfo();
 	int CurStep = m_curStep;
+
+	std::cerr << "Cur Step: " << CurStep << std::endl;
 
 	NodeInfo CurInfo = info->at(CurStep);
 	if (!CurInfo.is_visible)

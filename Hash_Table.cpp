@@ -37,6 +37,34 @@ bool HashTable::ValidateInput(const std::string& l_value, int& resValue) {
 	return true;
 }
 
+bool HashTable::ValidateCreate(const std::string& l_numbers, const std::string& l_value, int& n, int& m) {
+	if (l_numbers.empty())
+		return false;
+	
+	for (int i = 0; i < l_numbers.size(); i++) {
+		if (!isdigit(l_numbers[i]))
+			return false;
+	}
+	
+	n = std::stoi(l_numbers);
+	if (n < 1 || n > 50)
+		return false;
+
+	for (int i = 0; i < l_value.size(); i++) {
+		if (!isdigit(l_value[i]))
+			return false;
+	}
+
+	if (l_value.empty())
+		m = 0;
+	else
+		m = std::stoi(l_value);
+
+	if (m < 1 || (m > n / 2 && m_mode) || (m > 200 && m_mode == 0))
+		return false;
+
+}
+
 void HashTable::AddNodeStep(Node* node) {
 	auto CurInfo = node->getInfo();
 
@@ -109,6 +137,49 @@ void HashTable::AddNewStep() {
 	}
 }
 
+void HashTable::InsertNode(int l_value) {
+	int n;
+
+	if (m_mode == 0) {
+		n = m_chainingNodes.size();
+
+		int index = l_value % n;
+
+		Node* newNode = new Node(l_value);
+		Node* Cur = m_chainingNodes[index];
+
+		while (Cur->left) {
+			Cur = Cur->left;
+		}
+
+		Cur->left = newNode;
+
+	}
+	else if (m_mode == 1) {
+		n = m_probingNodes.size();
+
+		int index = l_value % n;
+
+		while (m_probingNodes[index]) {
+			index = (index + 1) % n;
+		}
+
+		m_probingNodes[index]->m_save.m_shownValue[0] = l_value;
+	}
+	else {
+		n = m_probingNodes.size();
+		int index = l_value % n;
+
+		while (m_probingNodes[index]) {
+			index = (index * index) % n;
+		}
+
+		m_probingNodes[index]->m_save.m_shownValue[0] = l_value;
+	}
+
+
+}
+
 void HashTable::InsertChaining(int l_value) {
 	int n = m_chainingNodes.size();
 	int index = l_value % n;
@@ -160,6 +231,30 @@ void HashTable::InsertLinearProbing(int l_value) {
 	newNode->getInfo()->back().is_appearing = 1;
 }
 
+void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_value) {
+	int n = 0, m = 0;
+	if (!ValidateCreate(l_numbers, l_value, n, m)) {
+		std::cerr << "Invalid input\n";
+		return;
+	}
+
+	if (m_mode)
+		ClearNodes(m_probingNodes);
+	else
+		ClearNodes(m_chainingNodes);
+
+	Create(n, m);
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	if (m_mode) {
+		renderer->Reset(m_probingNodes[0]->getInfo()->size());
+	}
+	else {
+		renderer->Reset(m_chainingNodes[0]->getInfo()->size());
+	}
+}
+
 void HashTable::OnInsert(const std::string& l_value) {
 	int resValue;
 
@@ -177,5 +272,84 @@ void HashTable::OnInsert(const std::string& l_value) {
 	}
 	else {
 		// quadratic probing
+	}
+}
+
+void HashTable::OnRemove(const std::string& l_value) {
+	int resValue;
+
+	if (!ValidateInput(l_value, resValue)) {
+		std::cerr << "Invalid input\n";
+		return;
+	}
+
+	if (m_mode == 0) {
+		// chaining
+	}
+	else if (m_mode == 1) {
+		// linear probing
+	}
+	else {
+		// quadratic probing
+	}
+}
+
+void HashTable::Create(int n, int m) {
+	std::vector<Node*>* nodes;
+
+	if (m_mode == 0) {
+		nodes = &m_chainingNodes;
+	}
+	else {
+		nodes = &m_probingNodes;
+	}
+
+	//Create all nodes and add values
+
+	for (int i = 0; i < n; i++) {
+		Node* newNode = new Node();
+		nodes->push_back(newNode);
+	}
+
+	for (int i = 0; i < m; i++) {
+		InsertNode(rand() % 100 + 1);
+	}
+
+	//Add appearing animation
+	AddNewStep();
+	for (int i = 0; i < nodes->size(); i++) {
+		Node* Cur = (*nodes)[i];
+		if (!Cur)
+			continue;
+
+		while (Cur) {
+			Cur->getInfo()->back().is_visible = 1;
+			Cur->getInfo()->back().is_appearing = 1;
+			Cur = Cur->left;
+		}
+	}
+}
+
+void HashTable::HandleEvent(sf::Event* l_event) {
+	NodeRenderer* nodeRenderer = m_stateManager->GetContext()->m_nodeRenderer;
+	nodeRenderer->HandleEvent(l_event);
+}
+
+void HashTable::Update(const sf::Time& l_time) {
+	NodeRenderer* nodeRenderer = m_stateManager->GetContext()->m_nodeRenderer;
+	nodeRenderer->Update(l_time.asMilliseconds());
+}
+void HashTable::Draw() {
+	NodeRenderer* nodeRenderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	if (m_mode == 0) {
+		for (auto& node : m_chainingNodes) {
+			nodeRenderer->DrawTree(node);
+		}
+	}
+	else {
+		for (auto& node : m_probingNodes) {
+			nodeRenderer->DrawTree(node);
+		}
 	}
 }
