@@ -3,7 +3,7 @@
 
 class AVL_Tree : public BaseState {
 private:
-	std::vector<Node*> m_align;
+	std::vector<Node*> m_align{ std::vector<Node*>(21, nullptr) };
 	const int ALIGN_OFFSET{ 10 };
 
 	const int MAX_NODE_NUM{ 21 };
@@ -20,7 +20,6 @@ private:
 	Node* m_removedNode{ nullptr };
 
 	Node* InsertNode(Node* Cur, int value, int hor_depth, int ver_depth);
-	Node* Generate(Node* Cur, int value);
 	Node* RemoveNode(Node* Cur, int value);
 
 	void ShiftLeftFrom(int value);
@@ -35,7 +34,14 @@ private:
 	void Centering();
 
 	bool ValidateInput(const std::string& l_value, std::vector<int>& res);
-	Node* BuildTree(Node* Cur, int value);
+	bool ValidateCreate(const std::string& l_value, std::vector<int>& res);
+
+	Node* BuildTree(Node* Cur, int value, int hor_depth, int ver_depth);
+	Node* BuildRotateLeft(Node* Cur);
+	Node* BuildRotateRight(Node* Cur);
+	void BuildCentering();
+
+	void ClearAlign();
 
 	void ClearTree(Node* Cur);
 public:

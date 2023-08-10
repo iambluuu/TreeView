@@ -128,6 +128,9 @@ public:
 	}
 
 	std::vector<int> getValue() {
+		if (m_info.empty())
+			return m_save.m_shownValue;
+
 		return m_info.back().m_shownValue;
 	}
 
