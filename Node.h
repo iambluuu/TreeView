@@ -8,7 +8,7 @@ enum NodeLink {
 };
 
 enum class NodeState {
-	Selected, Visited, Default, New, InRemove
+	Selected, Visited, Default, New, InRemove, Found, NotFound
 };
 
 class Node;
@@ -62,6 +62,8 @@ public:
 
 	Node(int value) {
 		m_save.m_shownValue[0] = value;
+		m_save.m_valueChange.first = value;
+		m_save.m_valueChange.second = value;
 
 		left = nullptr;
 		right = nullptr;

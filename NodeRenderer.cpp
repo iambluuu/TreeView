@@ -9,6 +9,9 @@ const sf::Color DarkBlue = sf::Color(45, 55, 73);
 const sf::Color LightBlue = sf::Color(53, 66, 89);
 const sf::Color LightBeige = sf::Color(240, 233, 210);
 
+const sf::Color Fulvous = sf::Color(228, 132, 0);
+const sf::Color Skyblue = sf::Color(0, 128, 255);
+
 void NodeRenderer::PrepareSprite() {
 
 	sf::Sprite Border(m_texture);
@@ -18,6 +21,8 @@ void NodeRenderer::PrepareSprite() {
 	NodeColors0->emplace( NodeState::Default, std::tuple<sf::Color, sf::Color, sf::Color>(DarkBlue, LightBeige, DarkBlue) );
 	NodeColors0->emplace( NodeState::Selected, std::tuple<sf::Color, sf::Color, sf::Color>(Green, Green, White) );
 	NodeColors0->emplace( NodeState::Visited, std::tuple<sf::Color, sf::Color, sf::Color>(Green, White, Green) );
+	NodeColors0->emplace( NodeState::Found, std::tuple<sf::Color, sf::Color, sf::Color>(Skyblue, Skyblue, White) );
+	NodeColors0->emplace( NodeState::NotFound, std::tuple<sf::Color, sf::Color, sf::Color>(Fulvous, Fulvous, White) );
 
 	int sizeX = 46;
 	int sizeY = 46;
@@ -347,6 +352,7 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	wind->draw(*FillerSprite);
 	wind->draw(*BorderSprite);
 
+	//Draw Value
 
 	float TopPos = coord.y;
 	float LeftPos = coord.x - (BorderSprite->getLocalBounds().width / 2);
@@ -368,9 +374,12 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 			else {
 				if (CurInfo.m_valueChange.first == 0)
 					m_label.setString("");
+				else if (CurInfo.m_valueChange.first == -1)
+					m_label.setString("DEL");
 				else
 					m_label.setString(std::to_string(CurInfo.m_valueChange.first));
 			}
+
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 			m_label.setFillColor(fading);
@@ -387,6 +396,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 			else {
 				if (CurInfo.m_valueChange.second == 0) 
 					m_label.setString("");
+				else if ( CurInfo.m_valueChange.second == -1)
+					m_label.setString("DEL");
 				else
 					m_label.setString(std::to_string(CurInfo.m_valueChange.second));
 			}
@@ -411,6 +422,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		else {
 			if (CurInfo.m_shownValue[j] == 0)
 				m_label.setString("");
+			else if (CurInfo.m_shownValue[j] == -1)
+				m_label.setString("DEL");
 			else
 				m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
 		}
@@ -443,13 +456,6 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		if (Cur->getInfo()->back().m_index >= 0) {
 			m_label.setFillColor(sf::Color::Red);
 			m_label.setString(std::to_string(Cur->getInfo()->back().m_index));
-			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
-			m_label.setPosition(coord.x, coord.y - 35);
-			wind->draw(m_label);
-		}
-		else if (Cur->getInfo()->back().m_index < -1) {
-			m_label.setFillColor(sf::Color::Red);
-			m_label.setString("DEL");
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
 			m_label.setPosition(coord.x, coord.y - 35);
 			wind->draw(m_label);

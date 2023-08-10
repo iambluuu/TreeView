@@ -8,7 +8,36 @@ AVL_Tree::~AVL_Tree() {
 	ClearTree(m_root);
 }
 
+Node* AVL_Tree::BuildTree(Node* Cur, int value) {
+	if (!Cur) {
+		Cur = new Node(value);
+		Cur->m_save.is_appearing = 1;
+		return Cur;
+	}
+
+	if (value < Cur->m_save.m_shownValue[0]) {
+		BuildTree(Cur->left, value);
+	}
+	else if (value > Cur->m_save.m_shownValue[0]) {
+		BuildTree(Cur->right, value);
+	}
+}
+
 void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value) {
+	std::vector<int> values;
+	if (!ValidateInput(l_value, values)) {
+		return;
+	}
+
+	ClearTree(m_root);
+
+	for (auto& value : values) {
+		m_root = BuildTree(m_root, value);
+	}
+
+	AddNewStep(m_root);
+
+	m_nodeNum = values.size();
 
 }
 
@@ -59,7 +88,7 @@ bool AVL_Tree::ValidateInput(const std::string& l_value, std::vector<int>& res) 
 	}
 
 	num *= sign;
-	if (num > 999 || num < -999) {
+	if (num > 999 || num <= 0) {
 		return false;
 	}
 

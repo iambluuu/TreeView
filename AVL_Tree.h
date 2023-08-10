@@ -35,6 +35,7 @@ private:
 	void Centering();
 
 	bool ValidateInput(const std::string& l_value, std::vector<int>& res);
+	Node* BuildTree(Node* Cur, int value);
 
 	void ClearTree(Node* Cur);
 public:

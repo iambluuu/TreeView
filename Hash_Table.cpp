@@ -259,7 +259,7 @@ void HashTable::InsertLinearProbing(int l_value) {
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 
-	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] != 0) {
+	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] > 0) {
 		index = (index + 1) % n;
 
 		AddNewStep();
@@ -271,7 +271,6 @@ void HashTable::InsertLinearProbing(int l_value) {
 	AddNewStep();
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
-	m_probingNodes[index]->getInfo()->back().m_valueChange.first = 0;
 	m_probingNodes[index]->getInfo()->back().m_valueChange.second = l_value;
 	m_probingNodes[index]->getInfo()->back().is_valueChanging = 1;
 }
@@ -285,9 +284,11 @@ void HashTable::InsertQuadraticProbing(int l_value) {
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 
 	int i = 1;
-	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] != 0 && i < n) {
+	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] > 0 && i < n) {
 		index = (l_value + i * i) % n;
 		i++;
+
+		std::cerr << index << std::endl;
 
 		AddNewStep();
 		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
@@ -295,10 +296,17 @@ void HashTable::InsertQuadraticProbing(int l_value) {
 
 	}
 
+	if (m_probingNodes[index]->getInfo()->back().m_shownValue[0] > 0) {
+		std::cerr << "Table is full" << std::endl;
+		AddNewStep();
+		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
+		m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::NotFound;
+		return;
+	}
+
 	AddNewStep();
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
-	m_probingNodes[index]->getInfo()->back().m_valueChange.first = 0;
 	m_probingNodes[index]->getInfo()->back().m_valueChange.second = l_value;
 	m_probingNodes[index]->getInfo()->back().is_valueChanging = 1;
 }
@@ -339,10 +347,78 @@ void HashTable::RemoveChaining(int value) {
 }
 
 void HashTable::RemoveLinearProbing(int value) {
+	int n = m_probingNodes.size();
+	int index = value % n;
+	Node* Cur = m_probingNodes[index];
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	int i = 1;
+	while (Cur->getInfo()->back().m_shownValue[0] != value && Cur->getInfo()->back().m_shownValue[0] != 0 && i < n) {
+		index = (value % n + i) % n;
+		i++;
+		Cur = m_probingNodes[index];
+
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Selected;
+	}
 	
+	if (Cur->getInfo()->back().m_shownValue[0] == value) {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 0;
+		Cur->getInfo()->back().is_valueChanging = 1;
+		Cur->getInfo()->back().m_valueChange.first = Cur->getInfo()->back().m_shownValue[0];
+		Cur->getInfo()->back().m_valueChange.second = -1;
+	}
+	else {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+	}
+
 }
 
-void RemoveQuadraticProbing(int value);
+void HashTable::RemoveQuadraticProbing(int value) {
+	int n = m_probingNodes.size();
+	int index = value % n;
+	Node* Cur = m_probingNodes[index];
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	int i = 1;
+	while (Cur->getInfo()->back().m_shownValue[0] != value && Cur->getInfo()->back().m_shownValue[0] != 0 && i < n) {
+		index = (value % n + i * i) % n;
+		i++;
+
+		std::cerr << Cur->getInfo()->back().m_shownValue[0] << " " << value << std::endl;
+
+		Cur = m_probingNodes[index];
+
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Selected;
+	}
+
+	if (Cur->getInfo()->back().m_shownValue[0] == value) {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 0;
+		Cur->getInfo()->back().is_valueChanging = 1;
+		Cur->getInfo()->back().m_valueChange.first = Cur->getInfo()->back().m_shownValue[0];
+		Cur->getInfo()->back().m_valueChange.second = -1;
+
+		std::cerr << "Found and deleting " << Cur->getInfo()->back().m_index << " " << value << std::endl;
+	}
+	else {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+	}
+}
 
 void SearchChaining(int value);
 void SearchLinearProbing(int value);
@@ -419,15 +495,35 @@ void HashTable::OnRemove(const std::string& l_value) {
 		return;
 	}
 
+	if ((m_mode == 0 && m_chainingNodes.size() == 0) || (m_mode && m_probingNodes.size() == 0)) {
+		std::cerr << "Create table first\n";
+		return;
+	}
+
+	ResetNodes();
+
 	if (m_mode == 0) {
 		// chaining
+		RemoveChaining(resValue);
 	}
 	else if (m_mode == 1) {
 		// linear probing
+		RemoveLinearProbing(resValue);
 	}
 	else {
 		// quadratic probing
+		RemoveQuadraticProbing(resValue);
 	}
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	if (m_mode) {
+		renderer->Reset(m_probingNodes[0]->getInfo()->size());
+	}
+	else {
+		renderer->Reset(m_chainingNodes[0]->getInfo()->size());
+	}
+
 }
 
 void HashTable::Create(int n, int m) {
