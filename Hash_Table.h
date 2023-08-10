@@ -22,11 +22,18 @@ private:
 	void InsertLinearProbing(int value);
 	void InsertQuadraticProbing(int value);
 
+	void RemoveChaining(int value);
+	void RemoveLinearProbing(int value);
+	void RemoveQuadraticProbing(int value);
+
+	void SearchChaining(int value);
+	void SearchLinearProbing(int value);
+	void SearchQuadraticProbing(int value);
+
 	void ClearNodes(std::vector<Node*>& nodes);
 	void ClearChain(Node* Cur);
 
 	void Create(int n, int m);
-	void Remove(int value);
 
 	void InsertNode(int value); //No animation
 	void ResetNodes();
@@ -50,10 +57,10 @@ public:
 	void Update(const sf::Time& l_time);
 	void Draw();
 
-
 	void OnCreate(const std::string& l_numbers, const std::string& l_value);
 	void OnInsert(const std::string& l_value);
 	void OnRemove(const std::string& l_value);
+	void OnSearch(const std::string& l_value);
 
 	int GetMode() const {
 		return m_mode;

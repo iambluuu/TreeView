@@ -157,6 +157,16 @@ void HashTable::AddNewStep() {
 	}
 }
 
+void HashTable::ShiftUp(Node* Cur) {
+	if (!Cur)
+		return;
+
+	Cur->getInfo()->back().is_moving = 1;
+	Cur->getInfo()->back().m_coord.second.second = Cur->getInfo()->back().m_coord.first.second - 1;
+
+	ShiftUp(Cur->left);
+}
+
 void HashTable::InsertNode(int l_value) {
 	int n;
 
@@ -293,6 +303,51 @@ void HashTable::InsertQuadraticProbing(int l_value) {
 	m_probingNodes[index]->getInfo()->back().is_valueChanging = 1;
 }
 
+void HashTable::RemoveChaining(int value) {
+	int n = m_chainingNodes.size();
+	int index = value % n;
+
+	Node* Cur = m_chainingNodes[index];
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	Node* preCur = nullptr;
+	while (Cur && Cur->getInfo()->back().m_shownValue[0] != value) {
+		preCur = Cur;
+		Cur = Cur->left;
+
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.first = NodeState::Default;
+	}
+
+	if (!Cur) {
+		return;
+	}
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 0;
+	Cur->getInfo()->back().is_appearing = 2;
+	
+	ShiftUp(Cur);
+
+	preCur->left = Cur->left;
+	preCur->getInfo()->back().m_arrowChange[0] = Cur->left;
+	
+}
+
+void HashTable::RemoveLinearProbing(int value) {
+	
+}
+
+void RemoveQuadraticProbing(int value);
+
+void SearchChaining(int value);
+void SearchLinearProbing(int value);
+void SearchQuadraticProbing(int value);
+
 void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 	int n = 0, m = 0;
 	if (!ValidateCreate(l_numbers, l_value, n, m)) {
@@ -322,6 +377,11 @@ void HashTable::OnInsert(const std::string& l_value) {
 
 	if (!ValidateInput(l_value, resValue)) {
 		std::cerr << "Invalid input\n";
+		return;
+	}
+
+	if ((m_mode == 0 && m_chainingNodes.size() == 0) || (m_mode && m_probingNodes.size() == 0)) {
+		std::cerr << "Create table first\n";
 		return;
 	}
 

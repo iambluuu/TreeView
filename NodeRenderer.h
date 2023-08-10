@@ -51,7 +51,7 @@ private:
 public:
 	NodeRenderer(StateManager* l_manager) {
 		m_stateManager = l_manager;
-		m_nodeGraphics.resize(4);
+		m_nodeGraphics.resize(3);
 		m_nodeColor.resize(4);
 
 		m_texture.loadFromFile("Assets/Texture/NodeSheet.png");
@@ -98,7 +98,7 @@ public:
 	void DrawArrow();
 
 	std::tuple<sf::Color, sf::Color, sf::Color>* GetNodeColor(int ThemeID, NodeState l_state);
-	sf::Vector2f GetPosOnScreen(std::pair<int, int> treeCoord);
+	sf::Vector2f GetPosOnScreen(std::pair<float, float> treeCoord);
 	sf::Color GetColorTransition(float percent, const sf::Color& start, const sf::Color& end);
 	int GetStep();
 

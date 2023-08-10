@@ -100,6 +100,10 @@ void UIManager::PrepareElements() {
 	searchBox->m_inputButton = searchInput;
 	Drawer* searchDrawer = new Drawer(this, "Search");
 
+	searchDrawer->AddElement(0, searchBox);
+	searchDrawer->AddElement(0, searchRandom);
+	searchDrawer->AddElement(0, searchInput);
+
 	AddToCloset(searchDrawer);
 
 	//Display
@@ -161,7 +165,7 @@ void UIManager::PrepareElements() {
 	AddElement(goToAVLTree);
 
 	GoToButton* goToHashTable = new GoToButton(this, StateType::Hash_Table);
-	goToHashTable->SetPosition(sf::Vector2f(128, 262));
+	goToHashTable->SetPosition(sf::Vector2f(97, 262));
 	AddElement(goToHashTable);
 }
 

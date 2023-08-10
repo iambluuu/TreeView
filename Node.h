@@ -17,6 +17,7 @@ struct NodeInfo {
 	
 	std::vector<int> m_shownValue{ std::vector<int>(3) };
 	std::vector<Node*> m_arrowCoord{ std::vector<Node*>(26, nullptr)};
+	std::vector<Node*> m_arrowChange{ std::vector<Node*>(26, nullptr)};
 
 	bool is_moving{ 0 };
 	bool is_visible{ 0 };
@@ -30,9 +31,8 @@ struct NodeInfo {
 	int m_bf{ 0 };
 	int m_index{ -1 };
 	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
-	std::pair<std::pair<int, int>, std::pair<int, int> > m_coord{ {0, 0}, {0, 0} };
+	std::pair<std::pair<float, float>, std::pair<float, float> > m_coord{ {0, 0}, {0, 0} };
 	std::pair<int, int> m_valueChange{ 0, 0 };
-	std::vector<Node*> m_arrowChange{ std::vector<Node*>(3)};
 };
 
 const NodeInfo DEFAULT_NODE_INFO;
@@ -167,15 +167,8 @@ public:
 			m_save.m_valueChange.first = m_save.m_valueChange.second;
 		}
 
-		for (int i = 0; i < 3; i++) {
-			if (!m_save.m_arrowCoord[i])
-				continue;
-
-			if (m_save.m_arrowCoord[i]->getInfo()->back().is_appearing == 2) {
-				m_save.m_arrowCoord[i] = nullptr;
-			}
-
-
+		for (int i = 0; i < 26; i++) {
+			m_save.m_arrowCoord[i] = m_save.m_arrowChange[i];
 		}
 	}
 

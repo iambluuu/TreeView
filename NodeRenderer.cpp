@@ -21,36 +21,14 @@ void NodeRenderer::PrepareSprite() {
 
 	int sizeX = 46;
 	int sizeY = 46;
-	Border.setTextureRect(sf::IntRect(0, 0, sizeX, sizeY));
-	Fill.setTextureRect(sf::IntRect(sizeX, 0, sizeX, sizeY));
-	Border.setOrigin(Border.getLocalBounds().left + Border.getLocalBounds().width / 2, Border.getLocalBounds().top + Border.getLocalBounds().height / 2);
-	Fill.setOrigin(Fill.getLocalBounds().left + Fill.getLocalBounds().width / 2, Fill.getLocalBounds().top + Fill.getLocalBounds().height / 2);
+	for (int i = 1; i <= 3; i++) {
+		Border.setTextureRect(sf::IntRect(0, sizeY * (i - 1), sizeX * i, sizeY));
+		Fill.setTextureRect(sf::IntRect(sizeX * i, sizeY * (i - 1), sizeX * i, sizeY));
+		Border.setOrigin(Border.getLocalBounds().left + Border.getLocalBounds().width / 2, Border.getLocalBounds().top + Border.getLocalBounds().height / 2);
+		Fill.setOrigin(Fill.getLocalBounds().left + Fill.getLocalBounds().width / 2, Fill.getLocalBounds().top + Fill.getLocalBounds().height / 2);
 
-	m_nodeGraphics[0] = std::make_pair(Border, Fill);
-
-	sizeX = 92;
-	Border.setTextureRect(sf::IntRect(0, sizeY * 1, sizeX, sizeY));
-	Fill.setTextureRect(sf::IntRect(sizeX, sizeY * 1, sizeX, sizeY));
-	Border.setOrigin(Border.getLocalBounds().left + Border.getLocalBounds().width / 2, Border.getLocalBounds().top + Border.getLocalBounds().height / 2);
-	Fill.setOrigin(Fill.getLocalBounds().left + Fill.getLocalBounds().width / 2, Fill.getLocalBounds().top + Fill.getLocalBounds().height / 2);
-
-	m_nodeGraphics[1] = std::make_pair(Border, Fill);
-
-	sizeX = 120;
-	Border.setTextureRect(sf::IntRect(0, sizeY * 2, sizeX, sizeY));
-	Fill.setTextureRect(sf::IntRect(sizeX, sizeY * 2, sizeX, sizeY));
-	Border.setOrigin(Border.getLocalBounds().left + Border.getLocalBounds().width / 2, Border.getLocalBounds().top + Border.getLocalBounds().height / 2);
-	Fill.setOrigin(Fill.getLocalBounds().left + Fill.getLocalBounds().width / 2, Fill.getLocalBounds().top + Fill.getLocalBounds().height / 2);
-
-	m_nodeGraphics[2] = std::make_pair(Border, Fill);
-
-	sizeX = 160;
-	Border.setTextureRect(sf::IntRect(0, sizeY * 3, sizeX, sizeY));
-	Fill.setTextureRect(sf::IntRect(sizeX, sizeY * 3, sizeX, sizeY));
-	Border.setOrigin(Border.getLocalBounds().left + Border.getLocalBounds().width / 2, Border.getLocalBounds().top + Border.getLocalBounds().height / 2);
-	Fill.setOrigin(Fill.getLocalBounds().left + Fill.getLocalBounds().width / 2, Fill.getLocalBounds().top + Fill.getLocalBounds().height / 2);
-
-	m_nodeGraphics[3] = std::make_pair(Border, Fill);
+		m_nodeGraphics[i - 1] = std::make_pair(Border, Fill);
+	}
 
 	//Arrows
 	m_arrowSprite.setTexture(m_arrowTexture);
@@ -212,6 +190,9 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	std::vector<NodeInfo>* info = Cur->getInfo();
 	int CurStep = m_curStep;
 
+	if (m_curStep >= info->size())
+		return;
+
 	NodeInfo CurInfo = info->at(CurStep);
 	if (!CurInfo.is_visible)
 		return;
@@ -226,33 +207,60 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	//Draw Arrows
 
 	for (int i = 0; i < CurInfo.m_arrowCoord.size(); i++) {
-		Node* Dest = CurInfo.m_arrowCoord[i];
+		Node* startDest = CurInfo.m_arrowCoord[i];
+		Node* endDest = CurInfo.m_arrowChange[i];
 
-		if (!Dest || !Dest->getInfo()->at(CurStep).is_visible)
+		if (!startDest && !endDest)
 			continue;
 
-		auto DestInfo = Dest->getInfo()->at(CurStep);
-
-		sf::Vector2f startCoord = GetPosOnScreen(CurInfo.m_coord.first);
+		sf::Vector2f startDestCoord, endDestCoord, destCoord;
+		sf::Vector2f curCoord = GetPosOnScreen(CurInfo.m_coord.first);
 
 		if (CurInfo.is_moving) {
 			sf::Vector2f First = GetPosOnScreen(CurInfo.m_coord.first);
 			sf::Vector2f Last = GetPosOnScreen(CurInfo.m_coord.second);
 
-			startCoord = First + (Last - First) * percent;
+			curCoord = First + (Last - First) * percent;
 		}
 
-		sf::Vector2f endCoord = GetPosOnScreen(DestInfo.m_coord.first);
+		if (startDest) {
+			if (startDest->getInfo()->at(CurStep).is_moving) {
+				sf::Vector2f First = GetPosOnScreen(startDest->getInfo()->at(CurStep).m_coord.first);
+				sf::Vector2f Last = GetPosOnScreen(startDest->getInfo()->at(CurStep).m_coord.second);
 
-		if (DestInfo.is_moving) {
-			sf::Vector2f First = GetPosOnScreen(DestInfo.m_coord.first);
-			sf::Vector2f Last = GetPosOnScreen(DestInfo.m_coord.second);
+				startDestCoord = First + (Last - First) * percent;
+			} else
+				startDestCoord = GetPosOnScreen(startDest->getInfo()->at(CurStep).m_coord.first);
+		} else
+			startDestCoord = curCoord;
 
-			endCoord = First + (Last - First) * percent;
+		if (endDest) {
+			if (endDest->getInfo()->at(CurStep).is_moving) {
+				sf::Vector2f First = GetPosOnScreen(endDest->getInfo()->at(CurStep).m_coord.first);
+				sf::Vector2f Last = GetPosOnScreen(endDest->getInfo()->at(CurStep).m_coord.second);
+
+				endDestCoord = First + (Last - First) * percent;
+			}
+			else
+				endDestCoord = GetPosOnScreen(endDest->getInfo()->at(CurStep).m_coord.first);
 		}
+		else 
+			endDestCoord = curCoord;
+		
+		destCoord = startDestCoord + (endDestCoord - startDestCoord) * percent;
 
-		float dist = sqrt(pow(startCoord.x - endCoord.x, 2) + pow(startCoord.y - endCoord.y, 2)) - 20;
-		float angle = atan2(endCoord.y - startCoord.y, endCoord.x - startCoord.x);
+
+		float dist = sqrt(pow(curCoord.x - destCoord.x, 2) + pow(curCoord.y - destCoord.y, 2)) - 20;
+		if (dist < 0)
+			dist = 0;
+		float angle = atan2(destCoord.y - curCoord.y, destCoord.x - curCoord.x);
+
+		NodeInfo DestInfo; 
+
+		if (endDest)
+			DestInfo = endDest->getInfo()->at(CurStep);
+		else
+			DestInfo = startDest->getInfo()->at(CurStep);
 
 		auto startColor = GetNodeColor(0, DestInfo.node_state.first); //subject to change, 0 to theme id
 		auto endColor = GetNodeColor(0, DestInfo.node_state.second); //subject to change, 0 to theme id
@@ -261,14 +269,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 		arrow->setTextureRect(sf::IntRect(229 - dist, directed * 22, dist, 22));
 
-		if (DestInfo.is_appearing == 1)
-			arrow->setTextureRect(sf::IntRect(229 - dist * percent, directed * 22, dist * percent, 22));
-		else if (DestInfo.is_appearing == 2) {
-			arrow->setTextureRect(sf::IntRect(229 - dist * (1 - percent), directed * 22, dist * (1 - percent), 22));
-		}
-
 		arrow->setOrigin(arrow->getLocalBounds().left, arrow->getLocalBounds().top + arrow->getLocalBounds().height / 2);
-		arrow->setPosition(startCoord);
+		arrow->setPosition(curCoord);
 		arrow->setRotation(angle * 180 / 3.14159265358979323846);
 		arrow->setColor(std::get<0>(*startColor));
 
@@ -300,6 +302,9 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 		coord = startCoord + (endCoord - startCoord) * percent;
 	}
+
+	BorderSprite->setOrigin(BorderSprite->getLocalBounds().left + BorderSprite->getLocalBounds().width / 2, BorderSprite->getLocalBounds().top + BorderSprite->getLocalBounds().height / 2);
+	FillerSprite->setOrigin(FillerSprite->getLocalBounds().left + FillerSprite->getLocalBounds().width / 2, FillerSprite->getLocalBounds().top + FillerSprite->getLocalBounds().height / 2);
 
 	BorderSprite->setPosition(coord);
 	FillerSprite->setPosition(coord);
@@ -445,6 +450,13 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 			m_label.setPosition(coord.x, coord.y - 35);
 			wind->draw(m_label);
 		}
+		else if (Cur->getInfo()->back().m_index < -1) {
+			m_label.setFillColor(sf::Color::Red);
+			m_label.setString("DEL");
+			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
+			m_label.setPosition(coord.x, coord.y - 35);
+			wind->draw(m_label);
+		}
 	}
 }
 
@@ -458,7 +470,7 @@ void NodeRenderer::DrawTree(Node* Root)
 	DrawTree(Root->right);
 }
 
-sf::Vector2f NodeRenderer::GetPosOnScreen(std::pair<int, int> treeCoord) {
+sf::Vector2f NodeRenderer::GetPosOnScreen(std::pair<float, float> treeCoord) {
 	float X = MIDDLE_LINE + (treeCoord.first - 0.5) * HORIZONTAL_SPACING;
 	float Y = TOP_LINE + treeCoord.second * VERTICAL_SPACING;
 
