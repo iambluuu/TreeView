@@ -32,7 +32,6 @@ public:
 		return m_stateManager;
 	}
 
-	virtual void OnCreate(const std::string& l_numbers, const std::string& l_value) = 0;
 	virtual void OnDestroy() = 0;
 
 	virtual void Activate() = 0;
@@ -44,6 +43,8 @@ public:
 
 	virtual void OnInsert(const std::string& l_value) = 0;
 	virtual void OnRemove(const std::string& l_value) = 0;
+	virtual void OnCreate(const std::string& l_numbers, const std::string& l_value) = 0;
+	virtual void OnSearch(const std::string& l_value) = 0;
 	
 	void setTransparent(const bool& l_transparent) {
 		m_transparent = l_transparent;

@@ -22,7 +22,7 @@ private:
 	std::string m_defaultString;
 	sf::RectangleShape m_caret;
 	const int MAX_CHARS = 30;
-	int max_input_char = 15;
+	int max_input_char = 50;
 
 	bool ValidateInput();
 

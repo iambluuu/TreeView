@@ -170,5 +170,8 @@
     <ClInclude Include="ViewButton.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
+    <ClInclude Include="TTF_Tree.h">
+      <Filter>Header Files\States</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #pragma once
 #include "StateManager.h"
 
-class AVL_Tree : public BaseState {
+class TTF_Tree : public BaseState {
 private:
 	std::vector<Node*> m_align{ std::vector<Node*>(51, nullptr) };
 	const int ALIGN_OFFSET{ 25 };
@@ -12,7 +12,7 @@ private:
 	int m_nodeNum{ 0 };
 	int m_leftWidth{ 0 };
 	int m_rightWidth{ 0 };
-	
+
 	float m_elapsed{ 0.f };
 
 	Node* m_root{ nullptr };
@@ -34,44 +34,35 @@ private:
 	void ClearStep(Node* Cur);
 	void Centering();
 
-	bool ValidateInput(const std::string& l_value, std::vector<int>& res);
-	bool ValidateCreate(const std::string& l_value, std::vector<int>& res);
+	bool ValidateInput(const std::string& l_value, int& resValue);
+	bool ValidateCreate(const std::string& l_numbers, const std::string& l_value, int& n, int& m);
 
-	Node* BuildTree(Node* Cur, int value, int hor_depth, int ver_depth);
-	Node* BuildRotateLeft(Node* Cur);
-	Node* BuildRotateRight(Node* Cur);
-	void BuildCentering();
+	void AddNodeStep(Node* node);
+	void AddNewStep();
 
-	void ClearAlign();
+	void ResetNodes();
 
-	void ClearTree(Node* Cur);
 public:
-	AVL_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {
-		m_align.resize(2 * MAX_WIDTH + 1);
-		fill(m_align.begin(), m_align.end(), nullptr);
+	TTF_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {
 	}
 
-	~AVL_Tree();
+	~TTF_Tree();
 
-	void OnDestroy();
+	StateManager* GetStateManager() {
+		return m_stateManager;
+	}
 
-	void Activate() ;
-	void Deactivate();
+	void OnDestroy() {};
+
+	void Activate() {};
+	void Deactivate() {};
 
 	void HandleEvent(sf::Event* l_event);
 	void Update(const sf::Time& l_time);
 	void Draw();
-	void ResetNodes(Node* Cur);
 
 	void OnCreate(const std::string& l_numbers, const std::string& l_value);
 	void OnInsert(const std::string& l_value);
 	void OnRemove(const std::string& l_value);
 	void OnSearch(const std::string& l_value);
-
-	Node* RotateLeft(Node* Cur);
-	Node* RotateRight(Node* Cur);
-
-	void PostProcessing();
-
-	void TestFunc();
 };

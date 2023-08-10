@@ -75,6 +75,27 @@ void Window::Update() {
 			m_isDone = 1;
 			return;
 		}
+
+		if (E.type == sf::Event::KeyPressed) {
+			switch (E.key.code) {
+			case sf::Keyboard::W:
+				MoveView(sf::Vector2f(0, -5));
+				break;
+				case sf::Keyboard::A:
+				MoveView(sf::Vector2f(-5, 0));
+				break;
+				case sf::Keyboard::S:
+				MoveView(sf::Vector2f(0, 5));
+				break;
+				case sf::Keyboard::D:
+				MoveView(sf::Vector2f(5, 0));
+				break;
+				case sf::Keyboard::R:
+				ResetView();
+				break;
+			}
+		}
+
 		m_stateManager->HandleEvent(&E);
 		m_uiManager->HandleEvent(&E);
 	}

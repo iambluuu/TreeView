@@ -420,9 +420,103 @@ void HashTable::RemoveQuadraticProbing(int value) {
 	}
 }
 
-void SearchChaining(int value);
-void SearchLinearProbing(int value);
-void SearchQuadraticProbing(int value);
+void HashTable::SearchChaining(int value) {
+	int n = m_chainingNodes.size();
+	int index = value % n;
+
+	Node* Cur = m_chainingNodes[index];
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	while (Cur && Cur->getInfo()->back().m_shownValue[0] != value) {
+		Cur = Cur->left;
+
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.first = NodeState::Default;
+
+		if (!Cur->left && Cur->getInfo()->back().m_shownValue[0] != value) {
+			AddNewStep();
+			Cur->getInfo()->back().is_stateChanging = 1;
+			Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+			return;
+		}
+	}
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Found;
+}
+
+void HashTable::SearchLinearProbing(int value) {
+	int n = m_probingNodes.size();
+	int index = value % n;
+	
+	Node* Cur = m_probingNodes[index];
+
+	AddNewStep();
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	int i = 1;
+	while (Cur->getInfo()->back().m_shownValue[0] != value && Cur->getInfo()->back().m_shownValue[0] != 0 && i < n) {
+		index = (value % n + i) % n;
+		i++;
+		Cur = m_probingNodes[index];
+
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Selected;
+	}
+
+	if (Cur->getInfo()->back().m_shownValue[0] == value) {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Found;
+	}
+	else {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+	}
+}
+
+void HashTable::SearchQuadraticProbing(int value) {
+	int n = m_probingNodes.size();
+	int index = value % n;
+
+	Node* Cur = m_probingNodes[index];
+
+	AddNewStep();
+
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	int i = 1;
+	while (Cur->getInfo()->back().m_shownValue[0] != value && Cur->getInfo()->back().m_shownValue[0] != 0 && i < n) {
+		index = (value % n + i * i) % n;
+		i++;
+
+		Cur = m_probingNodes[index];
+
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Selected;
+	}
+
+	if (Cur->getInfo()->back().m_shownValue[0] == value) {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Found;
+	}
+	else {
+		AddNewStep();
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+	}
+}
 
 void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 	int n = 0, m = 0;
@@ -581,6 +675,44 @@ void HashTable::Create(int n, int m) {
 			Cur->getInfo()->back().is_appearing = 1;
 		}
 
+	}
+}
+
+void HashTable::OnSearch(const std::string& l_value) {
+	int resValue;
+
+	if (!ValidateInput(l_value, resValue)) {
+		std::cerr << "Invalid input\n";
+		return;
+	}
+
+	if ((m_mode == 0 && m_chainingNodes.size() == 0) || (m_mode && m_probingNodes.size() == 0)) {
+		std::cerr << "Create table first\n";
+		return;
+	}
+
+	ResetNodes();
+
+	if (m_mode == 0) {
+		// chaining
+		SearchChaining(resValue);
+	}
+	else if (m_mode == 1) {
+		// linear probing
+		SearchLinearProbing(resValue);
+	}
+	else {
+		// quadratic probing
+		SearchQuadraticProbing(resValue);
+	}
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	if (m_mode) {
+		renderer->Reset(m_probingNodes[0]->getInfo()->size());
+	}
+	else {
+		renderer->Reset(m_chainingNodes[0]->getInfo()->size());
 	}
 }
 

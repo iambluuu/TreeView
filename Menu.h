@@ -18,4 +18,5 @@ public:
 
 	void OnInsert(const std::string& l_value) {}
 	void OnRemove(const std::string& l_value) {}
+	void OnSearch(const std::string& l_value) {}
 };

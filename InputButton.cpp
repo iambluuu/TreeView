@@ -57,6 +57,10 @@ void InputButton::OnClick() {
 			state->OnCreate("", m_textBox->ReadString());
 		break;
 
+	case Execute::Search:
+		state->OnSearch(m_textBox->ReadString());
+		break;
+
 	default:
 		break;
 	

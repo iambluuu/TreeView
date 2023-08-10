@@ -195,6 +195,7 @@
     <ClInclude Include="StaticElement.h" />
     <ClInclude Include="TextBox.h" />
     <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="TTF_Tree.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="UI_Element.h" />
     <ClInclude Include="Utilities.h" />

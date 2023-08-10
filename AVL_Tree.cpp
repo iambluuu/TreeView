@@ -29,8 +29,6 @@ Node* AVL_Tree::BuildTree(Node* Cur, int value, int hor_depth, int ver_depth) {
 
 		if (m_align[ver_depth + ALIGN_OFFSET]) {
 
-			std::cerr << "bug position: " << ver_depth + ALIGN_OFFSET << "\n";
-
 			if (value > m_align[ver_depth + ALIGN_OFFSET]->m_save.m_shownValue[0]) {
 				if (value > m_root->m_save.m_shownValue[0]) {
 					std::cerr << "Value collision: " << value << " " << m_align[ver_depth + ALIGN_OFFSET]->m_save.m_shownValue[0] << "\n";
@@ -231,8 +229,9 @@ void AVL_Tree::Deactivate() {
 }
 
 void AVL_Tree::ClearAlign() {
-	for (auto v : m_align)
-		v = nullptr;
+	for (int i = 0; i < m_align.size(); i++) {
+		m_align[i] = nullptr;
+	}
 }
 
 void AVL_Tree::ClearTree(Node * Cur) {
@@ -863,12 +862,38 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 
 }
 
-void AVL_Tree::OnGenerate() {
-	 //Subject to change, should get value from text box;
-	std::vector<int> input;
+void AVL_Tree::SearchNode(Node* Cur, int l_value) {
+	AddNewStep(m_root);
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
-	for (auto value : input) {
-		m_root = InsertNode(m_root, value, 0, 0);
+	if (Cur->getValue()[0] == l_value) {
+		AddNewStep(m_root);
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::Found;
+		return;
+	}
+
+	if (Cur->getValue()[0] > l_value) {
+		if (Cur->left) {
+			SearchNode(Cur->left, l_value);
+		}
+		else {
+			AddNewStep(m_root);
+			Cur->getInfo()->back().is_stateChanging = 1;
+			Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+			return;
+		}
+	} else 	if (Cur->getValue()[0] < l_value) {
+		if (Cur->right) {
+			SearchNode(Cur->right, l_value);
+		}
+		else {
+			AddNewStep(m_root);
+			Cur->getInfo()->back().is_stateChanging = 1;
+			Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+			return;
+		}
 	}
 }
 
@@ -920,6 +945,25 @@ void AVL_Tree::OnRemove(const std::string& l_value) {
 		renderer->Reset(m_removedNode->getInfo()->size());
 	else
 		renderer->Reset(m_root->getInfo()->size());
+}
+
+void AVL_Tree::OnSearch(const std::string& l_value) {
+	std::vector<int> input;
+	if (!ValidateInput(l_value, input)) {
+		return;
+	}
+
+	if (m_nodeNum == 0)
+		return;
+
+	PostProcessing();
+	ResetNodes(m_root);
+
+	SearchNode(m_root, input[0]);
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+
+	renderer->Reset(m_root->getInfo()->size());
 }
 
 Node* AVL_Tree::RotateLeft(Node* Cur) {

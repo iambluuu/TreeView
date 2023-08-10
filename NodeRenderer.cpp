@@ -477,6 +477,10 @@ sf::Vector2f NodeRenderer::GetPosOnScreen(std::pair<float, float> treeCoord) {
 	float X = MIDDLE_LINE + (treeCoord.first - 0.5) * HORIZONTAL_SPACING;
 	float Y = TOP_LINE + treeCoord.second * VERTICAL_SPACING;
 
+	if (m_curState == StateType::Hash_Table) {
+		X = MIDDLE_LINE + (treeCoord.first - 0.5) * (HORIZONTAL_SPACING + 10);
+		Y = TOP_LINE + treeCoord.second * VERTICAL_SPACING;
+	}
 	return sf::Vector2f(X, Y);
 }
 

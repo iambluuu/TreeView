@@ -41,7 +41,7 @@ private:
 
 	const float TOP_LINE = 200;
 	const float MIDDLE_LINE = 592 + 1500;
-	const float HORIZONTAL_SPACING = 56;
+	const float HORIZONTAL_SPACING = 46;
 	const float VERTICAL_SPACING = 70;
 
 	bool is_paused{ false };

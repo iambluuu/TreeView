@@ -42,6 +42,7 @@ void UIManager::PrepareElements() {
 
 	RandomButton* h_randomButton = new RandomButton(this, h_inputNumbers, h_inputValue);
 	InputButton* h_inputButton = new InputButton(this, h_inputNumbers, h_inputValue, Execute::Create);
+	h_inputNumbers->m_inputButton = h_inputButton;
 
 	Drawer * h_drawer = new Drawer(this, "Create");
 	h_drawer->AddElement(0, h_inputNumbers);
@@ -56,6 +57,7 @@ void UIManager::PrepareElements() {
 	TextBox* createValues= new TextBox(this, "v =");
 	RandomButton* createRandom = new RandomButton(this, createValues, nullptr);
 	InputButton* createInput = new InputButton(this, nullptr, createValues, Execute::Create);
+	createValues->m_inputButton = createInput;
 
 	Drawer* createDrawer = new Drawer(this, "Create");
 	createDrawer->AddElement(0, createValues);

@@ -2,7 +2,7 @@
 #include "Menu.h"
 #include "AVL_Tree.h"
 #include "Hash_Table.h"
-
+#include "TTF_Tree.h"
 
 StateManager::StateManager(SharedContext* l_shareContext)
 {
@@ -11,13 +11,14 @@ StateManager::StateManager(SharedContext* l_shareContext)
 	RegisterState<Menu>(StateType::Menu);
 	RegisterState<HashTable>(StateType::Hash_Table);
 	RegisterState<AVL_Tree>(StateType::AVLTree);
-	//RegisterState<TTF_Tree>(StateType::TTFTree);
+	RegisterState<TTF_Tree>(StateType::TTFTree);
 	//RegisterState<Trie>(StateType::Trie);
 	//RegisterState<Graph>(StateType::Graph);
 
 	CreateState(StateType::Menu);
 	CreateState(StateType::AVLTree);
 	CreateState(StateType::Hash_Table);
+	CreateState(StateType::TTFTree);
 
 }
 
