@@ -303,9 +303,6 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		coord = startCoord + (endCoord - startCoord) * percent;
 	}
 
-	BorderSprite->setOrigin(BorderSprite->getLocalBounds().left + BorderSprite->getLocalBounds().width / 2, BorderSprite->getLocalBounds().top + BorderSprite->getLocalBounds().height / 2);
-	FillerSprite->setOrigin(FillerSprite->getLocalBounds().left + FillerSprite->getLocalBounds().width / 2, FillerSprite->getLocalBounds().top + FillerSprite->getLocalBounds().height / 2);
-
 	BorderSprite->setPosition(coord);
 	FillerSprite->setPosition(coord);
 	m_label.setPosition(coord);

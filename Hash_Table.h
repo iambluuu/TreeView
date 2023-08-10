@@ -35,6 +35,8 @@ private:
 
 	void Create(int n, int m);
 
+	void ShiftUp(Node* Cur);
+
 	void InsertNode(int value); //No animation
 	void ResetNodes();
 
