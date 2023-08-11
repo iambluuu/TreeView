@@ -405,15 +405,6 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 	AddNewStep(Cur->right);
 }
 
-void AVL_Tree::ClearStep(Node* Cur) {
-	if (!Cur)
-		return;
-
-	Cur->getInfo()->clear();
-	ClearStep(Cur->left);
-	ClearStep(Cur->right);
-}
-
 void AVL_Tree::Centering() {
 	if (m_nodeNum == 0) {
 		return;

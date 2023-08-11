@@ -470,8 +470,16 @@ void NodeRenderer::DrawTree(Node* Root)
 		return;
 
 	DrawNode(Root, 0);
-	DrawTree(Root->left);
-	DrawTree(Root->right);
+
+	if (m_curState == StateType::AVLTree) {
+		DrawTree(Root->left);
+		DrawTree(Root->right);
+	}
+	else {
+		for (int i = 0; i < 26; i++) {
+			DrawTree(Root->child[i]);
+		}
+	}
 }
 
 sf::Vector2f NodeRenderer::GetPosOnScreen(std::pair<float, float> treeCoord) {
