@@ -13,6 +13,18 @@
 HWND hwnd;
 TCHAR szFileName[MAX_PATH];
 
+inline float parametric(float time) {
+	int alpha = 2;
+
+	float left = 1.0f, right = 1.0f;
+	while (alpha--) {
+		left *= time;
+		right *= (1.0f - time);
+	}
+
+	return left / (left + right);
+}
+
 inline std::string BrowseString() {
 	OPENFILENAME ofn;
 	ZeroMemory(&ofn, sizeof(ofn));

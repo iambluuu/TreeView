@@ -1,5 +1,17 @@
 #include "Drawer.h"
 
+float Drawer::parametric(float time) {
+	int alpha = 2;
+
+	float left = 1.0f, right = 1.0f;
+	while (alpha--) {
+		left *= time;
+		right *= (1.0f - time);
+	}
+
+	return left / (left + right);
+}
+
 Drawer::Drawer(UIManager* l_owner, const std::string& l_title) {
 	m_owner = l_owner;
 	m_themeManager = l_owner->GetThemeManager();
@@ -95,6 +107,8 @@ void Drawer::Update(float l_dT) {
 	
 	float percent = m_elapsed / ANIMATION_SPEED;
 
+	percent = parametric(percent);
+
 	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::Drawer, m_state);
 	m_sprite->setPosition(m_pos + offset);
 
@@ -144,6 +158,8 @@ void Drawer::AddElement(int level, BaseElement* l_element) {
 
 void Drawer::SetElementPosition(const float& l_percent) {
 	float level_offset = m_sprite->getLocalBounds().height + VERTICAL_SPACING;
+
+
 
 	for (int i = 0; i < m_elements.size(); ++i) {
 		if (m_elements[i].size() == 0) {

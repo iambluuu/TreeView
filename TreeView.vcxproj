@@ -170,6 +170,7 @@
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TextBox.cpp" />
+    <ClCompile Include="TTF_Tree.cpp" />
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="UI_Element.cpp" />
     <ClCompile Include="ViewButton.cpp" />

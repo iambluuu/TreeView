@@ -195,6 +195,7 @@ void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value
 
 	ClearTree(m_root);
 	ClearAlign();
+	PostProcessing();
 	m_leftWidth = 0;
 	m_rightWidth = 0;
 
@@ -810,12 +811,17 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 				temp->getInfo()->back().node_state.second = NodeState::Selected;
 			}
 
-			Cur->right = RemoveNode(Cur->right, temp->getValue()[0]);
-
-			Cur->getInfo()->back().is_stateChanging = 0;
+			AddNewStep(m_root);
+			Cur->getInfo()->back().is_stateChanging = 1;
+			Cur->getInfo()->back().node_state.second = NodeState::Found;
 			Cur->getInfo()->back().is_valueChanging = 1;
 			Cur->getInfo()->back().m_valueChange.first = Cur->getValue()[0];
 			Cur->getInfo()->back().m_valueChange.second = temp->getValue()[0];
+
+			temp->getInfo()->back().is_stateChanging = 0;
+			
+			Cur->right = RemoveNode(Cur->right, temp->getValue()[0]);
+			Cur->getInfo()->back().m_arrowChange[2] = Cur->right;
 
 			return Cur;
 		}

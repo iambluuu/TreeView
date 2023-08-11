@@ -22,6 +22,8 @@ private:
 	bool m_isOpened{ false };
 	float m_elapsed{ 0.0f };
 
+	float parametric(float time);
+
 public:
 	Drawer(UIManager* l_owner, const std::string& l_title);
 	~Drawer();

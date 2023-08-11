@@ -10,7 +10,7 @@ const sf::Color LightBlue = sf::Color(53, 66, 89);
 const sf::Color LightBeige = sf::Color(240, 233, 210);
 
 const sf::Color Fulvous = sf::Color(228, 132, 0);
-const sf::Color Skyblue = sf::Color(0, 128, 255);
+const sf::Color Skyblue = sf::Color(66, 103, 178);
 
 void NodeRenderer::PrepareSprite() {
 
@@ -205,6 +205,7 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	float CurStepElapsed = m_animationCurrent - STEP_DURATION * CurStep;
 	float percent = CurStepElapsed / STEP_DURATION;
 
+	percent = parametric(percent);
 
 	SharedContext* context = m_stateManager->GetContext();
 	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();

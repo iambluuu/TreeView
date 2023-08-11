@@ -48,6 +48,18 @@ private:
 	bool is_reverse{ false };
 	bool step_by_step{ false };
 
+	float parametric(float time) {
+		int alpha = 2;
+
+		float left = 1.0f, right = 1.0f;
+		while (alpha--) {
+			left *= time;
+			right *= (1.0f - time);
+		}
+
+		return left / (left + right);
+	}
+
 public:
 	NodeRenderer(StateManager* l_manager) {
 		m_stateManager = l_manager;

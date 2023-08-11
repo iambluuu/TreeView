@@ -200,11 +200,14 @@ void HashTable::InsertNode(int l_value) {
 		n = m_probingNodes.size();
 		int index = l_value % n;
 
-		while (m_probingNodes[index]->m_save.m_shownValue[0] != 0) {
-			index = (index * index) % n;
+		int i = 0;
+		while (m_probingNodes[index]->m_save.m_shownValue[0] != 0 && i < n) {
+			index = (l_value % n + i * i) % n;
+			i++;
 		}
 
-		m_probingNodes[index]->m_save.m_shownValue[0] = l_value;
+		if (m_probingNodes[index]->m_save.m_shownValue[0] <= 0)
+			m_probingNodes[index]->m_save.m_shownValue[0] = l_value;
 	}
 
 
@@ -531,6 +534,8 @@ void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_valu
 		ClearNodes(m_chainingNodes);
 
 	Create(n, m);
+	
+	std::cerr << "Created\n";
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
