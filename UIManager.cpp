@@ -184,11 +184,13 @@ void UIManager::PrepareStateUI() {
 	m_uiData.emplace(StateType::Menu, data);
 
 	//AVL Tree
+	//TTF Tree
 	data.closetMask = 30;
 	data.isMenu = 0;
 	data.tabMask = 0;
 
 	m_uiData.emplace(StateType::AVLTree, data);
+	m_uiData.emplace(StateType::TTFTree, data);
 
 	//Hash Table
 	data.closetMask = 29;

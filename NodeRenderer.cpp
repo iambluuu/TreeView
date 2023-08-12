@@ -356,35 +356,36 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 		float centersDist = BorderSprite->getLocalBounds().width * 2 * percent;
 		float radiusSpace = BorderSprite->getLocalBounds().width / 2;
+		float supporterWidth = (BorderSprite->getLocalBounds().width + 10)  * (1 - percent) + radiusSpace;
 
 		if (CurInfo.splitFromleft) {
-			supportBorder.setTextureRect(sf::IntRect(0, 46 * 2, radiusSpace + centersDist, BorderSprite->getLocalBounds().height));
-			supportBorder.setOrigin(supportBorder.getLocalBounds().left + radiusSpace, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
-			supportBorder.setPosition(coord.x - centersDist, coord.y);
+			//supportBorder.setTextureRect(sf::IntRect(0, 46 * 2, supporterWidth, BorderSprite->getLocalBounds().height));
+			//supportBorder.setOrigin(supportBorder.getLocalBounds().left + radiusSpace, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+			//supportBorder.setPosition(coord.x - centersDist, coord.y);
 
-			supportFiller.setTextureRect(sf::IntRect(46 * 3, 46 * 2, radiusSpace + centersDist, FillerSprite->getLocalBounds().height));
-			supportFiller.setOrigin(supportFiller.getLocalBounds().left + radiusSpace, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
-			supportFiller.setPosition(coord.x - centersDist, coord.y);
+			supportFiller.setTextureRect(sf::IntRect(46 * 3, 46 * 2, supporterWidth, FillerSprite->getLocalBounds().height));
+			supportFiller.setOrigin(supportFiller.getLocalBounds().left, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+			supportFiller.setPosition(coord.x - supporterWidth, coord.y);
 		}
 		else {
-			supportBorder.setTextureRect(sf::IntRect(46 * 3 - centersDist - radiusSpace, 46 * 2, radiusSpace + centersDist, BorderSprite->getLocalBounds().height));
-			supportBorder.setOrigin(supportBorder.getLocalBounds().left + centersDist, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
-			supportBorder.setPosition(coord.x + centersDist, coord.y);
+			//supportBorder.setTextureRect(sf::IntRect(46 * 3 - supporterWidth, 46 * 2, supporterWidth, BorderSprite->getLocalBounds().height));
+			//supportBorder.setOrigin(supportBorder.getLocalBounds().left + centersDist, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+			//supportBorder.setPosition(coord.x + centersDist, coord.y);
 
-			supportFiller.setTextureRect(sf::IntRect(46 * 6 - centersDist - radiusSpace, 46 * 2, radiusSpace + centersDist, FillerSprite->getLocalBounds().height));
-			supportFiller.setOrigin(supportFiller.getLocalBounds().left + centersDist, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
-			supportFiller.setPosition(coord.x + centersDist, coord.y);
+			supportFiller.setTextureRect(sf::IntRect(46 * 6 - supporterWidth, 46 * 2, supporterWidth, FillerSprite->getLocalBounds().height));
+			supportFiller.setOrigin(supportFiller.getLocalBounds().left + supportFiller.getLocalBounds().width, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+			supportFiller.setPosition(coord.x + supporterWidth, coord.y);
 		}
 
 		wind->draw(supportFiller);
-		wind->draw(supportBorder);
+		//wind->draw(supportBorder);
 	}
 
 	if (CurInfo.is_expanding) {
 		sf::Sprite supportBorder = *BorderSprite;
 		sf::Sprite supportFiller = *FillerSprite;
 
-		float width = BorderSprite->getLocalBounds().width / 2 * percent;
+		float width = std::max(23.f * (CurInfo.value_num - 1), BorderSprite->getLocalBounds().width / 2 * percent);
 
 		supportBorder.setTextureRect(sf::IntRect(0, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
 		supportBorder.setOrigin(supportBorder.getLocalBounds().left + supportBorder.getLocalBounds().width, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
@@ -413,30 +414,33 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 	//Draw Value
 
+	float spacing = 46;
 	float TopPos = coord.y;
-	float LeftPos = coord.x - (BorderSprite->getLocalBounds().width / 2);
-	float spacing = BorderSprite->getLocalBounds().width / (CurInfo.value_num + 1);
+	float LeftPos = coord.x - BorderSprite->getLocalBounds().width / 2.f + spacing / 2.f;
 
-	for (int j = 0; j < CurInfo.m_shownValue.size(); j++) {
-		LeftPos += spacing;
+	//save the current value color
+	auto saveColor = m_label.getFillColor();
 
-		if (CurInfo.is_valueChanging && CurInfo.m_shownValue[j] == CurInfo.m_valueChange.first) {
+	for (int j = 0; j < CurInfo.value_num; j++) {
+		if (CurInfo.is_valueChanging && j == CurInfo.m_valueChange.first) {
 			auto color = GetNodeColor(0, CurInfo.node_state.first);
 			
 			sf::Color fading = GetColorTransition(percent, std::get<2>(*color), sf::Color(255, 255, 255, 0));
 
 			if (m_curState == StateType::Trie) {
 				std::string tmp = "";
-				tmp.push_back(CurInfo.m_valueChange.first + 'a');
+				tmp.push_back(CurInfo.m_shownValue[j] + 'a');
 				m_label.setString(tmp);
 			}
-			else {
-				if (CurInfo.m_valueChange.first == 0)
+			else if (CurInfo.is_expanding) {
+				m_label.setString("");
+			} else {
+				if (CurInfo.m_shownValue[j] == 0)
 					m_label.setString("");
-				else if (CurInfo.m_valueChange.first == -1)
+				else if (CurInfo.m_shownValue[j] == -1)
 					m_label.setString("DEL");
 				else
-					m_label.setString(std::to_string(CurInfo.m_valueChange.first));
+					m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
 			}
 
 			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
@@ -466,9 +470,7 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 			m_label.setFillColor(appearing);
 
 			wind->draw(m_label);
-
-			if (CurInfo.m_valueChange.first == 0)
-				break;
+			LeftPos += spacing;
 
 			continue;
 		}
@@ -487,11 +489,28 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 				m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
 		}
 
+		m_label.setFillColor(saveColor);
+
 		m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
-		m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
+		
+		if (CurInfo.is_expanding && j != CurInfo.m_valueChange.first) {
+			int valueNum = CurInfo.value_num;
+
+			float preLeftPos = coord.x - (BorderSprite->getLocalBounds().width - 46) / 2.f + spacing / 2.f;
+			float Pos = 0;
+
+			if (j < CurInfo.m_valueChange.first)
+				Pos = preLeftPos + spacing * j;
+			else
+				Pos = preLeftPos + spacing * (j - 1);
+
+			m_label.setPosition(sf::Vector2f(LeftPos + (Pos - LeftPos) * (1 - percent), TopPos));
+		}
+		else
+			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
 
 		wind->draw(m_label);
-
+		LeftPos += spacing;
 	}
 
 	//Balance factor of AVL
@@ -544,8 +563,8 @@ sf::Vector2f NodeRenderer::GetPosOnScreen(std::pair<float, float> treeCoord) {
 	float X = MIDDLE_LINE + (treeCoord.first - 0.5) * HORIZONTAL_SPACING;
 	float Y = TOP_LINE + treeCoord.second * VERTICAL_SPACING;
 
-	if (m_curState == StateType::Hash_Table) {
-		X = MIDDLE_LINE + (treeCoord.first - 0.5) * (HORIZONTAL_SPACING + 10);
+	if (m_curState == StateType::AVLTree) {
+		X = MIDDLE_LINE + (treeCoord.first - 0.5) * (HORIZONTAL_SPACING - 10);
 		Y = TOP_LINE + treeCoord.second * VERTICAL_SPACING;
 	}
 	return sf::Vector2f(X, Y);

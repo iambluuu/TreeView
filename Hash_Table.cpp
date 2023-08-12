@@ -119,8 +119,7 @@ void HashTable::AddNodeStep(Node* node) {
 
 		if (clone.is_valueChanging) {
 			clone.is_valueChanging = 0;
-			clone.m_valueChange.first = clone.m_valueChange.second;
-			clone.m_shownValue[0] = clone.m_valueChange.first;
+			clone.m_shownValue[clone.m_valueChange.first] = clone.m_valueChange.second;
 		}
 
 		for (int i = 0; i < 3; i++) {
@@ -373,7 +372,6 @@ void HashTable::RemoveLinearProbing(int value) {
 		AddNewStep();
 		Cur->getInfo()->back().is_stateChanging = 0;
 		Cur->getInfo()->back().is_valueChanging = 1;
-		Cur->getInfo()->back().m_valueChange.first = Cur->getInfo()->back().m_shownValue[0];
 		Cur->getInfo()->back().m_valueChange.second = -1;
 	}
 	else {
@@ -411,7 +409,6 @@ void HashTable::RemoveQuadraticProbing(int value) {
 		AddNewStep();
 		Cur->getInfo()->back().is_stateChanging = 0;
 		Cur->getInfo()->back().is_valueChanging = 1;
-		Cur->getInfo()->back().m_valueChange.first = Cur->getInfo()->back().m_shownValue[0];
 		Cur->getInfo()->back().m_valueChange.second = -1;
 
 		std::cerr << "Found and deleting " << Cur->getInfo()->back().m_index << " " << value << std::endl;

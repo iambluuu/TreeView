@@ -21,13 +21,14 @@ private:
 	Node* m_removedNode{ nullptr };
 
 	void InsertNode(Node* Cur, int value);
-	Node* RemoveNode(Node* Cur, int value);
+	void RemoveNode(Node* Cur, int value);
 	void SearchNode(Node* Cur, int value);
 
 	void ExpandNode(Node* Cur, int value);
 	void CollapseNode(Node* Cur);
 	void SplitNode(Node* Cur);
 
+	void InsertToRow(Node* Cur, Node* LeftOfCur, int row);
 	void Aligning();
 	void ShiftDown();
 
@@ -36,6 +37,9 @@ private:
 
 	void AddNewStep(Node* Cur);
 	void ResetNodes(Node* Cur);
+
+	void ClearTree(Node* Cur);
+	void ClearAlign();
 
 public:
 	TTF_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {

@@ -390,8 +390,7 @@ void AVL_Tree::AddNewStep(Node* Cur) {
 		
 		if (clone.is_valueChanging) {
 			clone.is_valueChanging = 0;
-			clone.m_valueChange.first = clone.m_valueChange.second;
-			clone.m_shownValue[0] = clone.m_valueChange.first;
+			clone.m_shownValue[clone.m_valueChange.first] = clone.m_valueChange.second;
 		}
 
 		for (int i = 0; i < 3; i++) {
@@ -806,7 +805,6 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 			Cur->getInfo()->back().is_stateChanging = 1;
 			Cur->getInfo()->back().node_state.second = NodeState::Found;
 			Cur->getInfo()->back().is_valueChanging = 1;
-			Cur->getInfo()->back().m_valueChange.first = Cur->getValue()[0];
 			Cur->getInfo()->back().m_valueChange.second = temp->getValue()[0];
 
 			temp->getInfo()->back().is_stateChanging = 0;

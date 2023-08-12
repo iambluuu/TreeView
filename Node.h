@@ -63,8 +63,6 @@ public:
 
 	Node(int value) {
 		m_save.m_shownValue[0] = value;
-		m_save.m_valueChange.first = value;
-		m_save.m_valueChange.second = value;
 
 		left = nullptr;
 		right = nullptr;
@@ -74,6 +72,11 @@ public:
 	~Node() {
 		if (left || right || middle)
 			std::cerr << "You forgot to clean the tree";
+
+		for (int i = 0; i < 26; ++i)
+			if (child[i])
+				std::cerr << "You forgot to clean the tree";
+
 	}
 
 	std::vector<NodeInfo>* getInfo() {
@@ -151,6 +154,8 @@ public:
 
 		m_save.is_appearing = 0;
 		m_save.is_expanding = 0;
+		m_save.is_splitting = 0;
+		m_save.splitFromleft = 0;
 		m_save.is_stateChanging = 0;
 
 		m_save.node_state = { NodeState::Default, NodeState::Default };
@@ -163,14 +168,7 @@ public:
 		if (m_save.is_valueChanging) {
 			m_save.is_valueChanging = 0;
 
-			for (auto& v : m_save.m_shownValue)
-				if (v == m_save.m_valueChange.first) {
-					v = m_save.m_valueChange.second;
-					if (m_save.m_valueChange.first == 0)
-						break;
-				}
-
-			m_save.m_valueChange.first = m_save.m_valueChange.second;
+			m_save.m_shownValue[m_save.m_valueChange.first] = m_save.m_valueChange.second;
 		}
 
 		for (int i = 0; i < 26; i++) {

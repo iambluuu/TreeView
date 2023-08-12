@@ -1,7 +1,10 @@
 #include "TTF_Tree.h"
 
-
-void Centering();
+TTF_Tree::~TTF_Tree() {
+	//delete m_root;
+	ClearTree(m_root);
+	ClearAlign();
+}
 
 bool TTF_Tree::ValidateInput(const std::string& l_value, int& resValue) {
 	if (l_value.empty() || l_value.size() > 3)
@@ -70,6 +73,8 @@ void TTF_Tree::AddNewStep(Node* Cur) {
 	else {
 		NodeInfo clone = CurInfo->back();
 		clone.is_expanding = 0;
+		clone.is_splitting = 0;
+		clone.splitFromleft = 0;
 
 		if (clone.is_appearing == 2) {
 			clone.is_visible = 0;
@@ -94,11 +99,10 @@ void TTF_Tree::AddNewStep(Node* Cur) {
 
 		if (clone.is_valueChanging) {
 			clone.is_valueChanging = 0;
-			clone.m_valueChange.first = clone.m_valueChange.second;
-			clone.m_shownValue[0] = clone.m_valueChange.first;
+			clone.m_shownValue[clone.m_valueChange.first] = clone.m_valueChange.second;
 		}
 
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 4; i++) {
 			clone.m_arrowCoord[i] = clone.m_arrowChange[i];
 		}
 
@@ -118,10 +122,34 @@ void TTF_Tree::ResetNodes(Node* Cur) {
 	Cur->getInfo()->clear();
 
 	for (int i = 0; i < 4; i++) {
-		AddNewStep(Cur->child[i]);
+		ResetNodes(Cur->child[i]);
 	}
 }
 
+void TTF_Tree::ClearTree(Node* Cur) {
+	if (!Cur) {
+		return;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		ClearTree(Cur->child[i]);
+		Cur->child[i] = nullptr;
+	}
+
+	delete Cur;
+}
+
+void TTF_Tree::ClearAlign() {
+	for (int i = 0; i < m_align.size(); i++) {
+		for (int j = 0; j < m_align[i].size(); j++) {
+			m_align[i][j] = nullptr;
+		}
+
+		m_align[i].clear();
+	}
+
+	m_align.clear();
+}
 
 void TTF_Tree::HandleEvent(sf::Event* l_event) {
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
@@ -181,6 +209,7 @@ void TTF_Tree::InsertNode(Node* Cur, int value) {
 		m_align.push_back(std::vector<Node*>());
 		m_align.back().push_back(Cur);
 
+		m_root = Cur;
 		return;
 	}
 
@@ -193,9 +222,29 @@ void TTF_Tree::InsertNode(Node* Cur, int value) {
 		SplitNode(Cur);
 		Aligning();
 
-		InsertNode(Cur->par, value);
+		Node* par = Cur->par;
+
+		int index = par->getInfo()->back().value_num;
+
+		for (int i = index - 1; i >= 0; i--) {
+			int childValue = par->child[i]->getInfo()->back().m_shownValue[i];
+			if (par->getInfo()->back().is_valueChanging) {
+				if (par->getInfo()->back().m_valueChange.first == i)
+					childValue = par->getInfo()->back().m_valueChange.second;
+			}
+
+			std::cerr << "Value at index " << i << ": " << childValue << std::endl;
+
+			if (childValue > value) {
+				std::cerr << "index: " << i << std::endl;
+				index = i;
+			}
+		}
+
+		InsertNode(par->child[index], value);
 	}
 	else if (!Cur->child[0]) {
+		AddNewStep(m_root);
 		ExpandNode(Cur, value);
 		Aligning();
 	}
@@ -221,7 +270,7 @@ void TTF_Tree::InsertNode(Node* Cur, int value) {
 
 }
 
-Node* TTF_Tree::RemoveNode(Node* Cur, int value) {
+void TTF_Tree::RemoveNode(Node* Cur, int value) {
 
 }
 
@@ -230,20 +279,34 @@ void TTF_Tree::SearchNode(Node* Cur, int value) {
 }
 
 void TTF_Tree::ExpandNode(Node* Cur, int value) {
-
+	Cur->getInfo()->back().is_stateChanging = 0;
+	Cur->getInfo()->back().node_state.first = NodeState::Selected;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 	Cur->getInfo()->back().is_expanding = 1;
-	Cur->getInfo()->back().m_valueChange.first = 0;
-	Cur->getInfo()->back().m_valueChange.second = value;
+	Cur->getInfo()->back().is_valueChanging = 1;
 	Cur->getInfo()->back().value_num++;
 
-	for (int i = 0; i < Cur->getInfo()->back().value_num; i++) {
+	if (Cur->getInfo()->back().value_num > 3) {
+		for (int i = 0; i < Cur->getInfo()->back().m_shownValue.size(); i++)
+			std::cerr << Cur->getInfo()->back().m_shownValue[i] << " ";
+		std::cerr << std::endl;
+	}
+
+	//find the position of the new value
+	Cur->getInfo()->back().m_valueChange.first = Cur->getInfo()->back().value_num - 1;
+	for (int i = Cur->getInfo()->back().value_num - 2; i >= 0; i--) {
 		if (value < Cur->getInfo()->back().m_shownValue[i]) {
-			for (int j = Cur->getInfo()->back().value_num; j > i; j--) {
-				Cur->getInfo()->back().m_shownValue[i] = Cur->getInfo()->back().m_shownValue[i - 1];
-			}
+			Cur->getInfo()->back().m_valueChange.first = i;
+			Cur->getInfo()->back().m_valueChange.second = value;
 		}
 	}
+
+	for (int i = Cur->getInfo()->back().value_num - 1; i > Cur->getInfo()->back().m_valueChange.first; i--) {
+		Cur->getInfo()->back().m_shownValue[i] = Cur->getInfo()->back().m_shownValue[i - 1];
+	}
 }
+
+
 void TTF_Tree::CollapseNode(Node* Cur) {
 
 }
@@ -254,36 +317,41 @@ void TTF_Tree::SplitNode(Node* Cur) {
 	//New Node is the right node
 	Node* newNode = new Node;
 	newNode->par = Cur->par;
-	newNode->getInfo()->reserve(Cur->getInfo()->size());
+	newNode->getInfo()->resize(Cur->getInfo()->size());
 	
 	// (...) -> (.().) 
-	newNode->getInfo()->back().m_coord.first = { Cur->getInfo()->back().m_coord.first.first + 1, Cur->getInfo()->back().m_coord.first.second};
-	Cur->getInfo()->back().m_coord.first.first--;
-
 	newNode->getInfo()->back().m_shownValue[0] = Cur->getInfo()->back().m_shownValue[2];
-
 	newNode->getInfo()->back().is_visible = 1;
 	newNode->getInfo()->back().is_splitting = 1;
 	newNode->getInfo()->back().splitFromleft = 1;
+	newNode->getInfo()->back().node_state = { NodeState::Selected, NodeState::Selected };
 
-	m_align[m_align.size() - 1 - Cur->getInfo()->back().m_coord.first.second].push_back(newNode);
+	newNode->getInfo()->back().m_coord.first = { Cur->getInfo()->back().m_coord.first.first + 1, Cur->getInfo()->back().m_coord.first.second};
+	newNode->getInfo()->back().m_coord.second = newNode->getInfo()->back().m_coord.first;
+	Cur->getInfo()->back().m_coord.first.first--;
+
+	InsertToRow(newNode, Cur, m_align.size() - Cur->getInfo()->back().m_coord.first.second - 1);
 
 	int middleValue = Cur->getInfo()->back().m_shownValue[1];
 
 	Cur->getInfo()->back().value_num = 1;
 	Cur->getInfo()->back().m_shownValue[1] = 0;
 	Cur->getInfo()->back().m_shownValue[2] = 0;
+	Cur->getInfo()->back().is_stateChanging = 0;
+	Cur->getInfo()->back().is_splitting = 1;
+	Cur->getInfo()->back().node_state.first = NodeState::Selected;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
 	//Split children
 	for (int i = 0; i < 2; i++) {
 		newNode->child[i] = Cur->child[i + 2];
-		newNode->getInfo()->back().m_arrowCoord[i] = newNode->child[i];
+		newNode->getInfo()->back().m_arrowChange[i] = newNode->child[i];
 
 		if (newNode->child[i])
 			newNode->child[i]->par = newNode;
 
 		Cur->child[i + 2] = nullptr;
-		Cur->getInfo()->back().m_arrowCoord[i + 2] = nullptr;
+		Cur->getInfo()->back().m_arrowChange[i + 2] = nullptr;
 	}
 
 
@@ -294,7 +362,7 @@ void TTF_Tree::SplitNode(Node* Cur) {
 			if (par->child[i] == Cur) {
 				for (int j = 3; j > i + 1; j--) {
 					par->child[j] = par->child[j - 1];
-					par->getInfo()->back().m_arrowChange[j] = par->child[j - 1];
+					par->getInfo()->back().m_arrowChange[j] = par->child[j];
 				}
 
 				par->child[i + 1] = newNode;
@@ -307,10 +375,13 @@ void TTF_Tree::SplitNode(Node* Cur) {
 		ShiftDown();
 
 		m_root = new Node;
-		m_root->getInfo()->reserve(Cur->getInfo()->size());
+		m_root->getInfo()->resize(Cur->getInfo()->size());
 		m_root->getInfo()->back().m_coord.first = { 0, 0 };
 		m_root->getInfo()->back().m_coord.second = { 0, 0 };
-		m_root->getInfo()->back().m_shownValue[0] = Cur->getInfo()->back().m_shownValue[1];
+		m_root->getInfo()->back().is_valueChanging = 1;
+		m_root->getInfo()->back().m_valueChange.first = 0;
+		m_root->getInfo()->back().m_valueChange.second = middleValue;
+
 		m_root->getInfo()->back().is_visible = 1;
 		m_root->getInfo()->back().is_appearing = 1;
 
@@ -318,9 +389,15 @@ void TTF_Tree::SplitNode(Node* Cur) {
 		m_align.back().push_back(m_root);
 
 		m_root->child[0] = Cur;
-		m_root->child[2] = newNode;
+		m_root->child[1] = newNode;
 		m_root->getInfo()->back().m_arrowChange[0] = Cur;
 		m_root->getInfo()->back().m_arrowChange[1] = newNode;
+
+		Cur->par = m_root;
+		newNode->par = m_root;
+
+		std::cerr << "New root is created\n";
+		std::cerr << "New root step size: " << m_root->getInfo()->size() << "\n";
 	}
 }
 
@@ -350,6 +427,22 @@ void TTF_Tree::Aligning() {
 
 		left = - maxSize / 2;
 	}
+}
+
+void TTF_Tree::InsertToRow(Node* Cur, Node* LeftOfCur, int row) {
+	if (!Cur)
+		return;
+
+	m_align[row].push_back(m_align[row].back());
+
+	int i = m_align[row].size() - 1;
+
+	while (m_align[row][i - 1] != LeftOfCur) {
+		m_align[row][i] = m_align[row][i - 1];
+		i--;
+	}
+
+	m_align[row][i] = Cur;
 }
 
 void TTF_Tree::ShiftDown() {
