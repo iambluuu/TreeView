@@ -292,13 +292,9 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	//Draw Node shape
 
 	NodeGraphics* CurSprite = GetNodeGraphics(CurInfo.value_num); //do something here 
+
 	sf::Sprite* BorderSprite = &CurSprite->first;
 	sf::Sprite* FillerSprite = &CurSprite->second;
-
-	if (CurInfo.is_splitting) {
-
-		return;
-	}
 
 	sf::Vector2f coord = GetPosOnScreen(CurInfo.m_coord.first);
 
@@ -350,8 +346,70 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		m_label.setFillColor(std::get<2>(*color));
 	}
 
-	wind->draw(*FillerSprite);
-	wind->draw(*BorderSprite);
+	if (CurInfo.is_splitting) {
+		NodeGraphics support = *GetNodeGraphics(3);
+		sf::Sprite supportBorder = support.first;
+		sf::Sprite supportFiller = support.second;
+
+		supportBorder.setColor(BorderSprite->getColor());
+		supportFiller.setColor(FillerSprite->getColor());
+
+		float centersDist = BorderSprite->getLocalBounds().width * 2 * percent;
+		float radiusSpace = BorderSprite->getLocalBounds().width / 2;
+
+		if (CurInfo.splitFromleft) {
+			supportBorder.setTextureRect(sf::IntRect(0, 46 * 2, radiusSpace + centersDist, BorderSprite->getLocalBounds().height));
+			supportBorder.setOrigin(supportBorder.getLocalBounds().left + radiusSpace, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+			supportBorder.setPosition(coord.x - centersDist, coord.y);
+
+			supportFiller.setTextureRect(sf::IntRect(46 * 3, 46 * 2, radiusSpace + centersDist, FillerSprite->getLocalBounds().height));
+			supportFiller.setOrigin(supportFiller.getLocalBounds().left + radiusSpace, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+			supportFiller.setPosition(coord.x - centersDist, coord.y);
+		}
+		else {
+			supportBorder.setTextureRect(sf::IntRect(46 * 3 - centersDist - radiusSpace, 46 * 2, radiusSpace + centersDist, BorderSprite->getLocalBounds().height));
+			supportBorder.setOrigin(supportBorder.getLocalBounds().left + centersDist, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+			supportBorder.setPosition(coord.x + centersDist, coord.y);
+
+			supportFiller.setTextureRect(sf::IntRect(46 * 6 - centersDist - radiusSpace, 46 * 2, radiusSpace + centersDist, FillerSprite->getLocalBounds().height));
+			supportFiller.setOrigin(supportFiller.getLocalBounds().left + centersDist, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+			supportFiller.setPosition(coord.x + centersDist, coord.y);
+		}
+
+		wind->draw(supportFiller);
+		wind->draw(supportBorder);
+	}
+
+	if (CurInfo.is_expanding) {
+		sf::Sprite supportBorder = *BorderSprite;
+		sf::Sprite supportFiller = *FillerSprite;
+
+		float width = BorderSprite->getLocalBounds().width / 2 * percent;
+
+		supportBorder.setTextureRect(sf::IntRect(0, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
+		supportBorder.setOrigin(supportBorder.getLocalBounds().left + supportBorder.getLocalBounds().width, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+		supportBorder.setPosition(coord);
+		wind->draw(supportBorder);
+
+		supportBorder.setTextureRect(sf::IntRect(BorderSprite->getLocalBounds().width - width, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
+		supportBorder.setOrigin(supportBorder.getLocalBounds().left, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+		supportBorder.setPosition(coord);
+		wind->draw(supportBorder);
+
+		supportFiller.setTextureRect(sf::IntRect(FillerSprite->getLocalBounds().width, FillerSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, FillerSprite->getLocalBounds().height));
+		supportFiller.setOrigin(supportFiller.getLocalBounds().left + supportFiller.getLocalBounds().width, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+		supportFiller.setPosition(coord);
+		wind->draw(supportFiller);
+
+		supportFiller.setTextureRect(sf::IntRect(2 * FillerSprite->getLocalBounds().width - width, FillerSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, FillerSprite->getLocalBounds().height));
+		supportFiller.setOrigin(supportFiller.getLocalBounds().left, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+		supportFiller.setPosition(coord);
+		wind->draw(supportFiller);
+	}
+	else {
+		wind->draw(*FillerSprite);
+		wind->draw(*BorderSprite);
+	}
 
 	//Draw Value
 

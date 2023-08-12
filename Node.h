@@ -33,6 +33,7 @@ struct NodeInfo {
 	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
 	std::pair<std::pair<float, float>, std::pair<float, float> > m_coord{ {0, 0}, {0, 0} };
 	std::pair<int, int> m_valueChange{ 0, 0 };
+	bool splitFromleft{ 0 };
 };
 
 const NodeInfo DEFAULT_NODE_INFO;

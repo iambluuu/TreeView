@@ -3,7 +3,8 @@
 
 class TTF_Tree : public BaseState {
 private:
-	std::vector<Node*> m_align{ std::vector<Node*>(51, nullptr) };
+	std::vector<std::vector<Node*> > m_align;
+
 	const int ALIGN_OFFSET{ 25 };
 
 	const int MAX_NODE_NUM{ 51 };
@@ -19,18 +20,16 @@ private:
 	Node* m_newNode{ nullptr };
 	Node* m_removedNode{ nullptr };
 
-	Node* InsertNode(Node* Cur, int value, int hor_depth, int ver_depth);
+	void InsertNode(Node* Cur, int value);
 	Node* RemoveNode(Node* Cur, int value);
 	void SearchNode(Node* Cur, int value);
 
-	void ShiftLeftFrom(int value);
-	void ShiftRightFrom(int value);
-	void ShiftLeftTo(int value);
-	void ShiftRightTo(int value);
-	void ShiftUp(Node* Cur);
-	void ShiftDown(Node* Cur);
+	void ExpandNode(Node* Cur, int value);
+	void CollapseNode(Node* Cur);
+	void SplitNode(Node* Cur);
 
-	void Centering();
+	void Aligning();
+	void ShiftDown();
 
 	bool ValidateInput(const std::string& l_value, int& resValue);
 	bool ValidateCreate(const std::string& l_value, std::vector<int>& res);
