@@ -102,6 +102,9 @@
     <ClCompile Include="TTF_Tree.cpp">
       <Filter>Source Files\States</Filter>
     </ClCompile>
+    <ClCompile Include="Trie.cpp">
+      <Filter>Source Files\States</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI_Element.h">
@@ -174,6 +177,9 @@
       <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="TTF_Tree.h">
+      <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Trie.h">
       <Filter>Header Files\States</Filter>
     </ClInclude>
   </ItemGroup>

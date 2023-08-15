@@ -25,7 +25,7 @@ private:
 	void SearchNode(Node* Cur, int value);
 
 	void ExpandNode(Node* Cur, int value);
-	void CollapseNode(Node* Cur);
+	void CollapseNode(Node* Cur, int value);
 	void SplitNode(Node* Cur);
 
 	void InsertToRow(Node* Cur, Node* LeftOfCur, int row);

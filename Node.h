@@ -8,7 +8,7 @@ enum NodeLink {
 };
 
 enum class NodeState {
-	Selected, Visited, Default, New, InRemove, Found, NotFound
+	Selected, Visited, Default, New, InRemove, Found, NotFound, Marked
 };
 
 class Node;
@@ -23,7 +23,7 @@ struct NodeInfo {
 	bool is_visible{ 0 };
 	bool is_stateChanging{ 0 };
 	bool is_splitting{ 0 };
-	bool is_expanding{ 0 };
+	int is_expanding{ 0 }; //0 is no, 1 is expanding, 2 is shrinking;
 	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
 	bool is_valueChanging{ 0 };
 
@@ -48,9 +48,12 @@ private:
 public:
 	NodeInfo m_save;
 	int height{ 0 };
+	int child_num{ 0 };
+
 	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
 	Node* child[26];
 	Node* par{ nullptr };
+
 
 
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
@@ -150,15 +153,21 @@ public:
 	}
 
 	void SaveState() {
+		if (m_info.empty())
+			return;
+
 		m_save = m_info.back();
 
 		m_save.is_appearing = 0;
-		m_save.is_expanding = 0;
-		m_save.is_splitting = 0;
 		m_save.splitFromleft = 0;
-		m_save.is_stateChanging = 0;
+		m_save.is_splitting = 0;
 
-		m_save.node_state = { NodeState::Default, NodeState::Default };
+		if (m_save.node_state.first == NodeState::Marked && m_save.node_state.second != NodeState::InRemove) {
+			m_save.node_state = { NodeState::Marked, NodeState::Marked };
+		} else
+			m_save.node_state = { NodeState::Default, NodeState::Default };
+
+		m_save.is_stateChanging = 0;
 
 		if (m_save.is_moving) {
 			m_save.is_moving = 0;
@@ -170,6 +179,16 @@ public:
 
 			m_save.m_shownValue[m_save.m_valueChange.first] = m_save.m_valueChange.second;
 		}
+
+		if (m_save.is_expanding == 2) {
+			for (int i = m_save.m_valueChange.first; i < m_save.value_num - 1; i++) {
+				m_save.m_shownValue[i] = m_save.m_shownValue[i + 1];
+			}
+			m_save.m_shownValue[m_save.value_num - 1] = 0;
+			m_save.value_num--;
+		}
+
+		m_save.is_expanding = 0;
 
 		for (int i = 0; i < 26; i++) {
 			m_save.m_arrowCoord[i] = m_save.m_arrowChange[i];

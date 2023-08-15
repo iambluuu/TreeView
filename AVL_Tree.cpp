@@ -913,7 +913,6 @@ void AVL_Tree::OnInsert(const std::string& l_value) {
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_root->getInfo()->size());
-	
 }
 
 void AVL_Tree::OnRemove(const std::string& l_value) {

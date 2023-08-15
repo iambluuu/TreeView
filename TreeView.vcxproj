@@ -170,6 +170,7 @@
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TextBox.cpp" />
+    <ClCompile Include="Trie.cpp" />
     <ClCompile Include="TTF_Tree.cpp" />
     <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="UI_Element.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="StaticElement.h" />
     <ClInclude Include="TextBox.h" />
     <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="Trie.h" />
     <ClInclude Include="TTF_Tree.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="UI_Element.h" />

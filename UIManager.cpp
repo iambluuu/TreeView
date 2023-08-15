@@ -169,6 +169,10 @@ void UIManager::PrepareElements() {
 	GoToButton* goToHashTable = new GoToButton(this, StateType::Hash_Table);
 	goToHashTable->SetPosition(sf::Vector2f(97, 262));
 	AddElement(goToHashTable);
+
+	GoToButton* goToTTFTree = new GoToButton(this, StateType::TTFTree);
+	goToTTFTree->SetPosition(sf::Vector2f(97, 592));
+	AddElement(goToTTFTree);
 }
 
 void UIManager::PrepareStateUI() {
@@ -185,12 +189,14 @@ void UIManager::PrepareStateUI() {
 
 	//AVL Tree
 	//TTF Tree
+	//Trie
 	data.closetMask = 30;
 	data.isMenu = 0;
 	data.tabMask = 0;
 
 	m_uiData.emplace(StateType::AVLTree, data);
 	m_uiData.emplace(StateType::TTFTree, data);
+	m_uiData.emplace(StateType::Trie, data);
 
 	//Hash Table
 	data.closetMask = 29;

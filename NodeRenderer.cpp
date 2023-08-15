@@ -11,6 +11,7 @@ const sf::Color LightBeige = sf::Color(240, 233, 210);
 
 const sf::Color Fulvous = sf::Color(228, 132, 0);
 const sf::Color Skyblue = sf::Color(66, 103, 178);
+const sf::Color Crimson = sf::Color(178, 16, 49);
 
 void NodeRenderer::PrepareSprite() {
 
@@ -20,9 +21,12 @@ void NodeRenderer::PrepareSprite() {
 	auto NodeColors0 = &m_nodeColor[0];
 	NodeColors0->emplace( NodeState::Default, std::tuple<sf::Color, sf::Color, sf::Color>(DarkBlue, LightBeige, DarkBlue) );
 	NodeColors0->emplace( NodeState::Selected, std::tuple<sf::Color, sf::Color, sf::Color>(Green, Green, White) );
+	NodeColors0->emplace( NodeState::Marked, std::tuple<sf::Color, sf::Color, sf::Color>(Skyblue, White, Skyblue) );
 	NodeColors0->emplace( NodeState::Visited, std::tuple<sf::Color, sf::Color, sf::Color>(Green, White, Green) );
 	NodeColors0->emplace( NodeState::Found, std::tuple<sf::Color, sf::Color, sf::Color>(Skyblue, Skyblue, White) );
 	NodeColors0->emplace( NodeState::NotFound, std::tuple<sf::Color, sf::Color, sf::Color>(Fulvous, Fulvous, White) );
+	NodeColors0->emplace( NodeState::InRemove, std::tuple<sf::Color, sf::Color, sf::Color>(Crimson, Crimson, White) );
+
 
 	int sizeX = 46;
 	int sizeY = 46;
@@ -387,15 +391,19 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 		float width = std::max(23.f * (CurInfo.value_num - 1), BorderSprite->getLocalBounds().width / 2 * percent);
 
-		supportBorder.setTextureRect(sf::IntRect(0, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
-		supportBorder.setOrigin(supportBorder.getLocalBounds().left + supportBorder.getLocalBounds().width, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
-		supportBorder.setPosition(coord);
-		wind->draw(supportBorder);
+		if (CurInfo.is_expanding == 2) {
+			width = std::min(23.f * (CurInfo.value_num - 1), BorderSprite->getLocalBounds().width / 2 * (1 - percent));
+		}
 
-		supportBorder.setTextureRect(sf::IntRect(BorderSprite->getLocalBounds().width - width, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
-		supportBorder.setOrigin(supportBorder.getLocalBounds().left, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
-		supportBorder.setPosition(coord);
-		wind->draw(supportBorder);
+		//supportBorder.setTextureRect(sf::IntRect(0, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
+		//supportBorder.setOrigin(supportBorder.getLocalBounds().left + supportBorder.getLocalBounds().width, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+		//supportBorder.setPosition(coord);
+		//wind->draw(supportBorder);
+
+		//supportBorder.setTextureRect(sf::IntRect(BorderSprite->getLocalBounds().width - width, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
+		//supportBorder.setOrigin(supportBorder.getLocalBounds().left, supportBorder.getLocalBounds().top + supportBorder.getLocalBounds().height / 2);
+		//supportBorder.setPosition(coord);
+		//wind->draw(supportBorder);
 
 		supportFiller.setTextureRect(sf::IntRect(FillerSprite->getLocalBounds().width, FillerSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, FillerSprite->getLocalBounds().height));
 		supportFiller.setOrigin(supportFiller.getLocalBounds().left + supportFiller.getLocalBounds().width, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
@@ -429,12 +437,11 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 			if (m_curState == StateType::Trie) {
 				std::string tmp = "";
-				tmp.push_back(CurInfo.m_shownValue[j] + 'a');
+				if (CurInfo.m_shownValue[j])
+					tmp.push_back(CurInfo.m_shownValue[j] + 'a' - 1);
 				m_label.setString(tmp);
 			}
-			else if (CurInfo.is_expanding) {
-				m_label.setString("");
-			} else {
+			else {
 				if (CurInfo.m_shownValue[j] == 0)
 					m_label.setString("");
 				else if (CurInfo.m_shownValue[j] == -1)
@@ -453,7 +460,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 			if (m_curState == StateType::Trie) {
 				std::string tmp = "";
-				tmp.push_back(CurInfo.m_valueChange.second + 'a');
+				if (CurInfo.m_shownValue[j])
+					tmp.push_back(CurInfo.m_shownValue[j] + 'a' - 1);
 				m_label.setString(tmp);
 			}
 			else {
@@ -477,7 +485,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 		if (m_curState == StateType::Trie) {
 			std::string tmp = "";
-			tmp.push_back(CurInfo.m_shownValue[j] + 'a');
+			if (CurInfo.m_shownValue[j])
+				tmp.push_back(CurInfo.m_shownValue[j] + 'a' - 1);
 			m_label.setString(tmp);
 		}
 		else {
@@ -503,8 +512,12 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 				Pos = preLeftPos + spacing * j;
 			else
 				Pos = preLeftPos + spacing * (j - 1);
+			
+			if (CurInfo.is_expanding == 1)
+				m_label.setPosition(sf::Vector2f(LeftPos + (Pos - LeftPos) * (1 - percent), TopPos));
+			else
+				m_label.setPosition(sf::Vector2f(Pos + (LeftPos - Pos) * (1 - percent), TopPos));
 
-			m_label.setPosition(sf::Vector2f(LeftPos + (Pos - LeftPos) * (1 - percent), TopPos));
 		}
 		else
 			m_label.setPosition(sf::Vector2f(LeftPos, TopPos));
