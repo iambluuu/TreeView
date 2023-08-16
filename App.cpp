@@ -9,7 +9,7 @@ App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_co
 	m_context.m_wind->SetUIManager(&m_uiManager);
 	m_context.m_wind->SetStateManager(&m_stateManager);
 
-	m_stateManager.SwitchTo(StateType::Trie);
+	m_stateManager.SwitchTo(StateType::Heap);
 }
 
 App::~App() {}

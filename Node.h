@@ -162,7 +162,7 @@ public:
 		m_save.splitFromleft = 0;
 		m_save.is_splitting = 0;
 
-		if (m_save.node_state.first == NodeState::Marked && m_save.node_state.second != NodeState::InRemove) {
+		if (m_save.node_state.second == NodeState::Marked || (m_save.node_state.first == NodeState::Marked && m_save.node_state.second != NodeState::InRemove)) {
 			m_save.node_state = { NodeState::Marked, NodeState::Marked };
 		} else
 			m_save.node_state = { NodeState::Default, NodeState::Default };

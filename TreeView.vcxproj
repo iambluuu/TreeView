@@ -161,6 +161,7 @@
     <ClCompile Include="GoBackButton.cpp" />
     <ClCompile Include="GoToButton.cpp" />
     <ClCompile Include="Hash_Table.cpp" />
+    <ClCompile Include="Heap.cpp" />
     <ClCompile Include="InputButton.cpp" />
     <ClCompile Include="MediaButtons.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Drawer.h" />
     <ClInclude Include="GoBackButton.h" />
     <ClInclude Include="GoToButton.h" />
+    <ClInclude Include="Heap.h" />
     <ClInclude Include="MediaButtons.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="PlayBar.h" />

@@ -385,6 +385,7 @@ void Trie::RemoveNode(Node* Cur, Node* pre, int index, const std::string& l_stri
 		if (Cur->child_num > 0) {
 			Cur->getInfo()->back().is_stateChanging = 1;
 			Cur->getInfo()->back().node_state.second = NodeState::InRemove;
+			return;
 		}
 		else {
 			Cur->getInfo()->back().is_appearing = 2;
@@ -396,7 +397,7 @@ void Trie::RemoveNode(Node* Cur, Node* pre, int index, const std::string& l_stri
 
 		Node* Par = Cur->par;
 
-		while (Par && Par->child_num > 0) {
+		while (Par && Par->child_num > 0 && Par->getInfo()->back().node_state.first != NodeState::Marked) {
 			Par->child_num--;
 			if (Par->child_num == 0) {
 				m_removed = Par;
@@ -407,6 +408,10 @@ void Trie::RemoveNode(Node* Cur, Node* pre, int index, const std::string& l_stri
 			}
 
 			Par = Par->par;
+		}
+
+		if (Par) {
+			Par->child_num--;
 		}
 
 		if (m_removed) {

@@ -173,6 +173,10 @@ void UIManager::PrepareElements() {
 	GoToButton* goToTTFTree = new GoToButton(this, StateType::TTFTree);
 	goToTTFTree->SetPosition(sf::Vector2f(97, 592));
 	AddElement(goToTTFTree);
+
+	GoToButton* goToTrie = new GoToButton(this, StateType::Trie);
+	goToTrie->SetPosition(sf::Vector2f(628, 592));
+	AddElement(goToTrie);
 }
 
 void UIManager::PrepareStateUI() {
@@ -204,6 +208,13 @@ void UIManager::PrepareStateUI() {
 	data.tabMask = 0; //Subject to change, HT has 3 modes
 
 	m_uiData.emplace(StateType::Hash_Table, data);
+
+	//Heap
+	data.closetMask = 14;
+	data.isMenu = 0;
+	data.tabMask = 0; //Subject to change, Heap has 2 modes
+
+	m_uiData.emplace(StateType::Heap, data);
 
 }
 

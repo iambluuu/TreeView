@@ -4,13 +4,11 @@
 
 class Trie : public BaseState {
 private:
-	std::vector<Node*> m_align{ std::vector<Node*>(51, nullptr) };
-	Node* m_removed;
-
 	int m_nodeNum{ 0 };
 
 	Node* m_root{ nullptr };
 	Node* m_newNode{ nullptr };
+	Node* m_removed;
 
 	void InsertNode(Node* Cur, Node* pre, int index, const std::string& l_string);
 	void RemoveNode(Node* Cur, Node* pre, int index, const std::string& l_string);
@@ -25,11 +23,9 @@ private:
 	bool ValidateCreate(const std::string& l_value, std::vector<std::string>& res);
 
 	void PostProcessing();
-	void ClearAlign();
 	void ClearTree(Node* Cur);
 public:
 	Trie(StateManager* l_stateManager) : BaseState(l_stateManager) {
-		fill(m_align.begin(), m_align.end(), nullptr);
 		m_root = new Node(0);
 		m_root->m_save.is_visible = 1;
 
