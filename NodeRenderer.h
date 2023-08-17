@@ -1,6 +1,7 @@
 #pragma once
 #include "SharedContext.h"
 #include "StateManager.h"
+#include "CodeWindow.h"
 #include "Node.h"
 
 struct SharedContext;
@@ -14,6 +15,8 @@ enum class StateType;
 
 class NodeRenderer {
 private:
+	CodeWindow m_codeWindow;
+
 	std::vector<NodeGraphics> m_nodeGraphics;
 	sf::Sprite m_arrowSprite;
 	NodeColor m_nodeColor;
@@ -31,6 +34,8 @@ private:
 	sf::Text m_sideLabel;
 
 	sf::RectangleShape m_line;
+
+	int m_theme{ 0 };
 
 	const float STEP_DURATION{ 500.f };
 	float m_animationCurrent{ 0.f };
@@ -78,6 +83,9 @@ public:
 		m_label.setCharacterSize(20);
 		m_sideLabel.setFont(m_font);
 		m_sideLabel.setCharacterSize(15);
+
+		sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
+		m_codeWindow.setWindow(wind);
 		
 		PrepareSprite();
 	}
@@ -109,7 +117,10 @@ public:
 	void DrawNode(Node* Cur, bool Directed);
 	void DrawArrow();
 
+	void DrawCodeWindow();
+
 	std::tuple<sf::Color, sf::Color, sf::Color>* GetNodeColor(int ThemeID, NodeState l_state);
+
 	sf::Vector2f GetPosOnScreen(std::pair<float, float> treeCoord);
 	sf::Color GetColorTransition(float percent, const sf::Color& start, const sf::Color& end);
 	int GetStep();
@@ -144,5 +155,10 @@ public:
 
 	void SetState(StateType l_type) {
 		m_curState = l_type;
+	}
+
+	void SwitchTheme(int l_theme) {
+		m_theme = l_theme;
+		m_codeWindow.SwitchTheme(l_theme);
 	}
 };

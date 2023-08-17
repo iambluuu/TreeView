@@ -51,6 +51,9 @@ void NodeRenderer::Reset(const int& l_stepNum) {
 	m_animationCurrent = 0;
 	m_stepNum = l_stepNum;
 	m_limitStep = l_stepNum;
+	is_paused = 0;
+
+	m_codeWindow.Reset();
 }
 
 void NodeRenderer::OnPlay() {
@@ -272,8 +275,8 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		else
 			DestInfo = startDest->getInfo()->at(CurStep);
 
-		auto startColor = GetNodeColor(0, DestInfo.node_state.first); //subject to change, 0 to theme id
-		auto endColor = GetNodeColor(0, DestInfo.node_state.second); //subject to change, 0 to theme id
+		auto startColor = GetNodeColor(m_theme, DestInfo.node_state.first); 
+		auto endColor = GetNodeColor(m_theme, DestInfo.node_state.second); 
 
 		sf::Sprite* arrow = &m_arrowSprite;
 
@@ -335,15 +338,15 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 	
 	if (CurInfo.is_stateChanging) {
-		auto startColor = GetNodeColor(0, CurInfo.node_state.first); //subject to change, 0 to theme id
-		auto endColor = GetNodeColor(0, CurInfo.node_state.second); //subject to change, 0 to theme id
+		auto startColor = GetNodeColor(m_theme, CurInfo.node_state.first); //subject to change, 0 to theme id
+		auto endColor = GetNodeColor(m_theme, CurInfo.node_state.second); //subject to change, 0 to theme id
 
 		BorderSprite->setColor(GetColorTransition(percent, std::get<0>(*startColor), std::get<0>(*endColor)));
 		FillerSprite->setColor(GetColorTransition(percent, std::get<1>(*startColor), std::get<1>(*endColor)));
 		m_label.setFillColor(GetColorTransition(percent, std::get<2>(*startColor), std::get<2>(*endColor)));
 	}
 	else {
-		auto color = GetNodeColor(0, CurInfo.node_state.first); //subject to change, 0 to theme id
+		auto color = GetNodeColor(m_theme, CurInfo.node_state.first); //subject to change, 0 to theme id
 
 		BorderSprite->setColor(std::get<0>(*color));
 		FillerSprite->setColor(std::get<1>(*color));
@@ -619,4 +622,12 @@ sf::Color NodeRenderer::GetColorTransition(float percent, const sf::Color& start
 std::tuple<sf::Color, sf::Color, sf::Color>* NodeRenderer::GetNodeColor(int ThemeID, NodeState l_state) {
 	NodeColor* nodeColor = &m_nodeColor;
 	return &nodeColor->at(ThemeID)[l_state];
+}
+
+void NodeRenderer::DrawCodeWindow() {
+	int CurStep = m_curStep;
+	float CurStepElapsed = m_animationCurrent - STEP_DURATION * CurStep;
+	float percent = parametric(CurStepElapsed / STEP_DURATION);
+
+	m_codeWindow.Draw(CurStep, percent);
 }

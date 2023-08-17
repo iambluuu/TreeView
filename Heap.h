@@ -19,7 +19,7 @@ private:
 	void InsertNode(int value);
 	void RemoveNode(int value);
 	void SearchNode(int value);
-	void BuildTree(Node* Cur, Node* pre, int index, const std::string& l_string);
+	void BuildTree(int value);
 
 	void ResetNodes();
 	void AddNodeStep(Node* Cur);
@@ -31,9 +31,12 @@ private:
 	void Center(Node* Cur, const float& delta);
 
 	void Heapify(int index);
+	void HeapifyDown(int index);
 	void Swap(int a, int b);
+	void BuildSwap(int a, int b);
 
 	bool ValidateInput(const std::string& l_value, std::vector<int>& res);
+	bool ValidateIndex(const std::string& l_value, int& index);
 	bool ValidateCreate(const std::string& l_value, std::vector<int>& res);
 
 	void PostProcessing();

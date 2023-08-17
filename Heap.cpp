@@ -83,6 +83,27 @@ bool Heap::ValidateInput(const std::string& l_value, std::vector<int>& res) {
 	return true;
 }
 
+bool Heap::ValidateIndex(const std::string& l_value, int& index) {
+	if (l_value.empty()) {
+		return false;
+	}
+
+	for (int i = 0; i < l_value.size(); i++) {
+		if (l_value[i] < '0' || l_value[i] > '9') {
+			return false;
+		}
+	}
+	
+	index = std::stoi(l_value);
+
+	if (index < 0 || index >= (*m_arr).size()) {
+		return false;
+	}
+
+	return true;
+}
+
+
 void Heap::AddNodeStep(Node* Cur) {
 	auto CurInfo = Cur->getInfo();
 
@@ -175,13 +196,16 @@ void Heap::ClearTree() {
 		delete (*m_arr)[i];
 		(*m_arr)[i] = nullptr;
 	}
+
+	(*m_arr).clear();
 }
 
 void Heap::PostProcessing() {
-	delete m_removed;
-	m_removed = nullptr;
-
-	m_arr->pop_back();
+	if (m_removed) {
+		delete m_removed;
+		m_removed = nullptr;
+		m_arr->pop_back();
+	}
 }
 
 void Heap::HandleEvent(sf::Event* l_event) {
@@ -220,8 +244,15 @@ void Heap::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 	ResetNodes();
 	ClearTree();
 
+	for (int i = 0; i < value.size(); i++) {
+		BuildTree(value[i]);
+	}
+
+	Arrange();
+	AddNewStep();
+
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
-	renderer->Reset(m_root->getInfo()->size());
+	renderer->Reset(m_arr->front()->getInfo()->size());
 }
 
 void Heap::OnInsert(const std::string& l_value) {
@@ -241,18 +272,24 @@ void Heap::OnInsert(const std::string& l_value) {
 }
 
 void Heap::OnRemove(const std::string& l_value) {
-	std::vector<int> value;
-	if (!ValidateInput(l_value, value)) {
+	int index = 0;
+	if (!ValidateIndex(l_value, index)) {
 		std::cerr << "Invalid input\n";
 		return;
 	}
 
 	PostProcessing();
+
+	if (index >= m_arr->size()) {
+		std::cerr << "Index out of range\n";
+		return;
+	}
+
 	ResetNodes();
-	RemoveNode(value[0]);
+	RemoveNode(index);
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
-	renderer->Reset(m_root->getInfo()->size());
+	renderer->Reset(m_arr->front()->getInfo()->size());
 }
 
 void Heap::OnSearch(const std::string& l_value) {
@@ -269,8 +306,33 @@ void Heap::OnSearch(const std::string& l_value) {
 	renderer->Reset(m_arr->front()->getInfo()->size());
 }
 
-void Heap::BuildTree(Node* Cur, Node* pre, int index, const std::string& l_string) {
+void Heap::BuildTree(int value) {
+	Node* Cur = new Node(value);
 
+	Cur->m_save.is_appearing = 1;
+	Cur->m_save.is_visible = 1;
+	m_arr->push_back(Cur);
+
+	int index = m_arr->size() - 1;
+
+	if (index == 0)
+		return;	
+
+	int parent = (index - 1) / 2;
+
+	Node* parent_node = m_arr->at(parent);
+	int childIndex = 1 - index % 2;
+
+	parent_node->child[childIndex] = Cur;
+	Cur->m_save.is_moving = 1;
+	Cur->m_save.m_coord.first = parent_node->m_save.m_coord.first;
+	Cur->m_save.m_coord.first.second = parent_node->m_save.m_coord.first.second + 1;
+	Cur->m_save.m_coord.second.second = parent_node->m_save.m_coord.second.second + 1;
+
+	parent_node->m_save.m_arrowChange[childIndex] = Cur;
+	Cur->par = parent_node;
+
+	Heapify(index);
 }
 
 void Heap::InsertNode(int value) {
@@ -307,6 +369,32 @@ void Heap::InsertNode(int value) {
 }
 
 void Heap::RemoveNode(int value) {
+	AddNewStep();
+
+	m_arr->back()->getInfo()->back().is_stateChanging = 1;
+	m_arr->back()->getInfo()->back().node_state.second = NodeState::Found;
+
+	m_arr->at(value)->getInfo()->back().is_stateChanging = 1;
+	m_arr->at(value)->getInfo()->back().node_state.second = NodeState::InRemove;
+
+	Swap(value, m_arr->size() - 1);
+
+	AddNewStep();
+	m_arr->back()->getInfo()->back().is_appearing = 2;
+	m_removed = m_arr->back();
+
+	int parent = (m_arr->size() - 2) / 2;
+
+	if (parent < 0) {
+		return;
+	}
+
+	m_arr->at(parent)->child[1 - (m_arr->size() - 1) % 2] = nullptr;
+	m_arr->at(parent)->getInfo()->back().m_arrowChange[1 - (m_arr->size() - 1) % 2] = nullptr;
+
+	Arrange();
+
+	HeapifyDown(value);
 
 }
 
@@ -317,8 +405,6 @@ void Heap::SearchNode(int value) {
 void Heap::Arrange() {
 	CalSize(m_arr->front(), 0);
 	Align(m_arr->front(), 0, - std::max(m_size[0].first, 1), std::max(m_size[0].second, 1));
-
-	float delta = m_arr->front()->getInfo()->back().m_coord.second.first;
 }
 
 int Heap::CalSize(Node* Cur, int index) {
@@ -378,14 +464,46 @@ void Heap::Heapify(int index) {
 
 	if ((*m_arr)[parent]) {
 		if ((!m_mode && (*m_arr)[parent]->getValue()[0] < (*m_arr)[index]->getValue()[0]) || (m_mode && (*m_arr)[parent]->getValue()[0] < (*m_arr)[index]->getValue()[0])) {
-			std::cerr << "swap: " << index << " " << parent << "\n";
-			Swap(index, parent);
+
+			if ((*m_arr).front()->getInfo()->empty())
+				BuildSwap(index, parent);
+			else
+				Swap(index, parent);
 			Heapify(parent);
 		}
 	}
 }
 
+void Heap::HeapifyDown(int index) {
+	int next = index;
+	int left = index * 2 + 1;
+	int right = index * 2 + 2;
+
+	if (left < m_arr->size() && left != m_arr->size() - 1) {
+		if ((!m_mode && (*m_arr)[left]->getValue()[0] > (*m_arr)[next]->getValue()[0]) || (m_mode && (*m_arr)[left]->getValue()[0] < (*m_arr)[next]->getValue()[0])) {
+			next = left;
+		}
+	}
+
+	if (right < m_arr->size() && right != m_arr->size() - 1) {
+		if ((!m_mode && (*m_arr)[right]->getValue()[0] > (*m_arr)[next]->getValue()[0]) || (m_mode && (*m_arr)[right]->getValue()[0] < (*m_arr)[next]->getValue()[0])) {
+			next = right;
+		}
+	}
+
+	if (next != index) {
+		Swap(index, next);
+		HeapifyDown(next);
+	}
+}
+
 void Heap::Swap(int a, int b) {
+	if (a == b)
+		return;
+
+	if (a < b)
+		std::swap(a, b);
+
 	AddNewStep();
 
 	Node* A = (*m_arr)[a];
@@ -422,6 +540,52 @@ void Heap::Swap(int a, int b) {
 
 	A->getInfo()->back().m_coord.second = B->getInfo()->back().m_coord.first;
 	B->getInfo()->back().m_coord.second = A->getInfo()->back().m_coord.first;
+
+	(*m_arr)[a] = B;
+	(*m_arr)[b] = A;
+}
+
+void Heap::BuildSwap(int a, int b) {
+	if (a == b)
+		return;
+
+	if (a < b)
+		std::swap(a, b);
+
+	Node* A = (*m_arr)[a];
+	Node* B = (*m_arr)[b];
+
+	for (int i = 0; i < 2; i++) {
+		Node* tmp = A->m_save.m_arrowChange[i];
+		A->m_save.m_arrowChange[i] = B->m_save.m_arrowChange[i];
+		if (A->m_save.m_arrowChange[i] == A) {
+			A->m_save.m_arrowChange[i] = B;
+		}
+		A->child[i] = A->m_save.m_arrowChange[i];
+
+		B->m_save.m_arrowChange[i] = tmp;
+		B->child[i] = B->m_save.m_arrowChange[i];
+	}
+
+	Node* parA = (*m_arr)[(a - 1) / 2];
+	Node* parB = (*m_arr)[(b - 1) / 2];
+
+	for (int i = 0; i < 2; i++) {
+		if (parA->child[i] == A) {
+			parA->child[i] = B;
+			parA->m_save.m_arrowChange[i] = B;
+		}
+
+		if (parB->child[i] == B) {
+			parB->child[i] = A;
+			parB->m_save.m_arrowChange[i] = A;
+		}
+	}
+
+	A->m_save.is_moving = 1;
+	B->m_save.is_moving = 1;
+
+	std::swap(A->m_save.m_coord.second, B->m_save.m_coord.second);
 
 	(*m_arr)[a] = B;
 	(*m_arr)[b] = A;

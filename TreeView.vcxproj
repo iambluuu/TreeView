@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AVL_Tree.cpp" />
+    <ClCompile Include="CodeWindow.cpp" />
     <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="GoBackButton.cpp" />
     <ClCompile Include="GoToButton.cpp" />
@@ -182,6 +183,7 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="AVL_Tree.h" />
+    <ClInclude Include="CodeWindow.h" />
     <ClInclude Include="Drawer.h" />
     <ClInclude Include="GoBackButton.h" />
     <ClInclude Include="GoToButton.h" />
