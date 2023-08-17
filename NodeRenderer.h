@@ -161,4 +161,8 @@ public:
 		m_theme = l_theme;
 		m_codeWindow.SwitchTheme(l_theme);
 	}
+
+	void ResetCodeWindow() {
+		m_codeWindow.Reset();
+	}
 };

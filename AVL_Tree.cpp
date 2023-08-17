@@ -907,6 +907,7 @@ void AVL_Tree::OnInsert(const std::string& l_value) {
 
 	m_newNode = new Node(input);
 	ResetNodes(m_root);
+	
 
 	m_root = InsertNode(m_root, input[0], 0, 0);
 	Centering();
@@ -1030,6 +1031,9 @@ void AVL_Tree::PostProcessing() {
 	delete m_removedNode;
 	m_removedNode = nullptr;
 	m_newNode = nullptr;
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	renderer->ResetCodeWindow();
 }
 
 void AVL_Tree::TestFunc() {

@@ -52,8 +52,6 @@ void NodeRenderer::Reset(const int& l_stepNum) {
 	m_stepNum = l_stepNum;
 	m_limitStep = l_stepNum;
 	is_paused = 0;
-
-	m_codeWindow.Reset();
 }
 
 void NodeRenderer::OnPlay() {
