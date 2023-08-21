@@ -31,6 +31,8 @@ public:
 	void Update(float l_dT);
 	void Draw();
 
+	void Reset() {}
+
 	void SetTheme(int l_themeID);
 	void SetRandom();
 

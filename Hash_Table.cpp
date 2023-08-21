@@ -5,6 +5,15 @@ HashTable::~HashTable() {
 	ClearNodes(m_chainingNodes);
 }
 
+void HashTable::PostProccessing() {
+	ResetNodes();
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	codeWindow->Reset();
+}
+
 void HashTable::ClearNodes(std::vector<Node*>& nodes) {
 	for (int i = 0; i < nodes.size(); i++) {
 		ClearChain(nodes[i]);
@@ -122,14 +131,7 @@ void HashTable::AddNodeStep(Node* node) {
 			clone.m_shownValue[clone.m_valueChange.first] = clone.m_valueChange.second;
 		}
 
-		for (int i = 0; i < 3; i++) {
-			if (!clone.m_arrowCoord[i])
-				continue;
-
-			if (clone.m_arrowCoord[i]->getInfo()->back().is_appearing == 2) {
-				clone.m_arrowCoord[i] = nullptr;
-			}
-		}
+		clone.m_arrowCoord[0] = clone.m_arrowChange[0];
 
 		CurInfo->push_back(clone);
 	}
@@ -213,6 +215,9 @@ void HashTable::InsertNode(int l_value) {
 }
 
 void HashTable::InsertChaining(int l_value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_chainingNodes.size();
 	int index = l_value % n;
 
@@ -227,6 +232,8 @@ void HashTable::InsertChaining(int l_value) {
 	AddNewStep();
 	AddNodeStep(newNode);
 
+	codeWindow->MoveHighlight(0);
+
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -234,6 +241,7 @@ void HashTable::InsertChaining(int l_value) {
 		Cur = Cur->left;
 		AddNewStep();
 		AddNodeStep(newNode);
+		codeWindow->MoveHighlight(1);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.first = NodeState::Default;
 		Cur->getInfo()->back().node_state.second = NodeState::Selected;
@@ -241,8 +249,8 @@ void HashTable::InsertChaining(int l_value) {
 
 	Cur->left = newNode;
 	AddNewStep();
-
-	Cur->getInfo()->back().m_arrowCoord[0] = newNode;
+	codeWindow->Stay();
+	Cur->getInfo()->back().m_arrowChange[0] = newNode;
 	newNode->getInfo()->back().m_coord.first = { Cur->getInfo()->back().m_coord.first.first, Cur->getInfo()->back().m_coord.first.second + 1 };
 	newNode->getInfo()->back().m_coord.second = { Cur->getInfo()->back().m_coord.first.first, Cur->getInfo()->back().m_coord.first.second + 1 };
 	newNode->getInfo()->back().node_state.first = NodeState::Selected;
@@ -254,23 +262,30 @@ void HashTable::InsertChaining(int l_value) {
 
 
 void HashTable::InsertLinearProbing(int l_value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_probingNodes.size();
 	int index = l_value % n;
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
+
 
 	while (m_probingNodes[index]->getInfo()->back().m_shownValue[0] > 0) {
 		index = (index + 1) % n;
 
 		AddNewStep();
+		codeWindow->MoveHighlight(2);
 		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 		m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 
 	}
 
 	AddNewStep();
+	codeWindow->MoveHighlight(3);
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 	m_probingNodes[index]->getInfo()->back().m_valueChange.second = l_value;
@@ -278,10 +293,14 @@ void HashTable::InsertLinearProbing(int l_value) {
 }
 
 void HashTable::InsertQuadraticProbing(int l_value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_probingNodes.size();
 	int index = l_value % n;
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -293,6 +312,7 @@ void HashTable::InsertQuadraticProbing(int l_value) {
 		std::cerr << index << std::endl;
 
 		AddNewStep();
+		codeWindow->MoveHighlight(3);
 		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 		m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -301,12 +321,14 @@ void HashTable::InsertQuadraticProbing(int l_value) {
 	if (m_probingNodes[index]->getInfo()->back().m_shownValue[0] > 0) {
 		std::cerr << "Table is full" << std::endl;
 		AddNewStep();
+		codeWindow->MoveHighlight(-1);
 		m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 		m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::NotFound;
 		return;
 	}
 
 	AddNewStep();
+	codeWindow->MoveHighlight(5);
 	m_probingNodes[index]->getInfo()->back().is_stateChanging = 1;
 	m_probingNodes[index]->getInfo()->back().node_state.second = NodeState::Selected;
 	m_probingNodes[index]->getInfo()->back().m_valueChange.second = l_value;
@@ -314,12 +336,16 @@ void HashTable::InsertQuadraticProbing(int l_value) {
 }
 
 void HashTable::RemoveChaining(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_chainingNodes.size();
 	int index = value % n;
 
 	Node* Cur = m_chainingNodes[index];
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -329,15 +355,21 @@ void HashTable::RemoveChaining(int value) {
 		Cur = Cur->left;
 
 		AddNewStep();
+		codeWindow->MoveHighlight(1);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.first = NodeState::Default;
 	}
 
 	if (!Cur) {
+		AddNewStep();
+		codeWindow->MoveHighlight(-1);
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 		return;
 	}
 
 	AddNewStep();
+	codeWindow->MoveHighlight(1);
 	Cur->getInfo()->back().is_stateChanging = 0;
 	Cur->getInfo()->back().is_appearing = 2;
 	
@@ -349,11 +381,15 @@ void HashTable::RemoveChaining(int value) {
 }
 
 void HashTable::RemoveLinearProbing(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_probingNodes.size();
 	int index = value % n;
 	Node* Cur = m_probingNodes[index];
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -364,18 +400,21 @@ void HashTable::RemoveLinearProbing(int value) {
 		Cur = m_probingNodes[index];
 
 		AddNewStep();
+		codeWindow->MoveHighlight(2);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Selected;
 	}
 	
 	if (Cur->getInfo()->back().m_shownValue[0] == value) {
 		AddNewStep();
+		codeWindow->MoveHighlight(3);
 		Cur->getInfo()->back().is_stateChanging = 0;
 		Cur->getInfo()->back().is_valueChanging = 1;
 		Cur->getInfo()->back().m_valueChange.second = -1;
 	}
 	else {
 		AddNewStep();
+		codeWindow->MoveHighlight(-1);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 	}
@@ -383,11 +422,15 @@ void HashTable::RemoveLinearProbing(int value) {
 }
 
 void HashTable::RemoveQuadraticProbing(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_probingNodes.size();
 	int index = value % n;
 	Node* Cur = m_probingNodes[index];
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -401,12 +444,14 @@ void HashTable::RemoveQuadraticProbing(int value) {
 		Cur = m_probingNodes[index];
 
 		AddNewStep();
+		codeWindow->MoveHighlight(3);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Selected;
 	}
 
 	if (Cur->getInfo()->back().m_shownValue[0] == value) {
 		AddNewStep();
+		codeWindow->MoveHighlight(5);
 		Cur->getInfo()->back().is_stateChanging = 0;
 		Cur->getInfo()->back().is_valueChanging = 1;
 		Cur->getInfo()->back().m_valueChange.second = -1;
@@ -415,18 +460,23 @@ void HashTable::RemoveQuadraticProbing(int value) {
 	}
 	else {
 		AddNewStep();
+		codeWindow->MoveHighlight(-1);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 	}
 }
 
 void HashTable::SearchChaining(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_chainingNodes.size();
 	int index = value % n;
 
 	Node* Cur = m_chainingNodes[index];
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -434,11 +484,13 @@ void HashTable::SearchChaining(int value) {
 		Cur = Cur->left;
 
 		AddNewStep();
+		codeWindow->MoveHighlight(1);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.first = NodeState::Default;
 
 		if (!Cur->left && Cur->getInfo()->back().m_shownValue[0] != value) {
 			AddNewStep();
+			codeWindow->MoveHighlight(3);
 			Cur->getInfo()->back().is_stateChanging = 1;
 			Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 			return;
@@ -446,17 +498,22 @@ void HashTable::SearchChaining(int value) {
 	}
 
 	AddNewStep();
+	codeWindow->MoveHighlight(2);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Found;
 }
 
 void HashTable::SearchLinearProbing(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_probingNodes.size();
 	int index = value % n;
 	
 	Node* Cur = m_probingNodes[index];
 
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -467,30 +524,36 @@ void HashTable::SearchLinearProbing(int value) {
 		Cur = m_probingNodes[index];
 
 		AddNewStep();
+		codeWindow->MoveHighlight(3);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Selected;
 	}
 
 	if (Cur->getInfo()->back().m_shownValue[0] == value) {
 		AddNewStep();
+		codeWindow->MoveHighlight(2);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Found;
 	}
 	else {
 		AddNewStep();
+		codeWindow->MoveHighlight(4);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 	}
 }
 
 void HashTable::SearchQuadraticProbing(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int n = m_probingNodes.size();
 	int index = value % n;
 
 	Node* Cur = m_probingNodes[index];
 
 	AddNewStep();
-
+	codeWindow->MoveHighlight(0);
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
@@ -502,17 +565,20 @@ void HashTable::SearchQuadraticProbing(int value) {
 		Cur = m_probingNodes[index];
 
 		AddNewStep();
+		codeWindow->MoveHighlight(5);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Selected;
 	}
 
 	if (Cur->getInfo()->back().m_shownValue[0] == value) {
 		AddNewStep();
+		codeWindow->MoveHighlight(3);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Found;
 	}
 	else {
 		AddNewStep();
+		codeWindow->MoveHighlight(6);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 	}
@@ -525,6 +591,18 @@ void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_valu
 		return;
 	}
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code = std::vector<std::string>();
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
+	PostProccessing();
+
 	if (m_mode)
 		ClearNodes(m_probingNodes);
 	else
@@ -533,8 +611,6 @@ void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_valu
 	Create(n, m);
 	
 	std::cerr << "Created\n";
-
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
 	if (m_mode) {
 		renderer->Reset(m_probingNodes[0]->getInfo()->size());
@@ -557,7 +633,43 @@ void HashTable::OnInsert(const std::string& l_value) {
 		return;
 	}
 
-	ResetNodes();
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+	
+	if (m_mode == 0) {
+		code = {
+			"i = key % HT.length",
+			"HT[i].insert(key)",
+		};
+	}
+	else if (m_mode == 1) {
+		code = {
+			"i = key % HT.length",
+			"while (HT[i] != NULL)R",
+			"    i = (i + 1) % HT.length",
+			"HT[i] = key",
+		};
+	}
+	else {
+		code = {
+			"i = key % HT.length",
+			"j = 1",
+			"while (HT[i] != NULL)",
+			"    i = (i + j * j) % HT.length",
+			"    j++",
+			"HT[i] = key",
+		};
+	}
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
+	PostProccessing();
+	
 
 	if (m_mode == 0) {
 		// chaining
@@ -572,8 +684,6 @@ void HashTable::OnInsert(const std::string& l_value) {
 		// quadratic probing
 		InsertQuadraticProbing(resValue);
 	}
-
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
 	if (m_mode) {
 		renderer->Reset(m_probingNodes[0]->getInfo()->size());
@@ -596,7 +706,42 @@ void HashTable::OnRemove(const std::string& l_value) {
 		return;
 	}
 
-	ResetNodes();
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+
+	if (m_mode == 0) {
+		code = {
+			"i = key % HT.length",
+			"HT[i].remove(key)",
+		};
+	}
+	else if (m_mode == 1) {
+		code = {
+			"i = key % HT.length",
+			"while (HT[i] != key)",
+			"    i = (i + 1) % HT.length",
+			"if HT[i] != EMPTY: HT[i] = DELETED",
+		};
+	}
+	else {
+		code = {
+			"i = key % HT.length",
+			"j = 1",
+			"while (HT[i] != key)",
+			"    i = (i + j * j) % HT.length",
+			"    j++",
+			"if HT[i] != EMPTY: HT[i] = DELETED",
+		};
+	}
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
+	PostProccessing();
 
 	if (m_mode == 0) {
 		// chaining
@@ -610,8 +755,6 @@ void HashTable::OnRemove(const std::string& l_value) {
 		// quadratic probing
 		RemoveQuadraticProbing(resValue);
 	}
-
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
 	if (m_mode) {
 		renderer->Reset(m_probingNodes[0]->getInfo()->size());
@@ -659,7 +802,7 @@ void HashTable::Create(int n, int m) {
 			while (Cur) {
 				Cur->getInfo()->back().m_coord.first = std::make_pair(curX, curY);
 				Cur->getInfo()->back().m_coord.second = std::make_pair(curX, curY);
-				Cur->getInfo()->back().m_arrowCoord[0] = Cur->left;
+				Cur->getInfo()->back().m_arrowChange[0] = Cur->left;
 				Cur->getInfo()->back().is_visible = 1;
 				Cur->getInfo()->back().is_appearing = 1;
 				Cur = Cur->left;
@@ -693,7 +836,46 @@ void HashTable::OnSearch(const std::string& l_value) {
 		return;
 	}
 
-	ResetNodes();
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+
+	if (m_mode == 0) {
+		code = {
+			"i = key % HT.length",
+			"for j = 0 to HT[i].length",
+			"    if (HT[i][j] == key) return FOUND",
+			"return NOT_FOUND"
+		};
+	}
+	else if (m_mode == 1) {
+		code = {
+			"i = key % HT.length",
+			"while (HT[i] != NULL)",
+			"    if (HT[i] == key) return FOUND",
+			"    i = (i + 1) % HT.length",
+			"return NOT_FOUND"
+		};
+	}
+	else {
+		code = {
+			"i = key % HT.length",
+			"j = 0",
+			"while (HT[i] != NULL)",
+			"    if (HT[i] == key) return FOUND",
+			"    j++",
+			"    i = (i + j * j) % HT.length",
+			"return NOT_FOUND"
+		};
+	}
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
+	PostProccessing();
 
 	if (m_mode == 0) {
 		// chaining
@@ -707,8 +889,6 @@ void HashTable::OnSearch(const std::string& l_value) {
 		// quadratic probing
 		SearchQuadraticProbing(resValue);
 	}
-
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
 	if (m_mode) {
 		renderer->Reset(m_probingNodes[0]->getInfo()->size());
@@ -739,5 +919,26 @@ void HashTable::Draw() {
 		for (auto& node : m_probingNodes) {
 			nodeRenderer->DrawTree(node);
 		}
+	}
+}
+
+void HashTable::SwitchMode(int l_mode) {
+	m_mode = l_mode;
+
+	NodeRenderer* nodeRenderer = m_stateManager->GetContext()->m_nodeRenderer;
+	switch (l_mode) {
+	case 0:
+		if (!m_chainingNodes.empty())
+			nodeRenderer->Reset(m_chainingNodes[0]->getInfo()->size());
+		else
+			nodeRenderer->Reset(0);
+		break;
+	case 1:
+	case 2:
+		if (!m_probingNodes.empty())
+			nodeRenderer->Reset(m_probingNodes[0]->getInfo()->size());
+		else
+			nodeRenderer->Reset(0);
+		break;
 	}
 }

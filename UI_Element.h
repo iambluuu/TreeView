@@ -5,7 +5,7 @@
 #include "SFML/System.hpp"
 
 enum class ElementName {
-	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, ActiveTab, InactiveTab,
+	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, Tab,
 	PlayBar,
 
 	BackgroundColor,
@@ -67,6 +67,9 @@ public:
 	virtual void OnLeave() = 0;
 	virtual void Update(float l_dT) = 0;
 	virtual void Draw() = 0;
+
+	virtual void Reset() = 0;
+
 	virtual void SetPosition(sf::Vector2f l_pos) {
 		m_pos = l_pos;
 		m_hitBox.left = l_pos.x;

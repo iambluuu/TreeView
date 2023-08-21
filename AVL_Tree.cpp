@@ -4,7 +4,7 @@
 
 
 AVL_Tree::~AVL_Tree() {
-	PostProcessing();
+	delete m_removedNode;
 	ClearTree(m_root);
 	ClearAlign();
 }
@@ -193,6 +193,16 @@ void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value
 
 	std::cerr << "Create\n";
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code = std::vector<std::string>();
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
 	ClearTree(m_root);
 	ClearAlign();
 	PostProcessing();
@@ -213,7 +223,6 @@ void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value
 
 	AddNewStep(m_root);
 	
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(1);
 }
 
@@ -570,6 +579,8 @@ void AVL_Tree::ShiftDown(Node* Cur) {
 }
 
 Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
 
 	//std::cerr << "Inserting " << value << std::endl;
 	std::cerr << "Value: " << value << "Hor: " << hor_depth << " " << "Ver: " << ver_depth << std::endl;
@@ -584,6 +595,9 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	auto CurInfo = Cur->getInfo();
 	assert(!CurInfo->empty()); //make sure there's a NodeInfo for the current step
 	NodeInfo* CurStepInfo = &CurInfo->back();
+
+	codeWindow->MoveHighlight(0);
+
 
 	if (Cur == m_newNode) {
 
@@ -687,24 +701,32 @@ Node* AVL_Tree::InsertNode(Node* Cur, int value, int hor_depth, int ver_depth) {
 	CurStepInfo->m_bf = balance;
 
 	if (balance > 1 && value < Cur->left->getValue()[0]) {
+		codeWindow->MoveHighlight(2);
 		return RotateRight(Cur);
 	}
 
 	if (balance < -1 && value > Cur->right->getValue()[0]) {
+		codeWindow->MoveHighlight(4);
 		return RotateLeft(Cur);
 	}
 
 	if (balance > 1 && value > Cur->left->getValue()[0]) {
+		codeWindow->MoveHighlight(3);
 		Cur->left = RotateLeft(Cur->left);
 		Cur->getInfo()->back().m_arrowChange[0] = Cur->left;
+		codeWindow->Stay();
 		return RotateRight(Cur);
 	}
 
 	if (balance < -1 && value < Cur->right->getValue()[0]) {
+		codeWindow->MoveHighlight(5);
 		Cur->right = RotateRight(Cur->right);
 		Cur->getInfo()->back().m_arrowChange[2] = Cur->right;
+		codeWindow->Stay();
 		return RotateLeft(Cur);
 	}
+	
+	codeWindow->Stay();
 
 	return Cur;
 }
@@ -714,8 +736,11 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 		m_nodeNum++;
 		return Cur;
 	}
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
 
 	AddNewStep(m_root);
+	codeWindow->MoveHighlight(0);
 
 	auto CurInfo = Cur->getInfo();
 	assert(!CurInfo->empty()); //make sure there's a NodeInfo for the current step
@@ -749,6 +774,7 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 			if (temp == nullptr) {
 
 				AddNewStep(m_root);
+				codeWindow->MoveHighlight(0);
 				Cur->getInfo()->back().is_stateChanging = 0;
 				Cur->getInfo()->back().is_appearing = 2;
 				m_removedNode = Cur;
@@ -766,6 +792,7 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 				std::pair<int, int> tempCoord = CurInfo->back().m_coord.first;
 
 				AddNewStep(m_root);
+				codeWindow->MoveHighlight(0);
 				Cur->getInfo()->back().is_stateChanging = 0;
 				Cur->getInfo()->back().is_appearing = 2;
 				Cur->getInfo()->back().m_arrowChange[0] = nullptr;
@@ -788,7 +815,7 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 			Node* temp = Cur->right;
 
 			AddNewStep(m_root);
-
+			codeWindow->MoveHighlight(0);
 			temp->getInfo()->back().node_state.second = NodeState::Selected;
 			temp->getInfo()->back().is_stateChanging = 1;
 
@@ -796,12 +823,14 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 				temp = temp->left;
 
 				AddNewStep(m_root);
+				codeWindow->MoveHighlight(0);
 				Cur->getInfo()->back().is_stateChanging = 0;
 				temp->getInfo()->back().is_stateChanging = 1;
 				temp->getInfo()->back().node_state.second = NodeState::Selected;
 			}
 
 			AddNewStep(m_root);
+			codeWindow->MoveHighlight(0);
 			Cur->getInfo()->back().is_stateChanging = 1;
 			Cur->getInfo()->back().node_state.second = NodeState::Found;
 			Cur->getInfo()->back().is_valueChanging = 1;
@@ -819,13 +848,11 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 	Cur->height = Cur->GetHeight();
 	int balance = Cur->GetBalance();
 
-	std::cerr << "Value: " << Cur->getValue()[0] << std::endl;
-
-	std::cerr << "Balance: " << balance << std::endl;
-	std::cerr << "Height: " << Cur->height << std::endl;
-
 	AddNewStep(m_root);
 	AddNewStep(m_removedNode);
+
+	codeWindow->MoveHighlight(0);
+
 	CurStepInfo = &CurInfo->back();
 
 	CurStepInfo->is_stateChanging = 1;
@@ -833,25 +860,32 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 	CurStepInfo->m_bf = balance;
 
 	if (balance > 1 && Cur->left->GetBalance() >= 0) {
+		codeWindow->MoveHighlight(2);
 		return RotateRight(Cur);
 	}
 
 	if (balance < -1 && Cur->right->GetBalance() <= 0) {
+		codeWindow->MoveHighlight(4);
 		return RotateLeft(Cur);
 	}
 
 	if (balance > 1 && Cur->left->GetBalance() < 0) {
+		codeWindow->MoveHighlight(3);
 		Cur->left = RotateLeft(Cur->left);
 		Cur->getInfo()->back().m_arrowChange[0] = Cur->left;
+
+		codeWindow->Stay();
 		return RotateRight(Cur);
 	}
 
 	if (balance < -1 && Cur->right->GetBalance() > 0) {
+		codeWindow->MoveHighlight(5);
 		Cur->right = RotateRight(Cur->right);
 		Cur->getInfo()->back().m_arrowChange[2] = Cur->right;
+
+		codeWindow->Stay();
 		return RotateLeft(Cur);
 	}
-
 
 	return Cur;
 
@@ -859,11 +893,16 @@ Node* AVL_Tree::RemoveNode(Node* Cur, int value) {
 
 void AVL_Tree::SearchNode(Node* Cur, int l_value) {
 	AddNewStep(m_root);
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
 	if (Cur->getValue()[0] == l_value) {
 		AddNewStep(m_root);
+		codeWindow->MoveHighlight(1);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Found;
 		return;
@@ -871,20 +910,24 @@ void AVL_Tree::SearchNode(Node* Cur, int l_value) {
 
 	if (Cur->getValue()[0] > l_value) {
 		if (Cur->left) {
+			codeWindow->MoveHighlight(2);
 			SearchNode(Cur->left, l_value);
 		}
 		else {
 			AddNewStep(m_root);
+			codeWindow->MoveHighlight(0);
 			Cur->getInfo()->back().is_stateChanging = 1;
 			Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 			return;
 		}
 	} else 	if (Cur->getValue()[0] < l_value) {
 		if (Cur->right) {
+			codeWindow->MoveHighlight(3);
 			SearchNode(Cur->right, l_value);
 		}
 		else {
 			AddNewStep(m_root);
+			codeWindow->MoveHighlight(0);
 			Cur->getInfo()->back().is_stateChanging = 1;
 			Cur->getInfo()->back().node_state.second = NodeState::NotFound;
 			return;
@@ -903,6 +946,23 @@ void AVL_Tree::OnInsert(const std::string& l_value) {
 		return;
 	}
 
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code = {
+		"Insert v.", "check balance factor",
+		"    case LL: rotateR",
+		"    case LR: rotateL, rotateR",
+		"    case RR: rotateL",
+		"    case RL: rotateR, rotateL",
+	};
+	
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
 	PostProcessing();
 
 	m_newNode = new Node(input);
@@ -912,7 +972,6 @@ void AVL_Tree::OnInsert(const std::string& l_value) {
 	m_root = InsertNode(m_root, input[0], 0, 0);
 	Centering();
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_root->getInfo()->size());
 }
 
@@ -925,6 +984,22 @@ void AVL_Tree::OnRemove(const std::string& l_value) {
 	if (m_nodeNum == 0)
 		return;
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code = {
+		"Remove v.", "check balance factor",
+		"    case LL: rotateR",
+		"    case LR: rotateL, rotateR",
+		"    case RR: rotateL",
+		"    case RL: rotateR, rotateL",
+	};
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
 	m_nodeNum--;
 
 	PostProcessing();
@@ -932,9 +1007,6 @@ void AVL_Tree::OnRemove(const std::string& l_value) {
 
 	m_root = RemoveNode(m_root, input[0]);
 	Centering();
-
-
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
 	if (!m_root)
 		renderer->Reset(m_removedNode->getInfo()->size());
@@ -951,12 +1023,24 @@ void AVL_Tree::OnSearch(const std::string& l_value) {
 	if (m_nodeNum == 0)
 		return;
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code = {
+		"if node == nullptr, return NOT_FOUND",
+		"if value == node.value, return FOUND",
+		"if value < node.value, Search(node.left)",
+		"if value > node.value, Search(node.right)",
+	};
+
+	codeWindow->LoadCode(code);
+	/////////////////////////////////////////////
+
 	PostProcessing();
 	ResetNodes(m_root);
 
 	SearchNode(m_root, input[0]);
-
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 
 	renderer->Reset(m_root->getInfo()->size());
 }

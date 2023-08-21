@@ -47,18 +47,27 @@ void InputButton::OnClick() {
 		break;
 
 	case Execute::Remove:
-		state->OnRemove(m_textBox->ReadString());
+		if (m_textBox)
+			state->OnRemove(m_textBox->ReadString());
+		else
+			state->OnRemove("");
 		break;
 
 	case Execute::Create:
 		if (m_numberTextbox)
 			state->OnCreate(m_numberTextbox->ReadString(), m_textBox->ReadString());
-		else
+		else if (m_textBox)
 			state->OnCreate("", m_textBox->ReadString());
+		else
+			state->OnCreate("", "");
 		break;
 
 	case Execute::Search:
-		state->OnSearch(m_textBox->ReadString());
+		if (m_textBox)
+			state->OnSearch(m_textBox->ReadString());
+		else
+			state->OnSearch("");
+
 		break;
 
 	default:

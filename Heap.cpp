@@ -206,6 +206,13 @@ void Heap::PostProcessing() {
 		m_removed = nullptr;
 		m_arr->pop_back();
 	}
+
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	codeWindow->Reset();
+
+	ResetNodes();
 }
 
 void Heap::HandleEvent(sf::Event* l_event) {
@@ -240,8 +247,18 @@ void Heap::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 		return;
 	}
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code = std::vector<std::string>();
+
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
 	PostProcessing();
-	ResetNodes();
+
 	ClearTree();
 
 	for (int i = 0; i < value.size(); i++) {
@@ -251,7 +268,6 @@ void Heap::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 	Arrange();
 	AddNewStep();
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_arr->front()->getInfo()->size());
 }
 
@@ -262,12 +278,38 @@ void Heap::OnInsert(const std::string& l_value) {
 		return;
 	}
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+
+	if (m_mode == 0) {
+		code = {
+			"Heap[Heap.size] = value",
+			"i = Heap.size - 1",
+			"while i > 0 && Heap[i] > Heap[parent(i)]",
+			"	swap(Heap[i], Heap[parent(i)])",
+			"	i = parent(i)"
+		};
+	}
+	else {
+		code = {
+			"Heap[Heap.size] = value",
+			"i = Heap.size - 1",
+			"while i > 0 && Heap[i] < Heap[parent(i)]",
+			"	swap(Heap[i], Heap[parent(i)])",
+			"	i = parent(i)"
+		};
+	}
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
 	PostProcessing();
-	ResetNodes();
 
 	InsertNode(value[0]);
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset((*m_arr)[0]->getInfo()->size());
 }
 
@@ -278,32 +320,64 @@ void Heap::OnRemove(const std::string& l_value) {
 		return;
 	}
 
-	PostProcessing();
-
 	if (index >= m_arr->size()) {
 		std::cerr << "Index out of range\n";
 		return;
 	}
 
-	ResetNodes();
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+
+	if (m_mode == 0) {
+		code = {
+			"swap( Heap[Heap.size - 1], Heap[key] )",
+			"Remove( Heap[Heap.size - 1] )",
+			"while i < Heap.size:",
+			"	if Heap[i] < Heap[left(i)]:",
+			"		swap(Heap[i], Heap[left(i)])",
+			"		i = left(i)",
+			"	else if Heap[i] < Heap[right(i)]:",
+			"		swap(Heap[i], Heap[right(i)])",
+			"		i = right(i)"
+		};
+	}
+	else {
+		code = {
+			"swap( Heap[Heap.size - 1], Heap[key] )",
+			"Remove( Heap[Heap.size - 1] )",
+			"while i < Heap.size:",
+			"	if Heap[i] > Heap[left(i)]:",
+			"		swap(Heap[i], Heap[left(i)])",
+			"		i = left(i)",
+			"	else if Heap[i] > Heap[right(i)]:",
+			"		swap(Heap[i], Heap[right(i)])",
+			"		i = right(i)"
+		};
+	}
+	codeWindow->LoadCode(code);
+
+	/////////////////////////////////////////////
+
+	PostProcessing();
+	codeWindow->Stay();
 	RemoveNode(index);
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_arr->front()->getInfo()->size());
 }
 
 void Heap::OnSearch(const std::string& l_value) {
-	std::vector<int> value;
-	if (!ValidateInput(l_value, value))
-		return;
 
-	PostProcessing();
-	ResetNodes();
+}
 
-	SearchNode(value[0]);
+void Heap::OnGetSize() {
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
-	renderer->Reset(m_arr->front()->getInfo()->size());
+}
+
+void Heap::OnGetTop() {
+
 }
 
 void Heap::BuildTree(int value) {
@@ -336,6 +410,9 @@ void Heap::BuildTree(int value) {
 }
 
 void Heap::InsertNode(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	Node* Cur = new Node(value);
 
 	Cur->m_save.is_appearing = 1;
@@ -347,6 +424,7 @@ void Heap::InsertNode(int value) {
 	std::cerr << m_arr->at(0)->m_save.m_shownValue[0] << "\n";
 	
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 
 	if (index == 0)
 		return;
@@ -369,7 +447,11 @@ void Heap::InsertNode(int value) {
 }
 
 void Heap::RemoveNode(int value) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+	
 	AddNewStep();
+	codeWindow->MoveHighlight(0);
 
 	m_arr->back()->getInfo()->back().is_stateChanging = 1;
 	m_arr->back()->getInfo()->back().node_state.second = NodeState::Found;
@@ -380,6 +462,8 @@ void Heap::RemoveNode(int value) {
 	Swap(value, m_arr->size() - 1);
 
 	AddNewStep();
+	codeWindow->MoveHighlight(1);
+
 	m_arr->back()->getInfo()->back().is_appearing = 2;
 	m_removed = m_arr->back();
 
@@ -462,19 +546,27 @@ void Heap::Heapify(int index) {
 	if (parent == index)
 		return;
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	if ((*m_arr)[parent]) {
-		if ((!m_mode && (*m_arr)[parent]->getValue()[0] < (*m_arr)[index]->getValue()[0]) || (m_mode && (*m_arr)[parent]->getValue()[0] < (*m_arr)[index]->getValue()[0])) {
+		if ((!m_mode && (*m_arr)[parent]->getValue()[0] < (*m_arr)[index]->getValue()[0]) || (m_mode && (*m_arr)[parent]->getValue()[0] > (*m_arr)[index]->getValue()[0])) {
 
 			if ((*m_arr).front()->getInfo()->empty())
 				BuildSwap(index, parent);
-			else
+			else {
+				codeWindow->MoveHighlight(3);
 				Swap(index, parent);
+			}
 			Heapify(parent);
 		}
 	}
 }
 
 void Heap::HeapifyDown(int index) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	int next = index;
 	int left = index * 2 + 1;
 	int right = index * 2 + 2;
@@ -492,12 +584,22 @@ void Heap::HeapifyDown(int index) {
 	}
 
 	if (next != index) {
+		if (next == left) {
+			codeWindow->MoveHighlight(4);
+		}
+		else {
+			codeWindow->MoveHighlight(7);
+		}
+
 		Swap(index, next);
 		HeapifyDown(next);
 	}
 }
 
 void Heap::Swap(int a, int b) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	if (a == b)
 		return;
 

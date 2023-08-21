@@ -2,15 +2,16 @@
 
 enum class StateType;
 
-App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context),  m_uiManager(&m_stateManager), m_nodeRenderer(&m_stateManager) {
+App::App() : m_window("TreeView", sf::Vector2u(1600, 900)), m_stateManager(&m_context), m_nodeRenderer(&m_stateManager), m_uiManager(&m_stateManager){
 	m_context.m_wind = &m_window;
 	m_context.m_nodeRenderer = &m_nodeRenderer;
 	m_context.m_uiManager = &m_uiManager;
 	m_context.m_wind->SetUIManager(&m_uiManager);
 	m_context.m_wind->SetStateManager(&m_stateManager);
 
-	m_stateManager.SwitchTo(StateType::Heap);
+	m_stateManager.SwitchTo(StateType::Graph);
 	m_nodeRenderer.SwitchTheme(0);
+	m_uiManager.LoadTheme(0);
 }
 
 App::~App() {}

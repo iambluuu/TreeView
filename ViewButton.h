@@ -23,5 +23,7 @@ public:
 	void Update(float l_dT);
 	void Draw();
 
+	void Reset() {}
+
 	void SetTheme(int l_themeID) { m_themeID = l_themeID; }
 };

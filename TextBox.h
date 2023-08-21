@@ -5,6 +5,8 @@
 #include "InputButton.h"
 #include "Drawer.h"
 
+#include <sstream>
+
 class Drawer;
 class RandomButton;
 class InputButton;
@@ -37,6 +39,10 @@ public:
 	void SetPosition(sf::Vector2f l_pos);
 	void Update(float l_dT);
 	void Draw();
+
+	void Reset() {
+		m_string.clear();
+	}
 
 	void SetTheme(int l_themeID);
 	void SetString(const std::string& l_text);

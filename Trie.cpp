@@ -146,8 +146,14 @@ void Trie::ClearTree(Node* Cur) {
 }
 
 void Trie::PostProcessing() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	ClearTree(m_removed);
 	m_removed = nullptr;
+
+	ResetNodes(m_root);
+	codeWindow->Reset();
 }
 
 void Trie::HandleEvent(sf::Event* l_event) {
@@ -167,6 +173,8 @@ void Trie::Draw() {
 
 	renderer->DrawTree(m_root);
 	renderer->DrawTree(m_removed);
+
+	renderer->DrawCodeWindow();
 }
 
 void Trie::OnCreate(const std::string& l_numbers, const std::string& l_value) {
@@ -178,7 +186,6 @@ void Trie::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 	}
 
 	PostProcessing();
-	ResetNodes(m_root);
 	ClearTree(m_root);
 
 	m_root = new Node(0);
@@ -205,12 +212,28 @@ void Trie::OnInsert(const std::string& l_value) {
 		m_root->m_save.is_visible = 1;
 	}
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//Set up code window //////////////////////
+	std::vector<std::string> code;
+	code = {
+		"cur_node = root",
+		"for i = 0 to length(key) - 1",
+		"	if cur_node.child[i] == nullptr: ",
+		"		cur_node.child[i] = new Node(i)",
+		"	cur_node = cur_node.child[i]",
+		"curnode.is_end = true"
+	};
+
+	codeWindow->LoadCode(code);
+	///////////////////////////////////////////
+
 	PostProcessing();
-	ResetNodes(m_root);
+
 	m_nodeNum++;
 	InsertNode(m_root, m_root, -1, l_value);
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_root->getInfo()->size());
 }
 
@@ -220,12 +243,31 @@ void Trie::OnRemove(const std::string& l_value) {
 		return;
 	}
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//Set up code window //////////////////////
+	std::vector<std::string> code;
+	code = {
+		"cur_node = root"
+		"for i = 0 to length(key) - 1",
+		"	if cur_node.child[i] == nullptr: ",
+		"		return NOT_FOUND",
+		"	cur_node = cur_node.child[i]",
+		"curnode.is_end = false",
+		"while isEmpty(cur_node)",
+		"	par = cur_node.parent, delete cur_node",
+		"	cur_node = par",
+	};
+
+	codeWindow->LoadCode(code);
+	///////////////////////////////////////////
+
 	PostProcessing();
 	ResetNodes(m_root);
 	m_nodeNum++;
 	RemoveNode(m_root, m_root, -1, l_value);
 
-	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
 	renderer->Reset(m_root->getInfo()->size());
 }
 
@@ -244,6 +286,7 @@ void Trie::OnSearch(const std::string& l_value) {
 }
 
 void Trie::BuildTree(Node* Cur, Node* pre, int index, const std::string& l_string) {
+
 	if (!Cur) {
 		int value = l_string[index] - 'A' + 1;
 		if (l_string[index] >= 'a')
@@ -300,12 +343,15 @@ void Trie::BuildTree(Node* Cur, Node* pre, int index, const std::string& l_strin
 }
 
 void Trie::InsertNode(Node* Cur, Node* pre, int index, const std::string& l_string) {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
 	if (!Cur) {
 		int value = l_string[index] - 'A' + 1;
 		if (l_string[index] >= 'a')
 			value = l_string[index] - 'a' + 1;
 
-		Cur = new Node;
+		Cur = new Node(value);
 		
 		pre->child[value - 1] = Cur;
 		
@@ -322,24 +368,33 @@ void Trie::InsertNode(Node* Cur, Node* pre, int index, const std::string& l_stri
 		else { 
 			Par->child_num++;
 		}
+
+		AddNewStep(m_root);
+		codeWindow->MoveHighlight(3);
 		
 		Par->getInfo()->back().m_arrowChange[value - 1] = Cur;
 		Cur->getInfo()->resize(pre->getInfo()->size());
-		Cur->getInfo()->back().is_valueChanging = 1;
-		Cur->getInfo()->back().m_valueChange = { 0, value };
-		Cur->getInfo()->back().m_coord.first = pre->getInfo()->back().m_coord.first;
+		Cur->getInfo()->back().m_coord.first = pre->getInfo()->back().m_coord.second;
 		Cur->getInfo()->back().m_coord.second.second = pre->getInfo()->back().m_coord.second.second + 1;
 
-		AddNewStep(m_root);
 		Cur->getInfo()->back().is_appearing = 1;
 		Cur->getInfo()->back().is_visible = 1;
+		Cur->getInfo()->back().is_valueChanging = 1;
+
+		Cur->getInfo()->back().m_valueChange = {0, value};
+		
+		Cur->getInfo()->back().is_stateChanging = 1;
+		Cur->getInfo()->back().node_state = { NodeState::Selected, NodeState::Selected };
+
 		Align(m_root, - m_root->child_num / 2.f, m_root->child_num / 2.f);
 		
-		if (index == l_string.size() - 1) 
-			Cur->getInfo()->back().node_state = {NodeState::Marked, NodeState::Marked};
-		else {
+		if (index == l_string.size() - 1) {
+			AddNewStep(m_root);
+			codeWindow->MoveHighlight(5);
 			Cur->getInfo()->back().is_stateChanging = 1;
-			Cur->getInfo()->back().node_state = { NodeState::Selected, NodeState::Selected };
+			Cur->getInfo()->back().node_state = { NodeState::Selected, NodeState::Marked };
+		}
+		else {
 			int childIndex = l_string[index + 1] - 'A';
 			if (l_string[index + 1] >= 'a')
 				childIndex = l_string[index + 1] - 'a';
@@ -353,12 +408,19 @@ void Trie::InsertNode(Node* Cur, Node* pre, int index, const std::string& l_stri
 	int childIndex = l_string[index + 1] - 'A';
 	if (l_string[index + 1] >= 'a')
 		childIndex = l_string[index + 1] - 'a';
+
 	AddNewStep(m_root);
+	if (Cur == m_root)
+		codeWindow->MoveHighlight(0);
+	else
+		codeWindow->MoveHighlight(4);
+
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
 	if (index == l_string.size() - 1) {
 		AddNewStep(m_root);
+		codeWindow->MoveHighlight(5);
 		Cur->getInfo()->back().is_stateChanging = 1;
 		Cur->getInfo()->back().node_state.second = NodeState::Marked;
 	} else

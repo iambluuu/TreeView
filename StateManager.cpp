@@ -5,6 +5,7 @@
 #include "TTF_Tree.h"
 #include "Trie.h"
 #include "Heap.h"
+#include "Graph.h"
 
 StateManager::StateManager(SharedContext* l_shareContext)
 {
@@ -16,7 +17,7 @@ StateManager::StateManager(SharedContext* l_shareContext)
 	RegisterState<TTF_Tree>(StateType::TTFTree);
 	RegisterState<Heap>(StateType::Heap);
 	RegisterState<Trie>(StateType::Trie);
-	//RegisterState<Graph>(StateType::Graph);
+	RegisterState<Graph>(StateType::Graph);
 
 	CreateState(StateType::Menu);
 	CreateState(StateType::AVLTree);
@@ -24,7 +25,7 @@ StateManager::StateManager(SharedContext* l_shareContext)
 	CreateState(StateType::TTFTree);
 	CreateState(StateType::Trie);
 	CreateState(StateType::Heap);
-
+	CreateState(StateType::Graph);
 }
 
 StateManager::~StateManager() {

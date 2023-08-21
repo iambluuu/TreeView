@@ -42,8 +42,6 @@ class Node {
 private:
 	std::vector<NodeInfo> m_info;
 	std::vector<int> m_value;
-	sf::IntRect m_zone;
-
 
 public:
 	NodeInfo m_save;
@@ -53,8 +51,6 @@ public:
 	Node* left{ nullptr }, * right{ nullptr }, * middle{ nullptr };
 	Node* child[26];
 	Node* par{ nullptr };
-
-
 
 	Node(std::vector<int> l_value = std::vector<int>(3), Node* l_left = nullptr, Node* l_right = nullptr, Node* l_middle = nullptr) {
 		memset(child, 0, sizeof(child));
@@ -195,4 +191,40 @@ public:
 		}
 	}
 
+};
+
+class GraphNode {
+private:
+	void OnClick();
+	void OnHover();
+	void OnRelease();
+
+	bool isHeld{ 0 };
+
+public:
+	std::vector<NodeInfo> m_info;
+	NodeInfo m_save;
+
+	std::string m_value{ "" };
+
+	std::vector<std::pair<GraphNode*, int> > m_edges; // first - node, second - weight
+
+	const float m_mass{ 100 };
+	sf::Vector2f pos{ 0, 0 };
+	sf::Vector2f m_acc{ 0, 0 };
+	sf::Vector2f m_vel{ 0, 0 };
+	sf::Vector2f m_force{ 0, 0 };
+
+	bool isDrawn{ 0 };
+	bool isFixed{ 0 };
+
+	GraphNode(std::string val = "", sf::Vector2f l_pos = {0, 0}) {
+		pos = l_pos;
+
+		m_value = val;
+		m_save.is_visible = 1;
+	}
+
+	bool isHover(sf::Vector2f mousePos);
+	void HandleEvent(const sf::Event* l_event, sf::RenderWindow* l_target, sf::Vector2f offset);
 };

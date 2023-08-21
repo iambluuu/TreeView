@@ -38,6 +38,19 @@ public:
 	void Draw();
 
 	void Clear();
+	void Reset() {
+		m_elapsed = 0;
+		m_isOpened = false;
+		m_state = ElementState::Neutral;
+
+		for (int i = 0; i < m_elements.size(); ++i) {
+			for (int j = 0; j < m_elements[i].size(); ++j) {
+				m_elements[i][j]->Reset();
+			}
+		}
+
+		m_heightSpanned = 80;
+	}
 
 	void SetTheme(int l_themeID);
 	void AddElement(int level, BaseElement* l_element);

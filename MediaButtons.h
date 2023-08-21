@@ -26,6 +26,8 @@ public:
 	void Update(float l_dT);
 	void Draw();
 
+	void Reset() {}
+
 	ElementName GetName() { return m_name; }
 
 	void SetState(ElementState l_state) { m_state = l_state;}

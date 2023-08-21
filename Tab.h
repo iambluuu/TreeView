@@ -1,18 +1,20 @@
 #pragma once
-
 #include "UI_Element.h"
-#include "StateManager.h"
+#include "UIManager.h"
 
-enum class StateType;
+class UIManager;
 
-class GoToButton : public BaseElement {
+class Tab : public BaseElement {
+	friend class UIManager;
 private:
+	StateType m_type;
 	UIManager* m_owner;
-	sf::Sprite m_illustSprite;
-	StateType m_destState;
+	int mode;
 
 public:
-	GoToButton(UIManager* m_owner, StateType l_type);
+	bool isActivated{ false };
+
+	Tab(UIManager* l_owner, StateType l_state, int l_mode);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();
@@ -26,5 +28,6 @@ public:
 	void Reset() {}
 
 	void SetTheme(int l_themeID);
-	void SetRandom();
+	void SetLayer(int l_layer);
+
 };

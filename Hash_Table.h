@@ -10,7 +10,7 @@ private:
 	std::vector<Node*> m_probingNodes;
 	std::vector<Node*> m_chainingNodes;
 
-	int m_mode{ 2 }; // 0: chaining, 1: linear probing, 2: quadratic probing
+	int m_mode{ 0 }; // 0: chaining, 1: linear probing, 2: quadratic probing
 
 	bool ValidateInput(const std::string& l_value, int& resValue);
 	bool ValidateCreate(const std::string& l_numbers, const std::string& l_value, int& n, int& m);
@@ -40,6 +40,8 @@ private:
 	void InsertNode(int value); //No animation
 	void ResetNodes();
 
+	void PostProccessing();
+
 public:
 	HashTable(StateManager* l_stateManager) : BaseState(l_stateManager) {
 	}
@@ -63,7 +65,10 @@ public:
 	void OnInsert(const std::string& l_value);
 	void OnRemove(const std::string& l_value);
 	void OnSearch(const std::string& l_value);
+	void OnGetSize() {};
+	void OnGetTop() {}
 
+	void SwitchMode(int l_mode);
 	int GetMode() const {
 		return m_mode;
 	}

@@ -114,6 +114,14 @@ void ThemeManager::Initiate()
 	tmpSprite.setTextureRect(sf::IntRect(0, 157, 1120, 691));
 	ThemeSprite1->emplace(std::pair{ ElementName::DisplayArea, ElementState::Neutral }, tmpSprite);
 
+	//Tab sprite
+
+	tmpSprite.setTextureRect(sf::IntRect(0, 0, 277, 59));
+	ThemeSprite1->emplace(std::pair{ ElementName::Tab, ElementState::Clicked }, tmpSprite);
+	ThemeSprite1->emplace(std::pair{ ElementName::Tab, ElementState::Focused }, tmpSprite);
+	tmpSprite.setTextureRect(sf::IntRect(277, 0, 277, 59));
+	ThemeSprite1->emplace(std::pair{ ElementName::Tab, ElementState::Neutral }, tmpSprite);
+
 	//Playbar sprite
 
 	tmpSprite.setTextureRect(sf::IntRect(0, 848, 1120, 20));

@@ -110,5 +110,5 @@ void MediaButton::Draw() {
 }
 
 void MediaButton::SetTheme(int l_themeID) {
-
+	m_themeID = l_themeID;
 }

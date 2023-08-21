@@ -13,9 +13,11 @@ using NodeColor = std::vector<std::map<NodeState, std::tuple<sf::Color, sf::Colo
 
 enum class StateType;
 
+class CodeWindow;
+
 class NodeRenderer {
 private:
-	CodeWindow m_codeWindow;
+	CodeWindow* m_codeWindow{ nullptr };
 
 	std::vector<NodeGraphics> m_nodeGraphics;
 	sf::Sprite m_arrowSprite;
@@ -66,31 +68,8 @@ private:
 	}
 
 public:
-	NodeRenderer(StateManager* l_manager) {
-		m_stateManager = l_manager;
-		m_nodeGraphics.resize(3);
-		m_nodeColor.resize(4);
-
-		m_texture.loadFromFile("Assets/Texture/NodeSheet.png");
-		m_texture.setSmooth(1);
-
-		m_arrowTexture.loadFromFile("Assets/Texture/Arrow.png");
-		m_arrowTexture.setSmooth(1);
-
-		m_font.loadFromFile("Assets/Font/monofonto rg.otf");
-
-		m_label.setFont(m_font);
-		m_label.setCharacterSize(20);
-		m_sideLabel.setFont(m_font);
-		m_sideLabel.setCharacterSize(15);
-
-		sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
-		m_codeWindow.setWindow(wind);
-		
-		PrepareSprite();
-	}
-
-	~NodeRenderer() {}
+	NodeRenderer(StateManager* l_manager);
+	~NodeRenderer();
 
 	void PrepareSprite();
 	NodeGraphics* GetNodeGraphics(int valueNum);
@@ -117,11 +96,15 @@ public:
 	void DrawNode(Node* Cur, bool Directed);
 	void DrawArrow();
 
+	void DrawGraph(GraphNode* Root);
+	void DrawGraphNode(GraphNode* Root);
+
 	void DrawCodeWindow();
 
 	std::tuple<sf::Color, sf::Color, sf::Color>* GetNodeColor(int ThemeID, NodeState l_state);
 
 	sf::Vector2f GetPosOnScreen(std::pair<float, float> treeCoord);
+	sf::Vector2f GetPosOnScreen(sf::Vector2f treecoord);
 	sf::Color GetColorTransition(float percent, const sf::Color& start, const sf::Color& end);
 	int GetStep();
 
@@ -157,12 +140,9 @@ public:
 		m_curState = l_type;
 	}
 
-	void SwitchTheme(int l_theme) {
-		m_theme = l_theme;
-		m_codeWindow.SwitchTheme(l_theme);
-	}
+	void SwitchTheme(int l_theme);
 
-	void ResetCodeWindow() {
-		m_codeWindow.Reset();
-	}
+	void ResetCodeWindow();
+
+	CodeWindow* GetCodeWindow();
 };

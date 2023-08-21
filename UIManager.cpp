@@ -1,12 +1,21 @@
 #include "UIManager.h"
 //#include "AVL_Tree.h"
 
+const sf::Color DarkBlue = sf::Color(45, 55, 73);
+const sf::Color LightBlue = sf::Color(53, 66, 89);
+const sf::Color LightBeige = sf::Color(240, 233, 210);
+
 UIManager::UIManager(StateManager* stateManager) {
 	std::cerr << "UIManager safe\n";
 
 	m_elements.resize(5);
 	m_themeManager = new ThemeManager;
 	m_stateManager = stateManager;
+	//m_codeWindow = m_stateManager->GetContext()->m_nodeRenderer->GetCodeWindow();
+
+	m_font.loadFromFile("Assets/Font/Garet-Book.ttf");
+	m_stateTitle.setFont(m_font);
+	m_stateTitle.setCharacterSize(60);
 
 	PrepareElements();
 	PrepareStateUI();
@@ -25,6 +34,10 @@ UIManager::~UIManager() {
 		for (auto element : layer) {
 			delete element;
 		}
+	}
+
+	for (auto tab : m_tabs) {
+		delete tab;
 	}
 
 	delete m_themeManager;
@@ -108,6 +121,29 @@ void UIManager::PrepareElements() {
 
 	AddToCloset(searchDrawer);
 
+	//MST Drawer
+	Drawer* mstDrawer = new Drawer(this, "MST");
+	InputButton* mstInput = new InputButton(this, nullptr, nullptr, Execute::Search);
+	AddToCloset(mstDrawer);
+
+	//Dijkstra Drawer
+	//Connected Components Drawer
+
+	//Tabs
+	Tab* tabChaining = new Tab(this, StateType::Hash_Table, 0);
+	tabChaining->isActivated = 1;
+	Tab* tabLinear = new Tab(this, StateType::Hash_Table, 1);
+	Tab* tabQuadratic = new Tab(this, StateType::Hash_Table, 2);
+	Tab* tabMax = new Tab(this, StateType::Heap, 0);
+	tabMax->isActivated = 1;
+	Tab* tabMin = new Tab(this, StateType::Heap, 1);
+
+	AddToTabs(tabChaining);
+	AddToTabs(tabLinear);
+	AddToTabs(tabQuadratic);
+	AddToTabs(tabMax);
+	AddToTabs(tabMin);
+
 	//Display
 
 	//StaticElement* displayArea = new StaticElement(this, ElementName::DisplayArea);
@@ -177,12 +213,17 @@ void UIManager::PrepareElements() {
 	GoToButton* goToTrie = new GoToButton(this, StateType::Trie);
 	goToTrie->SetPosition(sf::Vector2f(628, 592));
 	AddElement(goToTrie);
+
+	GoToButton* goToHeap = new GoToButton(this, StateType::Heap);
+	goToHeap->SetPosition(sf::Vector2f(1109, 262));
+	AddElement(goToHeap);
 }
 
 void UIManager::PrepareStateUI() {
 	UIData data;
 
-	//Closet Mask: 00001 - Create(HashTable), 00010 - Create(Normal), 00100 - Insert, 01000 - Remove, 10000 - Search
+	//Closet Mask: 00001 - Create(HashTable), 00010 - Create(Normal), 00100 - Insert, 01000 - Remove, 10000 - Search, 100000 - 32 - MST, 64 - DJK, 128 - CC 
+	//Tab Mask: 00001 - Chaining, 00010 - Linear, 00100 - Quadratic, 01000 - Max, 10000 - Min
 
 	//Menu
 	data.closetMask = 0;
@@ -205,17 +246,23 @@ void UIManager::PrepareStateUI() {
 	//Hash Table
 	data.closetMask = 29;
 	data.isMenu = 0;
-	data.tabMask = 0; //Subject to change, HT has 3 modes
+	data.tabMask = 7;
 
 	m_uiData.emplace(StateType::Hash_Table, data);
 
 	//Heap
 	data.closetMask = 14;
 	data.isMenu = 0;
-	data.tabMask = 0; //Subject to change, Heap has 2 modes
+	data.tabMask = 24;
 
 	m_uiData.emplace(StateType::Heap, data);
 
+	//Graph
+	data.closetMask = 226;
+	data.isMenu = 0;
+	data.tabMask = 0;
+
+	m_uiData.emplace(StateType::Graph, data);
 }
 
 void UIManager::HandleEvent(sf::Event* l_event) {
@@ -229,6 +276,7 @@ void UIManager::HandleEvent(sf::Event* l_event) {
 	}
 
 	HandleEventCloset(l_event);
+	HandleEventTabs(l_event);
 	HandleEventMediaButtons(l_event);
 }
 
@@ -250,6 +298,15 @@ void UIManager::HandleEventMediaButtons(sf::Event* l_event) {
 	}
 }
 
+void UIManager::HandleEventTabs(sf::Event* l_event) {
+	for (auto tab : m_tabs) {
+		if (tab->GetState() == ElementState::Hidden || tab->GetState() == ElementState::Deactivate)
+			continue;
+
+		tab->HandleEvent(l_event);
+	}
+}
+
 void UIManager::AddElement(BaseElement* element) {
 	m_elements[element->GetLayer()].push_back(element);
 }
@@ -262,11 +319,42 @@ void UIManager::AddMediaButton(MediaButton* element) {
 	m_mediaButtons.push_back(element);
 }
 
+void UIManager::AddToTabs(Tab* element) {
+	m_tabs.push_back(element);
+}
+
 void UIManager::SwitchState(StateType l_type) {
 	std::cerr << "Switching UI to state: " << (int)l_type << std::endl;
 
 	m_uiState = l_type;
 	LoadUI(l_type);
+
+	switch (l_type) {
+	case StateType::AVLTree:
+		m_stateTitle.setCharacterSize(60);
+		m_stateTitle.setString("AVL TREE");
+		break;
+	case StateType::Hash_Table:
+		m_stateTitle.setCharacterSize(40);
+		m_stateTitle.setString("HASH TABLE");
+		break;
+	case StateType::TTFTree:
+		m_stateTitle.setCharacterSize(60);
+		m_stateTitle.setString("234 TREE");
+		break;
+	case StateType::Trie:
+		m_stateTitle.setCharacterSize(60);
+		m_stateTitle.setString("TRIE");
+		break;
+	case StateType::Heap:
+		m_stateTitle.setCharacterSize(60);
+		m_stateTitle.setString("HEAP");
+		break;
+	case StateType::Menu:
+		m_stateTitle.setCharacterSize(60);
+		m_stateTitle.setString("");
+		break;
+	}
 }
 
 void UIManager::LoadUI(StateType l_type) {
@@ -295,8 +383,9 @@ void UIManager::LoadUI(StateType l_type) {
 	}
 
 	for (int i = 0; i < m_closet.size(); i++) {
-		if (data.closetMask & (1 << i))
-			m_closet[i]->SetState(ElementState::Neutral);
+		if (data.closetMask & (1 << i)) {
+			m_closet[i]->Reset();
+		}
 		else
 			m_closet[i]->SetState(ElementState::Hidden);
 	}
@@ -307,10 +396,33 @@ void UIManager::LoadUI(StateType l_type) {
 		else
 			m_mediaButtons[i]->SetState(ElementState::Hidden);
 	}
+
+	for (int i = 0; i < m_tabs.size(); i++) {
+		if (data.tabMask & (1 << i)) {
+			if (m_tabs[i]->isActivated) {
+				m_tabs[i]->SetState(ElementState::Clicked);
+			}
+			else {
+				m_tabs[i]->SetState(ElementState::Neutral);
+			}
+		} else {
+			m_tabs[i]->SetState(ElementState::Hidden);
+		}
+	}
+
+	m_stateManager->GetContext()->m_nodeRenderer->GetCodeWindow()->Clear();
+	m_stateManager->GetContext()->m_nodeRenderer->Reset(0);
 }
 
 void UIManager::LoadTheme(int l_ID) {
 	m_theme = l_ID;
+
+	if (m_theme == 0) {
+		m_stateTitle.setFillColor(LightBeige);
+	}
+	else {
+		m_stateTitle.setFillColor(DarkBlue);
+	}
 }
 
 void UIManager::Update(const sf::Time& l_time) {
@@ -325,6 +437,7 @@ void UIManager::Update(const sf::Time& l_time) {
 
 	UpdateCloset(l_time);
 	UpdateMediaButtons(l_time);
+	UpdateTabs(l_time);
 }
 
 void UIManager::Draw() {
@@ -339,6 +452,19 @@ void UIManager::Draw() {
 
 	DrawCloset();
 	DrawMediaButtons();
+	DrawTabs();
+	
+	m_stateManager->GetContext()->m_nodeRenderer->DrawCodeWindow();
+
+	sf::RenderWindow* wind = m_stateManager->GetContext()->m_wind->GetRenderWindow();
+	sf::Vector2f offset = m_stateManager->GetContext()->m_wind->GetOffset();
+		
+	if (m_uiState != StateType::Hash_Table)
+		m_stateTitle.setPosition(offset.x + 130, offset.y + 12);
+	else
+		m_stateTitle.setPosition(offset.x + 130, offset.y + 27);
+
+	wind->draw(m_stateTitle);
 }
 
 void UIManager::UpdateCloset(const sf::Time& l_time) {
@@ -389,4 +515,72 @@ void UIManager::DrawMediaButtons() {
 
 		button->Draw();
 	}
+}
+
+void UIManager::UpdateTabs(const sf::Time& l_time) {
+	for (auto tab : m_tabs) {
+		if (tab->GetState() == ElementState::Hidden)
+			continue;
+
+		tab->Update(l_time.asMilliseconds());
+	}
+}
+
+void UIManager::DrawTabs() {
+	bool tabSwitched = false;
+
+	float Left = 875;
+	float Top = 45;
+
+	for (auto tab : m_tabs) {
+		if (tab->GetState() == ElementState::Hidden)
+			continue;
+
+		if (tab->GetState() == ElementState::Focused) {
+			tabSwitched = true;
+		}
+
+		Left -= 213;
+	}
+
+	Left += 213;
+
+	Tab* active = nullptr;
+
+	for (int i = m_tabs.size() - 1; i >= 0; i--) {
+		Tab* tab = m_tabs[i];
+		if (tab->GetState() == ElementState::Hidden)
+			continue;
+
+		if (tabSwitched) {
+			if (tab->GetState() != ElementState::Focused) {
+				tab->SetState(ElementState::Neutral);
+				tab->SetPosition(sf::Vector2f(Left, Top));
+				tab->Draw();
+				tab->isActivated = false;
+			}
+			else {
+				tab->SetState(ElementState::Clicked);
+				tab->SetPosition(sf::Vector2f(Left, Top));
+				active = tab;
+			}
+		}
+		else {
+			if (tab->GetState() == ElementState::Clicked) {
+				tab->SetPosition(sf::Vector2f(Left, Top));
+				active = tab;
+			}
+			else {
+				tab->SetState(ElementState::Neutral);
+				tab->SetPosition(sf::Vector2f(Left, Top));
+				tab->Draw();
+			}
+
+		}
+
+		Left += 213;
+	}
+
+	if (active != nullptr)
+		active->Draw();
 }

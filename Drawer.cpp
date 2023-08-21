@@ -159,8 +159,6 @@ void Drawer::AddElement(int level, BaseElement* l_element) {
 void Drawer::SetElementPosition(const float& l_percent) {
 	float level_offset = m_sprite->getLocalBounds().height + VERTICAL_SPACING;
 
-
-
 	for (int i = 0; i < m_elements.size(); ++i) {
 		if (m_elements[i].size() == 0) {
 			continue;
@@ -170,7 +168,6 @@ void Drawer::SetElementPosition(const float& l_percent) {
 			for (int j = 0; j < m_elements[i].size(); ++j) {
 				m_elements[i][j]->SetState(ElementState::Hidden);
 			}
-
 			continue;
 		}
 		
@@ -192,7 +189,6 @@ void Drawer::SetElementPosition(const float& l_percent) {
 		}
 
 		m_heightSpanned = std::max(m_sprite->getLocalBounds().height + VERTICAL_SPACING, level_offset * l_percent + ELEMENT_HEIGHT + VERTICAL_SPACING);
-
 		level_offset += ELEMENT_HEIGHT + VERTICAL_SPACING;
 	}
 

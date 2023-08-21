@@ -16,12 +16,14 @@
 #include "GoBackButton.h"
 #include "GoToButton.h"
 #include "ViewButton.h"
+#include "Tab.h"
 
 class BaseElement;
 
 class StateManager;
 class ThemeManager;
 class MediaButton;
+class Tab;
 
 enum class StateType;
 
@@ -38,12 +40,15 @@ private:
 
 	std::vector<std::vector<BaseElement*>> m_elements;
 	std::vector<Drawer*> m_closet;
+	std::vector<Tab*> m_tabs;
 	std::vector<MediaButton*> m_mediaButtons;
+	//CodeWindow* m_codeWindow;
 
 	StateManager* m_stateManager;
 	ThemeManager* m_themeManager;
 
 	sf::Font m_font;
+	sf::Text m_stateTitle;
 
 	StateType m_uiState;
 	int m_theme{ 0 };
@@ -58,6 +63,7 @@ public:
 
 	void HandleEvent(sf::Event* l_event);
 	void HandleEventCloset(sf::Event* l_event);
+	void HandleEventTabs(sf::Event* l_event);
 	void HandleEventMediaButtons(sf::Event* l_event);
 
 	sf::Font* GetFont();
@@ -70,12 +76,15 @@ public:
 	void AddElement(BaseElement* element);
 	void AddToCloset(Drawer* element);
 	void AddMediaButton(MediaButton* element);
+	void AddToTabs(Tab* element);
 
 	void Update(const sf::Time& l_time);
 	void UpdateCloset(const sf::Time& l_time);
+	void UpdateTabs(const sf::Time& l_time);
 	void UpdateMediaButtons(const sf::Time& l_time);
 	void Draw();
 	void DrawCloset();
+	void DrawTabs();
 	void DrawMediaButtons();
 	void CloseCloset();
 
