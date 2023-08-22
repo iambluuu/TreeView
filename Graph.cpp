@@ -3,12 +3,14 @@
 
 const float TIME_CONST = 0.2f;
 
-const float RADIUS = 100.f;
+const float RADIUS = 150.f;
 
 const float TOP = 110.f;
 const float BOT = 110.f + 680.f;
 const float LEFT = 0.f + 1500.f;
 const float RIGHT = 2 * 592.f + 1500.f;
+
+const sf::Vector2f CENTER = { (LEFT + RIGHT) / 2, (TOP + BOT) / 2 };
 
 Graph::~Graph() {
 	ClearGraph();
@@ -91,7 +93,7 @@ bool Graph::ValidateInput(const std::string& l_value) {
 	return true;
 }
 
-bool Graph::ValidateCreate(const std::string& l_value, std::vector<std::pair<std::string, std::pair<std::string, int> > >& edges) {
+bool Graph::ValidateCreate(const std::string& l_value) {
 
 	for (int i = 0; i < l_value.size(); ) {
 		int j = i;
@@ -110,7 +112,14 @@ bool Graph::ValidateCreate(const std::string& l_value, std::vector<std::pair<std
 			return false;
 		}
 
-		edges.push_back(std::make_pair(u, std::make_pair(v, w)));
+		if (u == v)
+			continue;
+
+		if (m_edges.find({ u, v }) == m_edges.end() && m_edges.find({v, u}) == m_edges.end()) {
+			m_edges.emplace( std::pair{u, v}, w);
+		}
+
+
 		i = j + 1;
 	}
 
@@ -180,6 +189,13 @@ void Graph::ApplyAcc() {
 			}
 		}
 	}
+
+	//float toward center
+	for (auto& u : m_nodes) {
+		float distFromCenter = sqrt(pow(u->pos.x - CENTER.x, 2) + pow(u->pos.y - CENTER.y, 2));
+
+		u->m_vel += (CENTER - u->pos) / distFromCenter * distFromCenter / (25 * TIME_CONST);
+	}
 }
 
 void Graph::MoveNode(GraphNode* Cur, const float& l_time) {
@@ -192,9 +208,8 @@ void Graph::MoveNode(GraphNode* Cur, const float& l_time) {
 }
 
 void Graph::OnCreate(const std::string& l_numbers, const std::string& l_value) {
-	std::vector<std::pair<std::string, std::pair<std::string, int> > > edges;
 	
-	if (!ValidateCreate(l_value, edges)) {
+	if (!ValidateCreate(l_value)) {
 		std::cerr << "Invalid input" << std::endl;
 		return;
 	}
@@ -203,10 +218,11 @@ void Graph::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 
 	ClearGraph();
 
-	for (int i = 0; i < edges.size(); i++) {
-		std::string u = edges[i].first, v = edges[i].second.first;
-		int w = edges[i].second.second;
-
+	for (auto& edge: m_edges) {
+		std::string u = edge.first.first;
+		std::string v = edge.first.second;
+		int w = edge.second;
+		
 		GraphNode* U = nullptr, *V = nullptr;
 
 		if (m_registered.find(u) == m_registered.end()) {
@@ -235,8 +251,7 @@ void Graph::OnCreate(const std::string& l_numbers, const std::string& l_value) {
 		V->m_edges.push_back(std::make_pair(U, w));
 	}
 
-	m_nodes[0]->isFixed = 1;
-	m_nodes[0]->pos = { (LEFT + RIGHT) / 2, (TOP + BOT) / 2 };
+	m_nodes[0]->pos = CENTER;
 
 	AddNewStep();
 	renderer->Reset(m_nodes[0]->m_info.size());

@@ -85,13 +85,6 @@ public:
 	void Update(const float& l_fT);
 	void Reset(const int& l_stepNum);
 	
-	void SplitNode(const NodeInfo& l_info, float percent);
-	void ExpandNode(const NodeInfo& l_info, float percent);
-	void SpawnNode(const NodeInfo& l_info, float percent);
-	void ChangeState(const NodeInfo& l_info, float percent);
-	void DespawnNode(const NodeInfo& l_info, float percent);
-	void MoveNode(const NodeInfo& l_info, float percent);
-	
 	void DrawTree(Node* Root);
 	void DrawNode(Node* Cur, bool Directed);
 	void DrawArrow();

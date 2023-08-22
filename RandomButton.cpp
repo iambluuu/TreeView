@@ -43,7 +43,7 @@ void RandomButton::SetRandom() {
 			return;
 		}
 
-		n = rand() % 10 + 1;
+		n = rand() % 20 + 1;
 
 		for (int i = 0; i < n; i++) {
 			char x = 'A' + rand() % n + 1;

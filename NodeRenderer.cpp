@@ -723,6 +723,7 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 			continue;
 
 		int weight = edge.second;
+		std::cerr << weight << std::endl;
 		sf::Vector2f vCoord = v->pos;
 
 		float dist = sqrt(pow(coord.x - vCoord.x, 2) + pow(coord.y - vCoord.y, 2)) - 20;
@@ -757,13 +758,16 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 			wind->draw(*arrow);
 		}
 
-		//m_sideLabel.setFillColor(std::get<0>(*endColor));
-		//m_sideLabel.setString(std::to_string(weight));
-		//m_sideLabel.setOrigin(m_sideLabel.getLocalBounds().left + m_sideLabel.getLocalBounds().width / 2, m_sideLabel.getLocalBounds().top + m_sideLabel.getLocalBounds().height / 2);
+		m_sideLabel.setFillColor(std::get<0>(*endColor));
+		m_sideLabel.setString(std::to_string(weight));
+		m_sideLabel.setCharacterSize(20);
+		m_sideLabel.setOrigin(m_sideLabel.getLocalBounds().left + m_sideLabel.getLocalBounds().width / 2, m_sideLabel.getLocalBounds().top + m_sideLabel.getLocalBounds().height / 2);
 
-		//sf::Vector2f WeightPos = (coord + vCoord) / 2.f;
-		//WeightPos.y -= 10;
-		//m_sideLabel.setPosition((coord + vCoord) / 2.f);
+		sf::Vector2f WeightPos = (coord + vCoord) / 2.f;
+		WeightPos.y -= 10;
+		m_sideLabel.setPosition(WeightPos);
+
+		wind->draw(m_sideLabel);
 	}
 	/////////////////////////////////////
 

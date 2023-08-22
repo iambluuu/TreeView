@@ -31,7 +31,6 @@ ThemeManager::ThemeManager() {
 
 	Initiate();
 	std::cerr << "ThemeManager Initiated\n";
-
 }
 
 sf::Color* ThemeManager::GetColor(int ThemeID, ElementName l_name, ElementState l_state) {

@@ -8,6 +8,7 @@ private:
 
 	std::vector<GraphNode*> m_nodes;
 	std::map<std::string, GraphNode*> m_registered;
+	std::map<std::pair<std::string, std::string>, int> m_edges;
 
 	void ResetNodes();
 	void AddNewStep();
@@ -17,14 +18,12 @@ private:
 	void MoveNode(GraphNode* Cur, const float& l_time);
 
 	bool ValidateInput(const std::string& l_value);
-	bool ValidateCreate(const std::string& l_value, std::vector<std::pair<std::string, std::pair<std::string, int> > >& edges);
+	bool ValidateCreate(const std::string& l_value);
 
 	void PostProcessing();
 	void ClearGraph();
 public:
-	Graph(StateManager* l_stateManager) : BaseState(l_stateManager) {
-
-	}
+	Graph(StateManager* l_stateManager) : BaseState(l_stateManager) { }
 
 	~Graph();
 

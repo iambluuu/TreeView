@@ -124,10 +124,26 @@ void UIManager::PrepareElements() {
 	//MST Drawer
 	Drawer* mstDrawer = new Drawer(this, "MST");
 	InputButton* mstInput = new InputButton(this, nullptr, nullptr, Execute::Search);
+	mstDrawer->AddElement(0, mstInput);
 	AddToCloset(mstDrawer);
 
 	//Dijkstra Drawer
+	Drawer* dijkstraDrawer = new Drawer(this, "Dijkstra");
+	TextBox* dijkstraBox = new TextBox(this, "s =");
+	dijkstraBox->max_input_char = 1;
+	RandomButton* dijkstraRandom = new RandomButton(this, dijkstraBox, nullptr);
+	InputButton* dijkstraInput = new InputButton(this, nullptr, dijkstraBox, Execute::Insert);
+
+	dijkstraDrawer->AddElement(0, dijkstraBox);
+	dijkstraDrawer->AddElement(0, dijkstraRandom);
+	dijkstraDrawer->AddElement(0, dijkstraInput);
+
 	//Connected Components Drawer
+	Drawer* ccDrawer = new Drawer(this, "CC");
+	InputButton* ccInput = new InputButton(this, nullptr, nullptr, Execute::Remove);
+	ccDrawer->AddElement(0, ccInput);
+	AddToCloset(ccDrawer);
+
 
 	//Tabs
 	Tab* tabChaining = new Tab(this, StateType::Hash_Table, 0);
@@ -217,6 +233,10 @@ void UIManager::PrepareElements() {
 	GoToButton* goToHeap = new GoToButton(this, StateType::Heap);
 	goToHeap->SetPosition(sf::Vector2f(1109, 262));
 	AddElement(goToHeap);
+
+	GoToButton* goToGraph = new GoToButton(this, StateType::Graph);
+	goToGraph->SetPosition(sf::Vector2f(1109, 592));
+	AddElement(goToGraph);
 }
 
 void UIManager::PrepareStateUI() {
@@ -353,6 +373,10 @@ void UIManager::SwitchState(StateType l_type) {
 	case StateType::Menu:
 		m_stateTitle.setCharacterSize(60);
 		m_stateTitle.setString("");
+		break;
+	case StateType::Graph:
+		m_stateTitle.setCharacterSize(60);
+		m_stateTitle.setString("GRAPH");
 		break;
 	}
 }

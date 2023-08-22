@@ -138,7 +138,7 @@ public:
 	}
 
 	int getValue(NodeLink l_pos) {
-		switch (l_pos) {
+		switch (l_pos) {	
 		case NodeLink::NLeft:
 			return m_value[0];
 		case NodeLink::NRight:
