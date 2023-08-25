@@ -18,7 +18,7 @@ private:
 
 	Node* m_root{ nullptr };
 	Node* m_newNode{ nullptr };
-	Node* m_removedNode{ nullptr };
+	std::vector<Node*> m_removedNode;
 
 	void InsertNode(Node* Cur, int value);
 	void RemoveNode(Node* Cur, int value);
@@ -27,10 +27,13 @@ private:
 	void ExpandNode(Node* Cur, int value);
 	void CollapseNode(Node* Cur, int value);
 	void SplitNode(Node* Cur);
+	void MergeNode(Node* Cur);
 
 	void InsertToRow(Node* Cur, Node* LeftOfCur, int row);
+	void RemoveFromRow(Node* Cur, int row);
 	void Aligning();
 	void ShiftDown();
+	void ShiftUp();
 
 	bool ValidateInput(const std::string& l_value, int& resValue);
 	bool ValidateCreate(const std::string& l_value, std::vector<int>& res);
@@ -40,6 +43,8 @@ private:
 
 	void ClearTree(Node* Cur);
 	void ClearAlign();
+
+	void PostProcessing();
 
 public:
 	TTF_Tree(StateManager* l_stateManager) : BaseState(l_stateManager) {

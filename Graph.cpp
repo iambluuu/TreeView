@@ -1,7 +1,7 @@
 #include "Graph.h"
 #include <sstream>
 
-const float TIME_CONST = 0.2f;
+const float TIME_CONST = 0.1f;
 
 const float RADIUS = 150.f;
 
