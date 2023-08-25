@@ -93,6 +93,7 @@ void PlayBar::Update(float l_dT) {
 		m_percent = nodeRenderer->GetProgress();
 	}
 
+	m_sprite = m_themeManager->GetSprite(m_themeID, m_name, m_state);
 	m_playedSprite->setTextureRect(sf::IntRect(0, 867, m_sprite->getLocalBounds().width * m_percent, 20));
 }
 

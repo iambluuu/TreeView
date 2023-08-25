@@ -3,15 +3,16 @@
 
 const sf::Color Black = sf::Color::Black;
 const sf::Color White = sf::Color::White;
-const sf::Color Green = sf::Color(103, 137, 131);
+const sf::Color Green = sf::Color(103, 137, 131, 255);
 
-const sf::Color DarkBlue = sf::Color(45, 55, 73);
-const sf::Color LightBlue = sf::Color(53, 66, 89);
-const sf::Color LightBeige = sf::Color(240, 233, 210);
+const sf::Color Navy = sf::Color(24, 29, 49, 255);
+const sf::Color DarkBlue = sf::Color(45, 55, 73, 255);
+const sf::Color LightBlue = sf::Color(53, 66, 89, 255);
+const sf::Color LightBeige = sf::Color(240, 233, 210, 255);
 
-const sf::Color Fulvous = sf::Color(228, 132, 0);
-const sf::Color Skyblue = sf::Color(66, 103, 178);
-const sf::Color Crimson = sf::Color(178, 16, 49);
+const sf::Color Fulvous = sf::Color(228, 132, 0, 255);
+const sf::Color Skyblue = sf::Color(66, 103, 178, 255);
+const sf::Color Crimson = sf::Color(178, 16, 49, 255);
 
 NodeRenderer::NodeRenderer(StateManager* l_manager) {
 	m_stateManager = l_manager;
@@ -19,7 +20,7 @@ NodeRenderer::NodeRenderer(StateManager* l_manager) {
 	m_nodeColor.resize(4);
 
 	m_texture.loadFromFile("Assets/Texture/NodeSheet.png");
-	m_texture.setSmooth(1);
+	m_texture.setSmooth(0);
 
 	m_arrowTexture.loadFromFile("Assets/Texture/Arrow.png");
 	m_arrowTexture.setSmooth(1);
@@ -54,6 +55,15 @@ void NodeRenderer::PrepareSprite() {
 	NodeColors0->emplace( NodeState::Found, std::tuple<sf::Color, sf::Color, sf::Color>(Skyblue, Skyblue, White) );
 	NodeColors0->emplace( NodeState::NotFound, std::tuple<sf::Color, sf::Color, sf::Color>(Fulvous, Fulvous, White) );
 	NodeColors0->emplace( NodeState::InRemove, std::tuple<sf::Color, sf::Color, sf::Color>(Crimson, Crimson, White) );
+
+	auto NodeColors1 = &m_nodeColor[1];
+	NodeColors1->emplace(NodeState::Default, std::tuple<sf::Color, sf::Color, sf::Color>(LightBeige, Navy, LightBeige));
+	NodeColors1->emplace(NodeState::Selected, std::tuple<sf::Color, sf::Color, sf::Color>(Green, Green, White));
+	NodeColors1->emplace(NodeState::Marked, std::tuple<sf::Color, sf::Color, sf::Color>(Skyblue, White, Skyblue));
+	NodeColors1->emplace(NodeState::Visited, std::tuple<sf::Color, sf::Color, sf::Color>(Green, White, Green));
+	NodeColors1->emplace(NodeState::Found, std::tuple<sf::Color, sf::Color, sf::Color>(Skyblue, Skyblue, White));
+	NodeColors1->emplace(NodeState::NotFound, std::tuple<sf::Color, sf::Color, sf::Color>(Fulvous, Fulvous, White));
+	NodeColors1->emplace(NodeState::InRemove, std::tuple<sf::Color, sf::Color, sf::Color>(Crimson, Crimson, White));
 
 
 	int sizeX = 46;
@@ -172,6 +182,10 @@ void NodeRenderer::OnReplay() {
 }
 
 void NodeRenderer::HandleEvent(sf::Event* l_event) {
+	Window* window = m_stateManager->GetContext()->m_wind;
+
+	if (window->isOverlayed())
+		return;
 
 	if (l_event->type == sf::Event::KeyPressed) {
 		switch (l_event->key.code) {
@@ -647,7 +661,7 @@ sf::Color NodeRenderer::GetColorTransition(float percent, const sf::Color& start
 	}
 
 	if (start.a > end.a) {
-		res.a = start.b - (start.b - end.a) * percent;
+		res.a = start.a - (start.a - end.a) * percent;
 	}
 	else {
 		res.a = start.a + (end.a - start.a) * percent;
@@ -714,17 +728,18 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 	sf::RenderWindow* wind = context->m_wind->GetRenderWindow();
 
 	sf::Vector2f coord = Root->pos;
-
+	
 	//Draw arrow/////////////////////////////
-	for (auto& edge : Root->m_edges) {
+	for (int i = 0; i < Root->m_edges.size(); i++) {
+		auto edge = Root->m_edges[i];
 		GraphNode* v = edge.first;
 
 		if (v->isDrawn)
 			continue;
 
 		int weight = edge.second;
-		std::cerr << weight << std::endl;
 		sf::Vector2f vCoord = v->pos;
+		int arrowState = Root->m_info[CurStep].edge_state[i];
 
 		float dist = sqrt(pow(coord.x - vCoord.x, 2) + pow(coord.y - vCoord.y, 2)) - 20;
 
@@ -733,8 +748,8 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 
 		float angle = atan2(vCoord.y - coord.y, vCoord.x - coord.x);
 
-		auto startColor = GetNodeColor(m_theme, Root->m_info[CurStep].node_state.first);
-		auto endColor = GetNodeColor(m_theme, Root->m_info[CurStep].node_state.second);
+		auto startColor = GetNodeColor(m_theme, v->m_info[CurStep].node_state.first);
+		auto endColor = GetNodeColor(m_theme, v->m_info[CurStep].node_state.second);
 
 		sf::Sprite* arrow = &m_arrowSprite;
 
@@ -743,22 +758,80 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 		arrow->setOrigin(arrow->getLocalBounds().left, arrow->getLocalBounds().top + arrow->getLocalBounds().height / 2);
 		arrow->setPosition(coord);
 		arrow->setRotation(angle * 180 / 3.14159265358979323846);
-		arrow->setColor(std::get<0>(*startColor));
 
-		wind->draw(*arrow);
 
-		if (v->m_info[CurStep].is_stateChanging) {
+		switch (arrowState) {
+		case -1: //Default color - non selected
+			{
+			auto color = GetNodeColor(m_theme, NodeState::Default);
+			arrow->setColor(std::get<0>(*color));
+			m_sideLabel.setFillColor(std::get<0>(*color));
+			wind->draw(*arrow);
+			}
+			
+			break;
 
-			if (Root->m_info[CurStep].node_state.second == NodeState::Visited) 
-				arrow->setTextureRect(sf::IntRect(0, 0 * 22, dist * percent, 22));
-			else if (Root->m_info[CurStep].node_state.second == NodeState::Selected)
-				arrow->setTextureRect(sf::IntRect(0, 0 * 22, dist * (1 - percent), 22));
+		case 0: // Flow from u
+		{
+			auto color = GetNodeColor(m_theme, NodeState::Default);
+			arrow->setColor(std::get<0>(*color));
+			wind->draw(*arrow);
 
+			arrow->setTextureRect(sf::IntRect(0, 0 * 22, dist * percent, 22));
 			arrow->setColor(std::get<0>(*endColor));
+			m_sideLabel.setFillColor(GetColorTransition(percent, std::get<0>(*startColor), std::get<0>(*endColor)));
+			wind->draw(*arrow);
+
+		}
+
+			break;
+
+		case 1: //Flow from v
+		{
+			auto color = GetNodeColor(m_theme, NodeState::Default);
+			arrow->setColor(std::get<0>(*color));
+			wind->draw(*arrow);
+
+			arrow->setTextureRect(sf::IntRect(0, 0 * 22, dist * (1 - percent), 22));
+			arrow->setColor(std::get<0>(*endColor));
+
+			m_sideLabel.setFillColor(GetColorTransition(percent, std::get<0>(*startColor), std::get<0>(*endColor)));
 			wind->draw(*arrow);
 		}
 
-		m_sideLabel.setFillColor(std::get<0>(*endColor));
+			break;
+
+		case 2: //Fade
+		{
+			auto defaultColor = GetNodeColor(m_theme, NodeState::Default);
+			sf::Color color = GetColorTransition(percent, std::get<0>(*defaultColor), std::get<0>(*endColor));
+			arrow->setColor(color);
+			m_sideLabel.setFillColor(color);
+			wind->draw(*arrow);
+		}
+
+			break;
+		case 3: //Selected
+			arrow->setColor(std::get<0>(*endColor));
+			m_sideLabel.setFillColor(std::get<0>(*endColor));
+			wind->draw(*arrow);
+			break;
+
+		case 4: { //Fade out
+			auto defaultColor = GetNodeColor(m_theme, NodeState::Default);
+			sf::Color color = GetColorTransition(percent, std::get<0>(*defaultColor), sf::Color(255, 255, 255, 0));
+
+			std::cerr << "percent: " << percent << std::endl;
+			std::cerr << "Default Color: " << (int)std::get<0>(*defaultColor).r << " " << (int)std::get<0>(*defaultColor).g << " " << (int)std::get<0>(*defaultColor).b << " " << (int)std::get<0>(*defaultColor).a << std::endl;
+			std::cerr << "Color: " << (int)color.r << " " << (int)color.g << " " << (int)color.b << " " << (int)color.a << std::endl;
+			arrow->setColor(color);
+			m_sideLabel.setFillColor(color);
+			wind->draw(*arrow);
+		}
+	
+			break;
+		}
+
 		m_sideLabel.setString(std::to_string(weight));
 		m_sideLabel.setCharacterSize(20);
 		m_sideLabel.setOrigin(m_sideLabel.getLocalBounds().left + m_sideLabel.getLocalBounds().width / 2, m_sideLabel.getLocalBounds().top + m_sideLabel.getLocalBounds().height / 2);
@@ -772,7 +845,7 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 	/////////////////////////////////////
 
 	//Draw node/////////////////////////////
-	NodeGraphics* CurSprite = GetNodeGraphics(1); //do something here 
+	NodeGraphics* CurSprite = GetNodeGraphics(1);
 
 	sf::Sprite* BorderSprite = &CurSprite->first;
 	sf::Sprite* FillerSprite = &CurSprite->second;
@@ -823,4 +896,36 @@ void NodeRenderer::DrawGraphNode(GraphNode* Root) {
 	wind->draw(*BorderSprite);
 	wind->draw(m_label);
 
+	//Draw distance/////////////////////////
+
+	int preDist = Root->m_info[CurStep].m_dist.first;
+	int dist = Root->m_info[CurStep].m_dist.second;
+
+	if (preDist == -1 && dist == -1)
+		return;
+
+	if (preDist == 2e9)
+		m_sideLabel.setString("INF");
+	else
+		m_sideLabel.setString(std::to_string(preDist));
+
+	m_sideLabel.setCharacterSize(20);
+	m_sideLabel.setOrigin(m_sideLabel.getLocalBounds().left + m_sideLabel.getLocalBounds().width / 2, m_sideLabel.getLocalBounds().top + m_sideLabel.getLocalBounds().height / 2);
+	m_sideLabel.setPosition(coord.x, coord.y + 50);
+
+	if (preDist != dist) {
+		m_sideLabel.setFillColor(GetColorTransition(percent, sf::Color::Red, sf::Color(255, 255, 255, 0)));
+		wind->draw(m_sideLabel);
+
+		m_sideLabel.setString(std::to_string(dist));
+		m_sideLabel.setFillColor(GetColorTransition(percent, sf::Color(255, 255, 255, 0), sf::Color::Red));
+		m_sideLabel.setOrigin(m_sideLabel.getLocalBounds().left + m_sideLabel.getLocalBounds().width / 2, m_sideLabel.getLocalBounds().top + m_sideLabel.getLocalBounds().height / 2);
+		m_sideLabel.setPosition(coord.x, coord.y + 50);
+		
+		wind->draw(m_sideLabel);
+	}
+	else {
+		m_sideLabel.setFillColor(sf::Color::Red);
+		wind->draw(m_sideLabel);
+	}
 }

@@ -23,7 +23,9 @@ void StaticElement::SetPosition(sf::Vector2f l_pos) {
 	m_sprite->setPosition(m_pos);
 }
 
-void StaticElement::Update(float l_dT){}
+void StaticElement::Update(float l_dT) {
+	m_sprite = m_themeManager->GetSprite(m_themeID, m_name, ElementState::Neutral);
+}
 
 void StaticElement::Draw() {
 	Window* window = m_owner->GetStateManager()->GetContext()->m_wind;

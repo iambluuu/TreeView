@@ -34,6 +34,10 @@ GoToButton::GoToButton(UIManager* l_owner, StateType l_type)
 	case StateType::TTFTree:
 		m_text.setString("234 Tree");
 		break;
+
+	case StateType::Graph:
+		m_text.setString("Graph");
+		break;
 	}
 
 	m_text.setOrigin(m_text.getLocalBounds().left, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2.f);

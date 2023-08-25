@@ -55,7 +55,7 @@ void Drawer::HandleEvent(sf::Event* l_event) {
 
 	for (auto level : m_elements) {
 		for (auto element : level) {
-			if (element->GetState() == ElementState::Hidden || element->GetState() == ElementState::Deactivate) {
+			if (element->GetState() == ElementState::Hidden || element->GetState() == ElementState::Deactivate || element->GetState() == ElementState::Disabled) {
 				continue;
 			}
 
@@ -112,9 +112,12 @@ void Drawer::Update(float l_dT) {
 	m_sprite = m_themeManager->GetSprite(m_themeID, ElementName::Drawer, m_state);
 	m_sprite->setPosition(m_pos + offset);
 
+	m_arrow = m_themeManager->GetSprite(m_themeID, ElementName::DrawerArrow, ElementState::Neutral);
+	m_arrow->setOrigin(m_arrow->getLocalBounds().left + m_arrow->getLocalBounds().width / 2.f, m_arrow->getLocalBounds().top + m_arrow->getLocalBounds().height / 2.f);
 
 	m_arrow->setPosition(m_pos.x + 30 + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 2 + offset.y);
 	m_text.setPosition(m_pos.x + 30 + m_arrow->getLocalBounds().width + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 2 + offset.y);
+	m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, ElementState::Neutral));
 
 	SetElementPosition(percent);
 	m_arrow->setRotation(90 * percent);
@@ -126,7 +129,7 @@ void Drawer::Draw() {
 	
 	for (int i = 0; i < m_elements.size(); i++) {
 		for (int j = 0; j < m_elements[i].size(); j++) {
-			if (m_elements[i][j]->GetState() == ElementState::Hidden) {
+			if (m_elements[i][j]->GetState() == ElementState::Hidden || m_elements[i][j]->GetState() == ElementState::Disabled) {
 				continue;
 			}
 
@@ -140,6 +143,28 @@ void Drawer::Draw() {
 	wind->draw(m_text);
 }
 
+void Drawer::DeactivateLine(int line) {
+	if (line >= m_elements.size()) {
+		return;
+	}
+
+	std::cerr << "Disabling line " << line << "\n";
+
+	for (int i = 0; i < m_elements[line].size(); i++) {
+		m_elements[line][i]->SetState(ElementState::Disabled);
+	}
+}
+
+void Drawer::ActivateLine(int line) {
+	if (line >= m_elements.size()) {
+		return;
+	}
+
+	for (int i = 0; i < m_elements[line].size(); i++) {
+		m_elements[line][i]->SetState(ElementState::Neutral);
+	}
+}
+
 void Drawer::Clear() {
 	for (int i = 0; i < m_elements.size(); i++) {
 		for (int j = 0; j < m_elements[i].size(); j++) {
@@ -150,6 +175,12 @@ void Drawer::Clear() {
 
 void Drawer::SetTheme(int l_themeID) {
 	m_themeID = l_themeID;
+
+	for (int i = 0; i < m_elements.size(); i++) {
+		for (int j = 0; j < m_elements[i].size(); j++) {
+			m_elements[i][j]->SetTheme(l_themeID);
+		}
+	}
 }
 
 void Drawer::AddElement(int level, BaseElement* l_element) {
@@ -160,7 +191,7 @@ void Drawer::SetElementPosition(const float& l_percent) {
 	float level_offset = m_sprite->getLocalBounds().height + VERTICAL_SPACING;
 
 	for (int i = 0; i < m_elements.size(); ++i) {
-		if (m_elements[i].size() == 0) {
+		if (m_elements[i].size() == 0 || m_elements[i][0]->GetState() == ElementState::Disabled) {
 			continue;
 		}
 

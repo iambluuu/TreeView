@@ -3,7 +3,7 @@
 const sf::Color LightBlue = sf::Color(92, 113, 151);
 const sf::Color DarkBlue = sf::Color(59, 73, 98);
 
-const float TOP_LINE = 631;
+const float TOP_LINE = 645;
 const float LEFT_LINE = 1180;
 
 float CodeWindow::GetLinePosition(int line) {
@@ -11,7 +11,7 @@ float CodeWindow::GetLinePosition(int line) {
 }
 
 void CodeWindow::Reset() {
-	if (!m_lines.empty()) 
+	if (!m_lines.empty())
 		m_lines.clear();
 }
 

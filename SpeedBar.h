@@ -1,18 +1,23 @@
 #pragma once
-#include "TextBox.h"
-#include "Drawer.h"
+#include "UI_Element.h"
+#include "UIManager.h"
+#include "NodeRenderer.h"
 
-class TextBox;
-class Drawer;
+class NodeRenderer;
+class UIManager;
 
-class RandomButton : public BaseElement {
-	friend class Drawer;
+class SpeedBar : public BaseElement {
+	friend class UIManager;
+	friend class NodeRenderer;
+
 private:
 	UIManager* m_owner{ nullptr };
-	TextBox* m_textBox{ nullptr };
+	sf::Sprite* m_knob{ nullptr };
+	int m_level{ 2 };
 
 public:
-	RandomButton(UIManager* m_owner, TextBox* l_textBox);
+	SpeedBar(UIManager* m_owner);
+	~SpeedBar();
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();
@@ -26,6 +31,5 @@ public:
 	void Reset() {}
 
 	void SetTheme(int l_themeID);
-	void SetRandom();
-
 };
+

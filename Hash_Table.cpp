@@ -5,7 +5,32 @@ HashTable::~HashTable() {
 	ClearNodes(m_chainingNodes);
 }
 
+void HashTable::Activate() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	if (m_mode) {
+		if (m_probingNodes.empty())
+			renderer->Reset(0);
+		else
+			renderer->Reset(m_probingNodes[0]->getInfo()->size());
+	}
+	else {
+		if (m_chainingNodes.empty())
+			renderer->Reset(0);
+		else
+			renderer->Reset(m_chainingNodes[0]->getInfo()->size());
+	}
+
+	codeWindow->Clear();
+	renderer->OnSkipForward();
+}
+
+
 void HashTable::PostProccessing() {
+	delete m_removed;
+	m_removed = nullptr;
+
 	ResetNodes();
 
 	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
@@ -66,32 +91,27 @@ bool HashTable::ValidateInput(const std::string& l_value, int& resValue) {
 	return true;
 }
 
-bool HashTable::ValidateCreate(const std::string& l_numbers, const std::string& l_value, int& n, int& m) {
-	if (l_numbers.empty())
-		return false;
-	
-	for (int i = 0; i < l_numbers.size(); i++) {
-		if (!isdigit(l_numbers[i]))
-			return false;
-	}
-	
-	n = std::stoi(l_numbers);
-	if (n < 1 || n > 50)
+bool HashTable::ValidateCreate(const std::string& l_value, int& n, int& m) {
+	if (l_value.empty())
 		return false;
 
 	for (int i = 0; i < l_value.size(); i++) {
-		if (!isdigit(l_value[i]))
+		if (!isdigit(l_value[i]) && l_value[i] != ' ' && l_value[i] != ',')
 			return false;
 	}
+	
+	std::stringstream ss(l_value);
 
-	if (l_value.empty())
-		m = 0;
-	else
-		m = std::stoi(l_value);
+	ss >> n >> m;
 
-	if (m < 1 || (m > n / 2 && m_mode) || (m > 200 && m_mode == 0))
+	if (n < 1 || n > 50)
 		return false;
 
+	if (m < 0 || m > 50)
+		return false;
+
+	if (m_mode != 0 && m > n / 2)
+		return false;
 }
 
 void HashTable::AddNodeStep(Node* node) {
@@ -349,35 +369,46 @@ void HashTable::RemoveChaining(int value) {
 	Cur->getInfo()->back().is_stateChanging = 1;
 	Cur->getInfo()->back().node_state.second = NodeState::Selected;
 
-	Node* preCur = nullptr;
-	while (Cur && Cur->getInfo()->back().m_shownValue[0] != value) {
-		preCur = Cur;
-		Cur = Cur->left;
+	Node* preCur = Cur;
+	Cur = Cur->left;
 
+	while (Cur && Cur->getInfo()->back().m_shownValue[0] != value) {
 		AddNewStep();
 		codeWindow->MoveHighlight(1);
 		Cur->getInfo()->back().is_stateChanging = 1;
-		Cur->getInfo()->back().node_state.first = NodeState::Default;
+		Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+		preCur = Cur;
+		Cur = Cur->left;
+
 	}
 
 	if (!Cur) {
 		AddNewStep();
 		codeWindow->MoveHighlight(-1);
-		Cur->getInfo()->back().is_stateChanging = 1;
-		Cur->getInfo()->back().node_state.second = NodeState::NotFound;
+		preCur->getInfo()->back().is_stateChanging = 1;
+		preCur->getInfo()->back().node_state.second = NodeState::NotFound;
 		return;
 	}
 
 	AddNewStep();
 	codeWindow->MoveHighlight(1);
+	Cur->getInfo()->back().is_stateChanging = 1;
+	Cur->getInfo()->back().node_state.second = NodeState::Selected;
+
+	AddNewStep();
+	codeWindow->MoveHighlight(1);
+
+	m_removed = Cur;
 	Cur->getInfo()->back().is_stateChanging = 0;
 	Cur->getInfo()->back().is_appearing = 2;
+	Cur->getInfo()->back().m_arrowChange[0] = nullptr;
 	
-	ShiftUp(Cur);
+	ShiftUp(Cur->left);
 
 	preCur->left = Cur->left;
-	preCur->getInfo()->back().m_arrowChange[0] = Cur->left;
-	
+	preCur->getInfo()->back().m_arrowChange[0] = preCur->left;
+	Cur->left = nullptr;
 }
 
 void HashTable::RemoveLinearProbing(int value) {
@@ -584,9 +615,9 @@ void HashTable::SearchQuadraticProbing(int value) {
 	}
 }
 
-void HashTable::OnCreate(const std::string& l_numbers, const std::string& l_value) {
-	int n = 0, m = 0;
-	if (!ValidateCreate(l_numbers, l_value, n, m)) {
+void HashTable::OnCreate(const std::string& l_value) {
+	int n = -1, m = -1;
+	if (!ValidateCreate(l_value, n, m)) {
 		std::cerr << "Invalid input\n";
 		return;
 	}
@@ -914,6 +945,8 @@ void HashTable::Draw() {
 		for (auto& node : m_chainingNodes) {
 			nodeRenderer->DrawTree(node);
 		}
+
+		nodeRenderer->DrawTree(m_removed);
 	}
 	else {
 		for (auto& node : m_probingNodes) {

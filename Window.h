@@ -2,9 +2,16 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 #include "SFML/System.hpp"
+
 #include "UIManager.h"
 #include "StateManager.h"
+#include "Page.h"
 
+#include <Windows.h>
+#include <commdlg.h>
+#include <shlobj.h>
+
+class Page;
 class UIManager;
 class StateManager;
 
@@ -22,9 +29,11 @@ private:
 	sf::RenderWindow m_window;
 	bool m_isDone;
 	bool m_isFullscreen;
+	bool m_isOverlayed{ 0 };
 
 	UIManager* m_uiManager{ nullptr };
 	StateManager* m_stateManager{ nullptr };
+	Page* m_page{ nullptr };
 
 	sf::View m_view;
 
@@ -43,6 +52,15 @@ public:
 	void Update();
 	void UpdateCursor();
 	void Draw(sf::Drawable& l_drawable);
+	void DrawPage();
+
+	void setOverlayed(bool l_overlayed) {
+		m_isOverlayed = l_overlayed;
+	}
+
+	bool isOverlayed() {
+		return m_isOverlayed;
+	}
 
 	bool IsDone();
 	bool IsFullscreen();
@@ -64,6 +82,8 @@ public:
 	sf::RenderWindow* GetRenderWindow() {
 		return &m_window;
 	}
+
+	Page* GetPage();
 
 	void setCursorType(int l_cursorType) {
 		m_cursorType = std::max(m_cursorType, l_cursorType);

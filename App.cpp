@@ -30,6 +30,7 @@ void App::Render() {
 	m_window.BeginDraw();
 	m_stateManager.Draw();
 	m_uiManager.Draw();
+	m_window.DrawPage();
 	m_window.EndDraw();
 }
 

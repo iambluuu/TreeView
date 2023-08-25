@@ -5,7 +5,7 @@ class TextBox;
 class Drawer;
 
 enum class Execute {
-	Insert = 1, Create, Remove, Search, Clear, Random
+	Insert = 1, Create, Remove, Search, Clear, Random, InputMatrix, GetSize, GetTop
 };
 
 class InputButton : public BaseElement {
@@ -20,7 +20,7 @@ private:
 
 public:
 
-	InputButton(UIManager* m_owner, TextBox* l_numberTextbox, TextBox* l_textBox, Execute l_execute);
+	InputButton(UIManager* m_owner, TextBox* l_textBox, Execute l_execute);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();

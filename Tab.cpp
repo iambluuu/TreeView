@@ -31,7 +31,11 @@ Tab::Tab(UIManager* l_owner, StateType l_state, int l_mode) {
 
     m_text.setFont(*m_owner->GetThemeManager()->GetFont());
 	m_text.setCharacterSize(32);
-	m_text.setFillColor(sf::Color::Black);
+
+	if (m_themeID == 0)
+		m_text.setFillColor(sf::Color::Black);
+	else
+		m_text.setFillColor(sf::Color::White);
 
 	m_sprite = m_owner->GetThemeManager()->GetSprite(m_themeID, ElementName::Tab, ElementState::Neutral);
 	m_hitBox.width = m_sprite->getTextureRect().width - 128;

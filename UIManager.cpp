@@ -5,6 +5,8 @@ const sf::Color DarkBlue = sf::Color(45, 55, 73);
 const sf::Color LightBlue = sf::Color(53, 66, 89);
 const sf::Color LightBeige = sf::Color(240, 233, 210);
 
+const sf::Color Navy = sf::Color(24, 29, 49, 255);
+
 UIManager::UIManager(StateManager* stateManager) {
 	std::cerr << "UIManager safe\n";
 
@@ -48,42 +50,48 @@ void UIManager::PrepareElements() {
 	std::cerr << "background created\n";
 	AddElement(background);
 
-	//Create Drawer for hash table
+	////Create Drawer for hash table
 
-	TextBox *h_inputNumbers = new TextBox(this, "n =");
-	TextBox *h_inputValue = new TextBox(this, "m =");
+	//TextBox *h_inputNumbers = new TextBox(this, "n =");
+	//TextBox *h_inputValue = new TextBox(this, "m =");
 
-	RandomButton* h_randomButton = new RandomButton(this, h_inputNumbers, h_inputValue);
-	InputButton* h_inputButton = new InputButton(this, h_inputNumbers, h_inputValue, Execute::Create);
-	h_inputNumbers->m_inputButton = h_inputButton;
+	//RandomButton* h_randomButton = new RandomButton(this, h_inputNumbers, h_inputValue);
+	//InputButton* h_inputButton = new InputButton(this, h_inputNumbers, h_inputValue, Execute::Create);
+	//h_inputNumbers->m_inputButton = h_inputButton;
 
-	Drawer * h_drawer = new Drawer(this, "Create");
-	h_drawer->AddElement(0, h_inputNumbers);
-	h_drawer->AddElement(1, h_inputValue);
-	h_drawer->AddElement(1, h_randomButton);
-	h_drawer->AddElement(1, h_inputButton);
+	//Drawer * h_drawer = new Drawer(this, "Create");
+	//h_drawer->AddElement(0, h_inputNumbers);
+	//h_drawer->AddElement(1, h_inputValue);
+	//h_drawer->AddElement(1, h_randomButton);
+	//h_drawer->AddElement(1, h_inputButton);
 
-	AddToCloset(h_drawer);
+	//AddToCloset(h_drawer);
 
 	//Create Drawer
 
 	TextBox* createValues= new TextBox(this, "v =");
-	RandomButton* createRandom = new RandomButton(this, createValues, nullptr);
-	InputButton* createInput = new InputButton(this, nullptr, createValues, Execute::Create);
+	RandomButton* createRandom = new RandomButton(this, createValues);
+	InputButton* createInput = new InputButton(this, createValues, Execute::Create);
+	InputButton* createInputMatrix = new InputButton(this, createValues, Execute::InputMatrix);
+	BrowseButton* createBrowse = new BrowseButton(this);
+	MatrixButton* createMatrix = new MatrixButton(this);
 	createValues->m_inputButton = createInput;
 
 	Drawer* createDrawer = new Drawer(this, "Create");
 	createDrawer->AddElement(0, createValues);
 	createDrawer->AddElement(0, createRandom);
 	createDrawer->AddElement(0, createInput);
+	createDrawer->AddElement(1, createBrowse);
+	createDrawer->AddElement(2, createMatrix);
+	createDrawer->AddElement(2, createInputMatrix);
 
 	AddToCloset(createDrawer);
 
 	//Insert Drawer
 	TextBox *insertBox = new TextBox(this, "v =");
 	insertBox->max_input_char = 1;
-	RandomButton* insertRandom = new RandomButton(this, insertBox, nullptr);
-	InputButton* insertInput = new InputButton(this, nullptr, insertBox, Execute::Insert);
+	RandomButton* insertRandom = new RandomButton(this, insertBox);
+	InputButton* insertInput = new InputButton(this, insertBox, Execute::Insert);
 	insertBox->m_inputButton = insertInput;
 	Drawer* insertDrawer = new Drawer(this, "Insert");
 
@@ -96,8 +104,8 @@ void UIManager::PrepareElements() {
 	//Remove Drawer
 	TextBox* removeBox = new TextBox(this, "v =");
 	removeBox->max_input_char = 1;
-	RandomButton* removeRandom = new RandomButton(this, removeBox, nullptr);
-	InputButton* removeInput = new InputButton(this, nullptr, removeBox, Execute::Remove);
+	RandomButton* removeRandom = new RandomButton(this, removeBox);
+	InputButton* removeInput = new InputButton(this, removeBox, Execute::Remove);
 	removeBox->m_inputButton = removeInput;
 	Drawer* removeDrawer = new Drawer(this, "Remove");
 
@@ -110,8 +118,8 @@ void UIManager::PrepareElements() {
 	//Search Drawer
 	TextBox* searchBox = new TextBox(this, "v =");
 	searchBox->max_input_char = 1;
-	RandomButton* searchRandom = new RandomButton(this, searchBox, nullptr);
-	InputButton* searchInput = new InputButton(this, nullptr, searchBox, Execute::Search);
+	RandomButton* searchRandom = new RandomButton(this, searchBox);
+	InputButton* searchInput = new InputButton(this, searchBox, Execute::Search);
 	searchBox->m_inputButton = searchInput;
 	Drawer* searchDrawer = new Drawer(this, "Search");
 
@@ -123,7 +131,7 @@ void UIManager::PrepareElements() {
 
 	//MST Drawer
 	Drawer* mstDrawer = new Drawer(this, "MST");
-	InputButton* mstInput = new InputButton(this, nullptr, nullptr, Execute::Search);
+	InputButton* mstInput = new InputButton(this, nullptr, Execute::Search);
 	mstDrawer->AddElement(0, mstInput);
 	AddToCloset(mstDrawer);
 
@@ -131,18 +139,32 @@ void UIManager::PrepareElements() {
 	Drawer* dijkstraDrawer = new Drawer(this, "Dijkstra");
 	TextBox* dijkstraBox = new TextBox(this, "s =");
 	dijkstraBox->max_input_char = 1;
-	RandomButton* dijkstraRandom = new RandomButton(this, dijkstraBox, nullptr);
-	InputButton* dijkstraInput = new InputButton(this, nullptr, dijkstraBox, Execute::Insert);
+	RandomButton* dijkstraRandom = new RandomButton(this, dijkstraBox);
+	InputButton* dijkstraInput = new InputButton(this, dijkstraBox, Execute::Insert);
 
 	dijkstraDrawer->AddElement(0, dijkstraBox);
 	dijkstraDrawer->AddElement(0, dijkstraRandom);
 	dijkstraDrawer->AddElement(0, dijkstraInput);
 
+	AddToCloset(dijkstraDrawer);
+
 	//Connected Components Drawer
 	Drawer* ccDrawer = new Drawer(this, "CC");
-	InputButton* ccInput = new InputButton(this, nullptr, nullptr, Execute::Remove);
+	InputButton* ccInput = new InputButton(this, nullptr, Execute::Remove);
 	ccDrawer->AddElement(0, ccInput);
 	AddToCloset(ccDrawer);
+
+	//GetSize Drawer
+	Drawer* getSizeDrawer = new Drawer(this, "Get Size");
+	InputButton* getSizeInput = new InputButton(this, nullptr, Execute::GetSize);
+	getSizeDrawer->AddElement(0, getSizeInput);
+	AddToCloset(getSizeDrawer);
+
+	//GetTop Drawer
+	Drawer* getTopDrawer = new Drawer(this, "Get Top");
+	InputButton* getTopInput = new InputButton(this, nullptr, Execute::GetTop);
+	getTopDrawer->AddElement(0, getTopInput);
+	AddToCloset(getTopDrawer);
 
 
 	//Tabs
@@ -167,9 +189,14 @@ void UIManager::PrepareElements() {
 	//displayArea->SetPosition(sf::Vector2f(32, 104));
 	//AddElement(displayArea);
 
+	//PlayBar
 	PlayBar* playBar = new PlayBar(this);
 	playBar->SetPosition(sf::Vector2f(32, 808));
 	AddElement(playBar);
+
+	//SpeedBar
+	SpeedBar* speedBar = new SpeedBar(this);
+	AddElement(speedBar);
 
 	//Media Buttons
 	MediaButton* playButton = new MediaButton(this, ElementName::Pause);
@@ -188,6 +215,11 @@ void UIManager::PrepareElements() {
 	AddMediaButton(backwardButton);
 	AddMediaButton(skipForwardButton);
 	AddMediaButton(skipBackwardButton);
+
+	//Theme Button
+	ThemeButton* themeButton = new ThemeButton(this);
+
+	AddElement(themeButton);
 
 	//View Buttons
 	ViewButton* viewUp = new ViewButton(this, ElementName::ViewUp);
@@ -242,7 +274,7 @@ void UIManager::PrepareElements() {
 void UIManager::PrepareStateUI() {
 	UIData data;
 
-	//Closet Mask: 00001 - Create(HashTable), 00010 - Create(Normal), 00100 - Insert, 01000 - Remove, 10000 - Search, 100000 - 32 - MST, 64 - DJK, 128 - CC 
+	//Closet Mask: 1 - Create(Normal), 2 - Insert, 4 - Remove, 8 - Search, 16 - MST, 32 - DJK, 64 - CC, 128 - Get Size, 256 - Get Top
 	//Tab Mask: 00001 - Chaining, 00010 - Linear, 00100 - Quadratic, 01000 - Max, 10000 - Min
 
 	//Menu
@@ -255,7 +287,7 @@ void UIManager::PrepareStateUI() {
 	//AVL Tree
 	//TTF Tree
 	//Trie
-	data.closetMask = 30;
+	data.closetMask = 15;
 	data.isMenu = 0;
 	data.tabMask = 0;
 
@@ -264,21 +296,21 @@ void UIManager::PrepareStateUI() {
 	m_uiData.emplace(StateType::Trie, data);
 
 	//Hash Table
-	data.closetMask = 29;
+	data.closetMask = 15;
 	data.isMenu = 0;
 	data.tabMask = 7;
-
 	m_uiData.emplace(StateType::Hash_Table, data);
 
+
 	//Heap
-	data.closetMask = 14;
+	data.closetMask = 391;
 	data.isMenu = 0;
 	data.tabMask = 24;
 
 	m_uiData.emplace(StateType::Heap, data);
 
 	//Graph
-	data.closetMask = 226;
+	data.closetMask = 113;
 	data.isMenu = 0;
 	data.tabMask = 0;
 
@@ -409,6 +441,13 @@ void UIManager::LoadUI(StateType l_type) {
 	for (int i = 0; i < m_closet.size(); i++) {
 		if (data.closetMask & (1 << i)) {
 			m_closet[i]->Reset();
+
+			if (l_type == StateType::Graph) {
+				m_closet[i]->ActivateLine(2);
+			}
+			else {
+				m_closet[i]->DeactivateLine(2);
+			}
 		}
 		else
 			m_closet[i]->SetState(ElementState::Hidden);
@@ -433,9 +472,6 @@ void UIManager::LoadUI(StateType l_type) {
 			m_tabs[i]->SetState(ElementState::Hidden);
 		}
 	}
-
-	m_stateManager->GetContext()->m_nodeRenderer->GetCodeWindow()->Clear();
-	m_stateManager->GetContext()->m_nodeRenderer->Reset(0);
 }
 
 void UIManager::LoadTheme(int l_ID) {
@@ -445,8 +481,30 @@ void UIManager::LoadTheme(int l_ID) {
 		m_stateTitle.setFillColor(LightBeige);
 	}
 	else {
-		m_stateTitle.setFillColor(DarkBlue);
+		m_stateTitle.setFillColor(Navy);
 	}
+
+	for (auto layer : m_elements) {
+		for (auto element : layer) {
+			element->SetTheme(l_ID);
+		}
+	}
+
+	for (auto element : m_closet) {
+		element->SetTheme(l_ID);
+	}
+
+	for (auto element : m_mediaButtons) {
+		element->SetTheme(l_ID);
+	}
+
+	for (auto element : m_tabs) {
+		element->SetTheme(l_ID);
+	}
+
+
+	NodeRenderer* nodeRenderer = m_stateManager->GetContext()->m_nodeRenderer;
+	nodeRenderer->SwitchTheme(l_ID);
 }
 
 void UIManager::Update(const sf::Time& l_time) {
@@ -553,7 +611,7 @@ void UIManager::UpdateTabs(const sf::Time& l_time) {
 void UIManager::DrawTabs() {
 	bool tabSwitched = false;
 
-	float Left = 875;
+	float Left = 876;
 	float Top = 45;
 
 	for (auto tab : m_tabs) {

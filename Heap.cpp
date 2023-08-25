@@ -9,6 +9,20 @@ Heap::~Heap() {
 	ClearTree();
 }
 
+void Heap::Activate() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	if (!m_arr->empty())
+		renderer->Reset(m_arr->front()->getInfo()->size());
+	else
+		renderer->Reset(0);
+
+	codeWindow->Clear();
+	renderer->OnSkipForward();
+}
+
+
 bool Heap::ValidateCreate(const std::string& l_value, std::vector<int>& res) {
 	std::string soFar = "";
 
@@ -239,7 +253,7 @@ void Heap::Draw() {
 	}
 }
 
-void Heap::OnCreate(const std::string& l_numbers, const std::string& l_value) {
+void Heap::OnCreate(const std::string& l_value) {
 	std::vector<int> value;
 
 	if (!ValidateCreate(l_value, value)) {
@@ -373,11 +387,56 @@ void Heap::OnSearch(const std::string& l_value) {
 }
 
 void Heap::OnGetSize() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
 
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+	code = {
+		"return Heap.size//"
+	};
+
+	code[0] += std::to_string(m_arr->size());
+
+	codeWindow->LoadCode(code);
+	/////////////////////////////////////////////
+
+	PostProcessing();
+
+	codeWindow->MoveHighlight(0);
+	if (!m_arr->empty()) {
+		AddNewStep();
+		m_arr->back()->getInfo()->back().is_stateChanging = 1;
+		m_arr->back()->getInfo()->back().node_state.second = NodeState::Selected;
+	}
+
+	renderer->Reset(1);
 }
 
 void Heap::OnGetTop() {
+	if (m_arr->empty())
+		return;
 
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	//SET UP CODE WINDOW/////////////////////////
+	std::vector<std::string> code;
+	code = {
+		"return Heap[0]//"
+	};
+
+	codeWindow->LoadCode(code);
+	/////////////////////////////////////////////
+
+	PostProcessing();
+
+	codeWindow->MoveHighlight(0);
+	AddNewStep();
+	(*m_arr)[0]->getInfo()->back().is_stateChanging = 1;
+	(*m_arr)[0]->getInfo()->back().node_state.second = NodeState::Selected;
+
+	renderer->Reset(1);
 }
 
 void Heap::BuildTree(int value) {

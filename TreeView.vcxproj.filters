@@ -37,6 +37,12 @@
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{f94c1039-785d-4a91-a785-83e033fb1834}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TextEditor">
+      <UniqueIdentifier>{b65a313a-9c06-456b-baec-671d91bfb122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TextEditor">
+      <UniqueIdentifier>{45f2ed21-4c5a-41fc-ae03-3925c350d5e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -123,6 +129,27 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="BrowseButton.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="SpeedBar.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TextLine.cpp">
+      <Filter>Source Files\TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Page.cpp">
+      <Filter>Source Files\TextEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixButton.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files\States</Filter>
+    </ClCompile>
+    <ClCompile Include="ThemeButton.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UI_Element.h">
@@ -207,6 +234,27 @@
       <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Tab.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="BrowseButton.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="SpeedBar.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ListNode.h">
+      <Filter>Header Files\TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="Page.h">
+      <Filter>Header Files\TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="TextLine.h">
+      <Filter>Header Files\TextEditor</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixButton.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="ThemeButton.h">
       <Filter>Header Files\UI</Filter>
     </ClInclude>
   </ItemGroup>

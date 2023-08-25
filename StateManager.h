@@ -43,10 +43,12 @@ public:
 
 	virtual void OnInsert(const std::string& l_value) = 0;
 	virtual void OnRemove(const std::string& l_value) = 0;
-	virtual void OnCreate(const std::string& l_numbers, const std::string& l_value) = 0;
+	virtual void OnCreate(const std::string& l_value) = 0;
 	virtual void OnSearch(const std::string& l_value) = 0;
 	virtual void OnGetSize() = 0;
 	virtual void OnGetTop() = 0;
+
+	virtual void OnInputMatrix(const std::vector<std::string> l_lines) = 0;
 
 	virtual void SwitchMode(int l_mode) = 0;
 	

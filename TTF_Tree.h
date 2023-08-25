@@ -53,19 +53,20 @@ public:
 
 	void OnDestroy() {};
 
-	void Activate() {};
+	void Activate();
 	void Deactivate() {};
 
 	void HandleEvent(sf::Event* l_event);
 	void Update(const sf::Time& l_time);
 	void Draw();
 
-	void OnCreate(const std::string& l_numbers, const std::string& l_value);
+	void OnCreate(const std::string& l_value);
 	void OnInsert(const std::string& l_value);
 	void OnRemove(const std::string& l_value);
 	void OnSearch(const std::string& l_value);
 	void OnGetSize() {}
 	void OnGetTop() {}
+	void OnInputMatrix(const std::vector<std::string> l_lines) {}
 
 	void SwitchMode(int l_mode) {}
 };

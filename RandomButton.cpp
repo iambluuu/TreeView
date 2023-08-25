@@ -4,10 +4,9 @@
 class UIManager;
 
 
-RandomButton::RandomButton(UIManager* l_owner, TextBox* l_textBox, TextBox* l_textBox2) {
+RandomButton::RandomButton(UIManager* l_owner, TextBox* l_textBox) {
 	m_owner = l_owner;
 	m_textBox = l_textBox;
-	m_textBox2 = l_textBox2;
 
 	m_name = ElementName::RandomButton;
 	m_themeManager = l_owner->GetThemeManager();
@@ -25,15 +24,6 @@ void RandomButton::SetPosition(sf::Vector2f l_pos) {
 }
 
 void RandomButton::SetRandom() {
-	if (m_textBox2) {
-		int n =  rand() % 10 + 10;
-		m_textBox->SetString(std::to_string(n));
-		int m = rand() % (n / 2) + 1;
-		m_textBox2->SetString(std::to_string(m));
-		return;
-	}
-
-
 	int n = rand() % m_textBox->max_input_char + 1;
 
 	if (m_owner->GetState() == StateType::Graph) {
@@ -69,6 +59,16 @@ void RandomButton::SetRandom() {
 		return;
 	}
 
+	if (m_owner->GetState() == StateType::Hash_Table) {		
+		std::string temp = "";
+		int n = rand() % 10 + 10;
+		int m = rand() % (n / 2) + 1;
+		temp = std::to_string(n) + " " + std::to_string(m);
+
+		m_textBox->m_string = temp;
+		return;
+	}
+
 	for (int i = 0; i < n; i++) {
 		if (m_owner->GetState() == StateType::Trie) {
 			int length = rand() % 5 + 1;
@@ -92,9 +92,6 @@ void RandomButton::SetRandom() {
 
 void RandomButton::OnClick() {
 	m_textBox->m_string.clear();
-	if (m_textBox2) {
-		m_textBox2->m_string.clear();
-	}
 
 	SetRandom();
 }

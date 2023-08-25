@@ -6,13 +6,6 @@
 #include <string>
 #include <algorithm>
 
-#include <windows.h>
-#include <commdlg.h>
-#include <shlobj.h>
-
-HWND hwnd;
-TCHAR szFileName[MAX_PATH];
-
 inline float parametric(float time) {
 	int alpha = 2;
 
@@ -23,36 +16,6 @@ inline float parametric(float time) {
 	}
 
 	return left / (left + right);
-}
-
-inline std::string BrowseString() {
-	OPENFILENAME ofn;
-	ZeroMemory(&ofn, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = hwnd;
-	ofn.lpstrFilter = L"Text Files (*.txt)\0*.txt\0";
-	ofn.lpstrFile = szFileName;
-	ofn.nMaxFile = MAX_PATH;
-	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR;
-	ofn.lpstrDefExt = L"txt";
-
-	std::string s;
-
-	if (GetOpenFileName(&ofn) == TRUE) {
-		// User selected a file
-		std::ifstream file(ofn.lpstrFile);
-		std::string line;
-		while (std::getline(file, line)) {
-			s.append(line);
-		}
-
-		file.close();
-	}
-	else {
-		// User cancelled the dialog
-	}
-
-	return s;
 }
 
 inline void ReadQuotedString(std::stringstream& l_stream, std::string& l_string)

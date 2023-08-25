@@ -5,7 +5,7 @@
 #include "SFML/System.hpp"
 
 enum class ElementName {
-	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, Tab,
+	DrawerButton = 1, DrawerArrow, RandomButton, InputButton, Drawer, TextBox, Background, DisplayArea, Tab, BrowseButton, MatrixButton,
 	PlayBar,
 
 	BackgroundColor,
@@ -17,6 +17,9 @@ enum class ElementName {
 	SkipForward,
 	Backward,
 	SkipBackward,
+	SpeedBar,
+
+	ThemeButton,
 
 	GoBack,
 	GoTo,
@@ -31,7 +34,7 @@ enum class ElementName {
 };
 
 enum class ElementState {
-	Neutral = 1, Focused, Clicked, Hidden, Deactivate
+	Neutral = 1, Focused, Clicked, Hidden, Deactivate, Disabled
 };;
 
 

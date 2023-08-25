@@ -37,6 +37,9 @@ public:
 	void Update(float l_dT);
 	void Draw();
 
+	void DeactivateLine(int line);
+	void ActivateLine(int line);
+
 	void Clear();
 	void Reset() {
 		m_elapsed = 0;

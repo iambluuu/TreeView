@@ -17,6 +17,10 @@
 #include "GoToButton.h"
 #include "ViewButton.h"
 #include "Tab.h"
+#include "BrowseButton.h"
+#include "MatrixButton.h"
+#include "SpeedBar.h"
+#include "ThemeButton.h"
 
 class BaseElement;
 

@@ -184,7 +184,7 @@ void AVL_Tree::BuildCentering() {
 	}
 }
 
-void AVL_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value) {
+void AVL_Tree::OnCreate(const std::string& l_value) {
 	std::vector<int> values;
 	if (!ValidateCreate(l_value, values)) {
 		std::cerr << "Failed to create tree. Invalid input.\n";
@@ -231,7 +231,16 @@ void AVL_Tree::OnDestroy() {
 }
 
 void AVL_Tree::Activate() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
 
+	if (m_root)
+		renderer->Reset(m_root->getInfo()->size());
+	else
+		renderer->Reset(0);
+
+	codeWindow->Clear();
+	renderer->OnSkipForward();
 }
 
 void AVL_Tree::Deactivate() {

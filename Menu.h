@@ -6,10 +6,10 @@ public:
 	Menu(StateManager* stateManager) : BaseState(stateManager) {}
 	~Menu() {}
 
-	void OnCreate(const std::string& l_numbers, const std::string& l_value) {}
+	void OnCreate(const std::string& l_value) {}
 	void OnDestroy() {}
 
-	void Activate() {}
+	void Activate();
 	void Deactivate() {}
 
 	void HandleEvent(sf::Event* l_event) {}
@@ -21,6 +21,7 @@ public:
 	void OnSearch(const std::string& l_value) {}
 	void OnGetSize() {}
 	void OnGetTop() {}
+	void OnInputMatrix(const std::vector<std::string> l_lines) {}
 
 	void SwitchMode(int l_mode) {}
 };

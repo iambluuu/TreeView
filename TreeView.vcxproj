@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AVL_Tree.cpp" />
+    <ClCompile Include="BrowseButton.cpp" />
     <ClCompile Include="CodeWindow.cpp" />
     <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="GoBackButton.cpp" />
@@ -166,13 +167,19 @@
     <ClCompile Include="Hash_Table.cpp" />
     <ClCompile Include="Heap.cpp" />
     <ClCompile Include="InputButton.cpp" />
+    <ClCompile Include="MatrixButton.cpp" />
     <ClCompile Include="MediaButtons.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="NodeRenderer.cpp" />
+    <ClCompile Include="Page.cpp" />
     <ClCompile Include="PlayBar.cpp" />
     <ClCompile Include="RandomButton.cpp" />
+    <ClCompile Include="SpeedBar.cpp" />
     <ClCompile Include="StaticElement.cpp" />
     <ClCompile Include="Tab.cpp" />
+    <ClCompile Include="TextLine.cpp" />
+    <ClCompile Include="ThemeButton.cpp" />
     <ClCompile Include="ThemeManager.cpp" />
     <ClCompile Include="StateManager.cpp" />
     <ClCompile Include="TextBox.cpp" />
@@ -187,13 +194,17 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="AVL_Tree.h" />
+    <ClInclude Include="BrowseButton.h" />
     <ClInclude Include="CodeWindow.h" />
     <ClInclude Include="Drawer.h" />
     <ClInclude Include="GoBackButton.h" />
     <ClInclude Include="GoToButton.h" />
     <ClInclude Include="Heap.h" />
+    <ClInclude Include="ListNode.h" />
+    <ClInclude Include="MatrixButton.h" />
     <ClInclude Include="MediaButtons.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="Page.h" />
     <ClInclude Include="PlayBar.h" />
     <ClInclude Include="InputButton.h" />
     <ClInclude Include="NodeRenderer.h" />
@@ -201,10 +212,13 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="RandomButton.h" />
     <ClInclude Include="SharedContext.h" />
+    <ClInclude Include="SpeedBar.h" />
     <ClInclude Include="StateManager.h" />
     <ClInclude Include="StaticElement.h" />
     <ClInclude Include="Tab.h" />
     <ClInclude Include="TextBox.h" />
+    <ClInclude Include="TextLine.h" />
+    <ClInclude Include="ThemeButton.h" />
     <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="Trie.h" />
     <ClInclude Include="TTF_Tree.h" />

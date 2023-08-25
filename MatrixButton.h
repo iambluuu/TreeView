@@ -1,18 +1,24 @@
 #pragma once
-#include "TextBox.h"
 #include "Drawer.h"
+
+#include <fstream>
+#include <sstream>
 
 class TextBox;
 class Drawer;
 
-class RandomButton : public BaseElement {
+class MatrixButton : public BaseElement {
 	friend class Drawer;
 private:
 	UIManager* m_owner{ nullptr };
 	TextBox* m_textBox{ nullptr };
+	TextBox* m_numberTextbox{ nullptr };
+
+	//std::map<StateType, std::function<void()> > m_func;
 
 public:
-	RandomButton(UIManager* m_owner, TextBox* l_textBox);
+
+	MatrixButton(UIManager* l_owner);
 
 	void HandleEvent(sf::Event* l_event);
 	void OnHover();
@@ -26,6 +32,4 @@ public:
 	void Reset() {}
 
 	void SetTheme(int l_themeID);
-	void SetRandom();
-
 };

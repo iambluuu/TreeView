@@ -3,11 +3,13 @@
 Window::Window() {
 	m_fps = 60;
 	Setup("Window", sf::Vector2u(1600, 900));
+	m_page = new Page(this);
 }
 
 Window::Window(const std::string& l_title, const sf::Vector2u& l_size) : m_view(sf::FloatRect(0, 0, 1600, 900)) {
 	m_fps = 60;
 	Setup(l_title, l_size);
+	m_page = new Page(this);
 }
 
 Window::~Window() {
@@ -34,6 +36,7 @@ void Window::Create() {
 
 void Window::Destroy() {
 	m_window.close();
+	delete m_page;
 }
 
 void Window::ToggleFullscreen() {
@@ -65,32 +68,44 @@ void Window::Draw(sf::Drawable& l_drawable) {
 	m_window.draw(l_drawable);
 }
 
+void Window::DrawPage() {
+	if (!m_page->isOpen)
+		return;
+
+	m_page->Draw();
+}
+
 void Window::Update() {
 	sf::Event E;
 	
 	m_cursorType = 0;
 
 	while (m_window.pollEvent(E)) {
-		if (E.type == sf::Event::Closed) {
+		if (E.type == sf::Event::Closed) {	
 			m_isDone = 1;
 			return;
 		}
 
-		if (E.type == sf::Event::KeyPressed) {
+		if (m_page->isOpen) {
+			m_page->HandleEvent(&E);
+			return;
+		}
+
+		if (E.type == sf::Event::KeyPressed && !m_isOverlayed) {
 			switch (E.key.code) {
 			case sf::Keyboard::W:
 				MoveView(sf::Vector2f(0, -5));
 				break;
-				case sf::Keyboard::A:
+			case sf::Keyboard::A:
 				MoveView(sf::Vector2f(-5, 0));
 				break;
-				case sf::Keyboard::S:
+			case sf::Keyboard::S:
 				MoveView(sf::Vector2f(0, 5));
 				break;
-				case sf::Keyboard::D:
+			case sf::Keyboard::D:
 				MoveView(sf::Vector2f(5, 0));
 				break;
-				case sf::Keyboard::R:
+			case sf::Keyboard::R:
 				ResetView();
 				break;
 			}
@@ -100,6 +115,8 @@ void Window::Update() {
 		m_uiManager->HandleEvent(&E);
 	}
 
+	if (m_page->isOpen)
+		m_page->Update();
 	UpdateCursor();
 }
 
@@ -139,5 +156,9 @@ void Window::ResetView() {
 
 sf::Vector2f Window::GetOffset() {
 	return m_offset;
+}
+
+Page* Window::GetPage() {
+	return m_page;
 }
 

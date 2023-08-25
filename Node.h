@@ -36,6 +36,17 @@ struct NodeInfo {
 	bool splitFromleft{ 0 };
 };
 
+struct GraphNodeInfo {
+	std::vector<int> edge_state; //First is index, Second is change type: 0 - flow from u, 1 - flow from v, 2 - change color, -1 - do nothing
+
+	bool is_visible{ 0 };
+	bool is_stateChanging{ 0 };
+	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
+
+	std::pair<int, int> m_dist{ -1, -1 };
+	std::pair<NodeState, NodeState> node_state{ NodeState::Default, NodeState::Default };
+};
+
 const NodeInfo DEFAULT_NODE_INFO;
 
 class Node {
@@ -202,12 +213,13 @@ private:
 	bool isHeld{ 0 };
 
 public:
-	std::vector<NodeInfo> m_info;
-	NodeInfo m_save;
+	std::vector<GraphNodeInfo> m_info;
+	GraphNodeInfo m_save;
 
 	std::string m_value{ "" };
 
 	std::vector<std::pair<GraphNode*, int> > m_edges; // first - node, second - weight
+	GraphNode* par{ this };
 
 	const float m_mass{ 100 };
 	sf::Vector2f pos{ 0, 0 };
@@ -215,6 +227,7 @@ public:
 	sf::Vector2f m_vel{ 0, 0 };
 	sf::Vector2f m_force{ 0, 0 };
 
+	bool visited{ 0 };
 	bool isDrawn{ 0 };
 	bool isFixed{ 0 };
 
@@ -227,4 +240,32 @@ public:
 
 	bool isHover(sf::Vector2f mousePos);
 	void HandleEvent(const sf::Event* l_event, sf::RenderWindow* l_target, sf::Vector2f offset);
+	void SaveState() {
+		if (m_info.empty())
+			return;
+
+		m_save = m_info.back();
+		m_save.is_appearing = 0;
+		m_save.m_dist = { -1, -1 };
+
+		for (int i = 0; i < m_save.edge_state.size(); i++) {
+			m_save.edge_state[i] = -1;
+		}
+
+		if (m_save.node_state.second == NodeState::Marked || (m_save.node_state.first == NodeState::Marked && m_save.node_state.second != NodeState::InRemove)) {
+			m_save.node_state = { NodeState::Marked, NodeState::Marked };
+		}
+		else
+			m_save.node_state = { NodeState::Default, NodeState::Default };
+
+		m_save.is_stateChanging = 0;
+	}
+
+	void ChangeState(NodeState l_state) {
+		if (m_info.empty())
+			return;
+
+		m_info.back().is_stateChanging = 1;
+		m_info.back().node_state.second = l_state;
+	}
 };

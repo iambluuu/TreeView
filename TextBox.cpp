@@ -30,6 +30,9 @@ void TextBox::SetString(const std::string& l_string) {
 }
 
 void TextBox::OnClick() {
+	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
+	wind->setOverlayed(1);
+
 	m_state = ElementState::Clicked;
 }
  
@@ -42,6 +45,7 @@ void TextBox::OnHover() {
 void TextBox::OnRelease() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
 	wind->setCursorType(1);
+	wind->setOverlayed(0);
 	m_state = ElementState::Neutral;
 }
 

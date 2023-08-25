@@ -1,14 +1,15 @@
-#include "InputButton.h"
+#include "BrowseButton.h"
 #include <iostream>
+
+HWND hwnd;
+TCHAR szFileName[MAX_PATH];
 
 class UIManager;
 
-InputButton::InputButton(UIManager* l_owner, TextBox* l_textBox, Execute l_execute) {
+BrowseButton::BrowseButton(UIManager* l_owner) {
 	m_owner = l_owner;
-	m_textBox = l_textBox;
-	m_execute = l_execute;
 
-	m_name = ElementName::InputButton;
+	m_name = ElementName::BrowseButton;
 	m_themeManager = l_owner->GetThemeManager();
 	m_layer = 1;
 
@@ -17,92 +18,42 @@ InputButton::InputButton(UIManager* l_owner, TextBox* l_textBox, Execute l_execu
 	m_hitBox.width = m_sprite->getLocalBounds().width;
 }
 
-void InputButton::SetPosition(sf::Vector2f l_pos) {
+void BrowseButton::SetPosition(sf::Vector2f l_pos) {
 	m_pos = l_pos;
 	m_hitBox.top = m_pos.y;
 	m_hitBox.left = m_pos.x;
 }
 
-void InputButton::SetRandom() {
-	int n = rand() % m_textBox->max_input_char + 1;
-
-	for (int i = 0; i < n; i++) {
-		int x = rand() % 99 + 1;
-		m_textBox->m_string += std::to_string(x) + ", ";
-	}
-
-	m_textBox->m_string.pop_back();
-	m_textBox->m_string.pop_back();
-}
-
-void InputButton::OnClick() {
+void BrowseButton::OnClick() {
 	StateType CurState = m_owner->GetState();
 	BaseState* state = nullptr;
 	state = m_owner->GetStateManager()->GetState(CurState);
 
-	std::string input = "";
-	if (m_textBox)
-		input = m_textBox->ReadString();
+	std::string input = BrowseString();
 
-	switch (m_execute) {
-	case Execute::Insert:
-		state->OnInsert(input);
-		break;
-
-	case Execute::Remove:
-		state->OnRemove(input);
-		break;
-
-	case Execute::Create:
-		state->OnCreate(input);
-		break;
-
-	case Execute::Search:
-		state->OnSearch(input);
-		break;
-
-	case Execute::InputMatrix:
-	{
-		Page* page = m_owner->GetStateManager()->GetContext()->m_wind->GetPage();
-		state->OnInputMatrix(page->GetContent());
-	}
-		break;
-
-	case Execute::GetSize:
-		state->OnGetSize();
-		break;
-
-	case Execute::GetTop:
-		state->OnGetTop();
-		break;
-
-	default:
-		break;
-	
-	}
-
+	state->OnCreate(input);
 }
 
-void InputButton::OnHover() {
+void BrowseButton::OnHover() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
 	wind->setCursorType(2);
 
 	m_state = ElementState::Focused;
 }
 
-void InputButton::OnRelease() {
+void BrowseButton::OnRelease() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
 	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
-void InputButton::OnLeave() {
+void BrowseButton::OnLeave() {
 	Window* wind = m_owner->GetStateManager()->GetContext()->m_wind;
 	wind->setCursorType(1);
 	m_state = ElementState::Neutral;
 }
 
-void InputButton::Update(float l_dT) {
+void BrowseButton::Update(float l_dT) {
 	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
 
 	m_hitBox.left = m_pos.x;
@@ -112,7 +63,7 @@ void InputButton::Update(float l_dT) {
 	m_sprite->setPosition(m_pos + offset);
 }
 
-void InputButton::Draw() {
+void BrowseButton::Draw() {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
 
 	if (!m_sprite)
@@ -121,7 +72,7 @@ void InputButton::Draw() {
 	wind->draw(*m_sprite);
 }
 
-void InputButton::HandleEvent(sf::Event* l_event) {
+void BrowseButton::HandleEvent(sf::Event* l_event) {
 	sf::RenderWindow* wind = m_owner->GetStateManager()->GetContext()->m_wind->GetRenderWindow();
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*wind);
 
@@ -135,11 +86,46 @@ void InputButton::HandleEvent(sf::Event* l_event) {
 	}
 }
 
-void InputButton::SetTheme(int l_themeID) {
+void BrowseButton::SetTheme(int l_themeID) {
 	m_themeID = l_themeID;
 }
 
 
-//void InputButton::AddFunction(StateType l_state, std::function<void()> l_func) {
+std::string BrowseButton::BrowseString() {
+
+	OPENFILENAME ofn;
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFilter = L"Text Files (*.txt)\0*.txt\0";
+	ofn.lpstrFile = szFileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_NOCHANGEDIR;
+	ofn.lpstrDefExt = L"txt";
+
+	std::string s;
+
+	if (GetOpenFileName(&ofn) == TRUE) {
+		// User selected a file
+		std::ifstream file(ofn.lpstrFile);
+		std::string line;
+		while (std::getline(file, line)) {
+			s.append(line);
+		}
+
+		file.close();
+	}
+	else {
+		// User cancelled the dialog
+	}
+
+	std::cerr << "String from browse: " << s << std::endl;
+
+	return s;
+
+}
+
+//void BrowseButton::AddFunction(StateType l_state, std::function<void()> l_func) {
 //	m_func[l_state] = l_func;
 //}

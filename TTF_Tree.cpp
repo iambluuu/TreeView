@@ -6,6 +6,19 @@ TTF_Tree::~TTF_Tree() {
 	ClearAlign();
 }
 
+void TTF_Tree::Activate() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	if (m_root)
+		renderer->Reset(m_root->getInfo()->size());
+	else
+		renderer->Reset(0);
+
+	codeWindow->Clear();
+	renderer->OnSkipForward();
+}
+
 bool TTF_Tree::ValidateInput(const std::string& l_value, int& resValue) {
 	if (l_value.empty() || l_value.size() > 3)
 		return false;
@@ -179,7 +192,7 @@ void TTF_Tree::Draw() {
 	renderer->DrawTree(m_removedNode);
 }
 
-void TTF_Tree::OnCreate(const std::string& l_numbers, const std::string& l_value) {
+void TTF_Tree::OnCreate(const std::string& l_value) {
 
 }
 

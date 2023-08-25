@@ -5,6 +5,19 @@ Trie::~Trie() {
 	ClearTree(m_root);
 }
 
+void Trie::Activate() {
+	NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+	CodeWindow* codeWindow = renderer->GetCodeWindow();
+
+	if (m_root)
+		renderer->Reset(m_root->getInfo()->size());
+	else
+		renderer->Reset(0);
+
+	codeWindow->Clear();
+	renderer->OnSkipForward();
+}
+
 bool Trie::ValidateInput(const std::string& l_value) {
 	if (l_value.empty())
 		return false;
@@ -32,7 +45,7 @@ bool Trie::ValidateCreate(const std::string& l_value, std::vector<std::string>& 
 				soFar.clear();
 			}
 		}
-		else if (l_value[i] < 'a' && l_value[i] > 'z' && l_value[i] < 'A' && l_value[i] > 'Z') {
+		else if ((l_value[i] < 'a' || l_value[i] > 'z') && (l_value[i] < 'A' || l_value[i] > 'Z')) {
 			std::cerr << "Invalid character: " << l_value[i] << "\n";
 			return false;
 		}
@@ -177,7 +190,7 @@ void Trie::Draw() {
 	renderer->DrawCodeWindow();
 }
 
-void Trie::OnCreate(const std::string& l_numbers, const std::string& l_value) {
+void Trie::OnCreate(const std::string& l_value) {
 	std::vector<std::string> l_strings;
 
 	if (!ValidateCreate(l_value, l_strings)) {

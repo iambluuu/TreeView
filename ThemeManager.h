@@ -27,6 +27,7 @@ private:
 	sf::Texture DisplayArea2;
 
 	sf::Texture Elements;
+	sf::Texture Elements2;
 	sf::Font m_font;
 
 	sf::Cursor DefaultCursor;
