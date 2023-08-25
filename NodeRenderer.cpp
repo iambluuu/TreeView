@@ -393,7 +393,7 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 		m_label.setFillColor(std::get<2>(*color));
 	}
 
-	if (CurInfo.is_splitting) {
+	if (CurInfo.is_splitting == 1) {
 		NodeGraphics support = *GetNodeGraphics(3);
 		sf::Sprite supportBorder = support.first;
 		sf::Sprite supportFiller = support.second;
@@ -426,16 +426,30 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 
 		wind->draw(supportFiller);
 		//wind->draw(supportBorder);
-	}
+	} 
 
-	if (CurInfo.is_expanding) {
+	if (CurInfo.is_splitting == 2) {
+		sf::Sprite supportFiller = *FillerSprite;
+
+		float width = std::max(23.f, BorderSprite->getLocalBounds().width / 2 * percent);
+
+		supportFiller.setTextureRect(sf::IntRect(FillerSprite->getLocalBounds().width, FillerSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, FillerSprite->getLocalBounds().height));
+		supportFiller.setOrigin(supportFiller.getLocalBounds().left + supportFiller.getLocalBounds().width, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+		supportFiller.setPosition(coord);
+		wind->draw(supportFiller);
+
+		supportFiller.setTextureRect(sf::IntRect(2 * FillerSprite->getLocalBounds().width - width, FillerSprite->getLocalBounds().height* (CurInfo.value_num - 1), width, FillerSprite->getLocalBounds().height));
+		supportFiller.setOrigin(supportFiller.getLocalBounds().left, supportFiller.getLocalBounds().top + supportFiller.getLocalBounds().height / 2);
+		supportFiller.setPosition(coord);
+		wind->draw(supportFiller);
+	} else if (CurInfo.is_expanding) {
 		sf::Sprite supportBorder = *BorderSprite;
 		sf::Sprite supportFiller = *FillerSprite;
 
 		float width = std::max(23.f * (CurInfo.value_num - 1), BorderSprite->getLocalBounds().width / 2 * percent);
 
 		if (CurInfo.is_expanding == 2) {
-			width = std::min(23.f * (CurInfo.value_num - 1), BorderSprite->getLocalBounds().width / 2 * (1 - percent));
+			width = std::max(23.f * (CurInfo.value_num - 1), BorderSprite->getLocalBounds().width / 2 * (1 - percent));
 		}
 
 		//supportBorder.setTextureRect(sf::IntRect(0, BorderSprite->getLocalBounds().height * (CurInfo.value_num - 1), width, BorderSprite->getLocalBounds().height));
@@ -473,6 +487,28 @@ void NodeRenderer::DrawNode(Node* Cur, bool directed) {
 	auto saveColor = m_label.getFillColor();
 
 	for (int j = 0; j < CurInfo.value_num; j++) {
+		if (CurInfo.is_splitting == 2) {
+			auto color = GetNodeColor(0, CurInfo.node_state.first);
+
+			sf::Color fadingIn = GetColorTransition(percent, sf::Color(255, 255, 255, 0), std::get<2>(*color));
+
+			m_label.setString(std::to_string(CurInfo.m_shownValue[j]));
+
+			if (j != CurInfo.m_valueChange.first)
+				m_label.setFillColor(fadingIn);
+			else
+				m_label.setFillColor(std::get<2>(*color));
+			m_label.setOrigin(m_label.getLocalBounds().left + m_label.getLocalBounds().width / 2, m_label.getLocalBounds().top + m_label.getLocalBounds().height / 2);
+
+			float distFromCenter = (j - 1) * 46.f * percent;
+			m_label.setPosition(sf::Vector2f(coord.x + distFromCenter, coord.y));
+
+			wind->draw(m_label);
+
+			continue;
+		}
+
+
 		if (CurInfo.is_valueChanging && j == CurInfo.m_valueChange.first) {
 			auto color = GetNodeColor(0, CurInfo.node_state.first);
 			

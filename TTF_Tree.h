@@ -23,6 +23,11 @@ private:
 	void InsertNode(Node* Cur, int value);
 	void RemoveNode(Node* Cur, int value);
 	void SearchNode(Node* Cur, int value);
+	void BuildTree(Node* Cur, int value);
+
+	int BuildAlign(Node* Cur);
+	void BuildSplit(Node* Cur);
+	void BuildExpand(Node* Cur, int value);
 
 	void ExpandNode(Node* Cur, int value);
 	void CollapseNode(Node* Cur, int value);

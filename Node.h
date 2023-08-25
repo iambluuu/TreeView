@@ -22,7 +22,7 @@ struct NodeInfo {
 	bool is_moving{ 0 };
 	bool is_visible{ 0 };
 	bool is_stateChanging{ 0 };
-	bool is_splitting{ 0 };
+	int is_splitting{ 0 }; //0 is no, 1 is splitting, 2 is merging
 	int is_expanding{ 0 }; //0 is no, 1 is expanding, 2 is shrinking;
 	int is_appearing{ 0 }; //0 is no, 1 is appearing, 2 is disappearing;
 	bool is_valueChanging{ 0 };
@@ -73,6 +73,7 @@ public:
 
 	Node(int value) {
 		m_save.m_shownValue[0] = value;
+		m_save.value_num = 1;
 
 		left = nullptr;
 		right = nullptr;

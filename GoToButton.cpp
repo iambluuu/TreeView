@@ -13,29 +13,36 @@ GoToButton::GoToButton(UIManager* l_owner, StateType l_type)
 	m_text.setFont(*m_themeManager->GetFont());
 	m_text.setCharacterSize(44);
 	m_text.setFillColor(*m_themeManager->GetColor(m_themeID, ElementName::TextBox, ElementState::Neutral));
+	m_illustSprite = *m_themeManager->GetSprite(0, ElementName::GoTo, ElementState::Clicked);
 	
 	switch (l_type) {
 	case StateType::AVLTree:
+		m_illustSprite.setTextureRect(sf::IntRect(0, 293, 394, 293));
 		m_text.setString("AVL Tree");
 		break;
 
 	case StateType::Heap:
+		m_illustSprite.setTextureRect(sf::IntRect(394, 879, 394, 293));
 		m_text.setString("Heap");
 		break;
 
 	case StateType::Hash_Table:
+		m_illustSprite.setTextureRect(sf::IntRect(394, 293, 394, 293));
 		m_text.setString("Hash Table");
 		break;
 
 	case StateType::Trie:
+		m_illustSprite.setTextureRect(sf::IntRect(0, 586, 394, 293));
 		m_text.setString("Trie");
 		break;
 
 	case StateType::TTFTree:
+		m_illustSprite.setTextureRect(sf::IntRect(394, 586, 394, 293));
 		m_text.setString("234 Tree");
 		break;
 
 	case StateType::Graph:
+		m_illustSprite.setTextureRect(sf::IntRect(0, 879, 394, 293));
 		m_text.setString("Graph");
 		break;
 	}
@@ -95,11 +102,13 @@ void GoToButton::Draw() {
 	sf::Vector2f offset = m_owner->GetStateManager()->GetContext()->m_wind->GetOffset();
 
 	m_sprite->setPosition(m_pos + offset);
+	m_illustSprite.setPosition(m_pos + offset);
 	m_text.setOrigin(m_text.getLocalBounds().left + m_text.getLocalBounds().width / 2, m_text.getLocalBounds().top + m_text.getLocalBounds().height / 2.f);
 	m_text.setPosition(m_pos.x + m_sprite->getLocalBounds().width / 2 + offset.x, m_pos.y + m_sprite->getLocalBounds().height / 6 * 5 + offset.y);
 
 	wind->Draw(*m_sprite);
 	wind->Draw(m_text);
+	wind->Draw(m_illustSprite);
 }
 
 void GoToButton::SetPosition(sf::Vector2f l_pos) {
