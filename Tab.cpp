@@ -62,7 +62,8 @@ void Tab::OnHover() {
 }
 
 void Tab::OnClick() {
-	auto State = m_owner->GetStateManager()->GetState(m_type);
+	BaseState* State = nullptr;
+	State = m_owner->GetStateManager()->GetState(m_type);
 
 	State->SwitchMode(mode);
 	m_state = ElementState::Focused;

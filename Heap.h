@@ -85,6 +85,15 @@ public:
 			m_arr = &m_minHeap;
 			break;
 		}
+
+		NodeRenderer* renderer = m_stateManager->GetContext()->m_nodeRenderer;
+		if (!m_arr->empty())
+			renderer->Reset((*m_arr)[0]->getInfo()->size());
+		else
+			renderer->Reset(0);
+
+		renderer->OnSkipForward();
+			
 	}
 
 	Node* RotateLeft(Node* Cur);

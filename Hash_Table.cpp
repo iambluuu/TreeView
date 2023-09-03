@@ -974,4 +974,6 @@ void HashTable::SwitchMode(int l_mode) {
 			nodeRenderer->Reset(0);
 		break;
 	}
+
+	nodeRenderer->OnSkipForward();
 }

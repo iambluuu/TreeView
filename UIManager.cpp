@@ -247,7 +247,7 @@ void UIManager::PrepareElements() {
 
 	//Menu Buttons
 	GoToButton* goToAVLTree = new GoToButton(this, StateType::AVLTree);
-	goToAVLTree->SetPosition(sf::Vector2f(628, 262));
+	goToAVLTree->SetPosition(sf::Vector2f(603, 262));
 	AddElement(goToAVLTree);
 
 	GoToButton* goToHashTable = new GoToButton(this, StateType::Hash_Table);
@@ -259,7 +259,7 @@ void UIManager::PrepareElements() {
 	AddElement(goToTTFTree);
 
 	GoToButton* goToTrie = new GoToButton(this, StateType::Trie);
-	goToTrie->SetPosition(sf::Vector2f(628, 592));
+	goToTrie->SetPosition(sf::Vector2f(603, 592));
 	AddElement(goToTrie);
 
 	GoToButton* goToHeap = new GoToButton(this, StateType::Heap);

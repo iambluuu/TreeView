@@ -59,7 +59,7 @@ void RandomButton::SetRandom() {
 		return;
 	}
 
-	if (m_owner->GetState() == StateType::Hash_Table) {		
+	if (m_owner->GetState() == StateType::Hash_Table && m_textBox->max_input_char != 1) {		
 		std::string temp = "";
 		int n = rand() % 10 + 10;
 		int m = rand() % (n / 2) + 1;

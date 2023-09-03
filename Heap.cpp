@@ -1,7 +1,7 @@
 #include "Heap.h"
 
 Heap::Heap(StateManager* l_stateManager) : BaseState(l_stateManager) {
-	SwitchMode(0);
+	m_arr = &m_maxHeap;
 }
 
 Heap::~Heap() {
